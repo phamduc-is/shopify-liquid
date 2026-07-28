@@ -1,0 +1,147 @@
+{
+  "files.associations": {
+    "*.liquid": "liquid"
+  },
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+  "editor.semanticHighlighting.enabled": true,
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "name": "Liquid Tag Brackets {% and %}",
+        "scope": [
+          "punctuation.definition.tag.liquid",
+          "punctuation.section.embedded.liquid",
+          "punctuation.definition.tag.begin.liquid",
+          "punctuation.definition.tag.end.liquid"
+        ],
+        "settings": {
+          "foreground": "#BD93F9",
+          "fontStyle": "bold"
+        }
+      },
+      {
+        "name": "Liquid Output Brackets {{ and }}",
+        "scope": [
+          "punctuation.definition.template-expression.begin.liquid",
+          "punctuation.definition.template-expression.end.liquid",
+          "punctuation.definition.variable.liquid"
+        ],
+        "settings": {
+          "foreground": "#FFB86C",
+          "fontStyle": "bold"
+        }
+      },
+      {
+        "name": "Liquid Keywords & Control Flow (if, assign, unless, render, doc)",
+        "scope": [
+          "keyword.control.liquid",
+          "keyword.operator.liquid",
+          "entity.name.tag.liquid",
+          "storage.type.liquid"
+        ],
+        "settings": {
+          "foreground": "#FF79C6",
+          "fontStyle": "bold"
+        }
+      },
+      {
+        "name": "Liquid Filters & Methods (| image_url, | default)",
+        "scope": [
+          "support.function.liquid",
+          "support.function.filter.liquid",
+          "entity.name.function.liquid"
+        ],
+        "settings": {
+          "foreground": "#82AAFF",
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "name": "Liquid Variables & Properties",
+        "scope": [
+          "variable.other.liquid",
+          "variable.language.liquid",
+          "variable.other.member.liquid"
+        ],
+        "settings": {
+          "foreground": "#80E9FF"
+        }
+      },
+      {
+        "name": "HTML Tag Names (div, a, img, etc.)",
+        "scope": [
+          "entity.name.tag.html",
+          "entity.name.tag",
+          "meta.tag.html"
+        ],
+        "settings": {
+          "foreground": "#4EC9B0",
+          "fontStyle": "bold"
+        }
+      },
+      {
+        "name": "HTML Tag Brackets < > </ >",
+        "scope": [
+          "punctuation.definition.tag.begin.html",
+          "punctuation.definition.tag.end.html",
+          "punctuation.definition.tag.xml",
+          "punctuation.definition.tag"
+        ],
+        "settings": {
+          "foreground": "#00E5FF",
+          "fontStyle": "bold"
+        }
+      },
+      {
+        "name": "HTML Attribute Names (class, href, width, etc.)",
+        "scope": [
+          "entity.other.attribute-name.html",
+          "entity.other.attribute-name"
+        ],
+        "settings": {
+          "foreground": "#FFD700",
+          "fontStyle": "regular"
+        }
+      },
+      {
+        "name": "String Literals ('...', \"...\")",
+        "scope": [
+          "string.quoted.double.html",
+          "string.quoted.single.html",
+          "string.quoted.double.liquid",
+          "string.quoted.single.liquid",
+          "string.quoted"
+        ],
+        "settings": {
+          "foreground": "#50FA7B"
+        }
+      },
+      {
+        "name": "Comments & LiquidDoc",
+        "scope": [
+          "comment.block.liquid",
+          "comment.line.liquid",
+          "comment",
+          "punctuation.definition.comment"
+        ],
+        "settings": {
+          "foreground": "#6272A4",
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "name": "Doc Annotations (@param, @example)",
+        "scope": [
+          "storage.type.class.jsdoc",
+          "entity.name.tag.jsdoc",
+          "keyword.other.documentation"
+        ],
+        "settings": {
+          "foreground": "#FF9500",
+          "fontStyle": "bold"
+        }
+      }
+    ]
+  }
+}
