@@ -15,6 +15,15 @@
       {% comment %} Preload the base font variant for initial page render {% endcomment %}
       {{ settings.type_primary_font | font_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
     {% endunless %}
+    {% comment %}
+      1. strip_html: Loại bỏ các thẻ <p>, <span>, <div> trong mô tả sản phẩm/trang
+      2. truncate: 160: Cắt bớt nếu mô tả dài quá 160 ký tự (chuẩn Google SEO)
+      3. escape: Mã hóa ký tự đặc biệt để tránh lỗi HTML / XSS
+    {% endcomment %}
+    <meta
+      name="description"
+      content="{{ page_description | default: shop.description | default: 'Cửa hàng Shopify của tôi - Chuyên cung cấp các sản phẩm chất lượng cao' | strip_html | truncate: 160 | escape }}"
+    >
 
     {% # Load and preload the critical CSS %}
     {{ 'critical.css' | asset_url | stylesheet_tag: preload: true }}
@@ -22,12 +31,47 @@
     {{ 'theme.css' | asset_url | stylesheet_tag }}
     {% # Social, title, etc. %}
     {% render 'meta-tags' %}
+    {% comment %} store info {% endcomment %}
+    {% render 'store-info' %}
 
     {{ content_for_header }}
   </head>
 
   <body>
     {% sections 'header-group' %}
+
+    {% if request.page_type == 'product' %}
+      <div style="background: #f4f4f4; padding: 20px; border: 2px red solid;">
+        <h2>Debug Dữ liệu Product dạng JSON:</h2>
+        <script type="application/json" id="product-json-debug">
+          {{ product | json }}
+        </script>
+        <p>Tên SP: {{ product.title }}</p>
+        <p>Giá nguyên gốc (cents): {{ product.price }}</p>
+      </div>
+    {% endif %}
+
+    {% comment %} product-price filter {% endcomment %}
+    {% if request.page_type == 'product' %}
+      <div style="background: #e8f8f5; padding: 15px; border: 2px #2ecc71 solid; margin: 10px 0;">
+        <h3>Kết quả Test Price Filter:</h3>
+        {% render 'product-price' %}
+      </div>
+    {% endif %}
+    {% comment %} Định dạng chuẩn ISO cho thẻ <time> và định dạng hiển thị tiếng Việt/Anh {% endcomment %}
+    <p>Hôm nay là: {{ 'now' | date: '%d/%m/%Y - %H:%M' }}</p>
+
+    {% if article %}
+      <time datetime="{{ article.published_at | date: '%Y-%m-%d' }}">
+        Đăng ngày: {{ article.published_at | date: '%d tháng %m, %Y' }}
+      </time>
+    {% endif %}
+
+    {% comment %} Render mock product list (Ngày 5 - Task 2) {% endcomment %}
+    <div style="padding: 20px; background: #fff; margin: 20px 0; border: 1px #ddd solid;">
+      <h3>Danh sách sản phẩm mẫu (Ngày 5 - Task 2):</h3>
+      {% render 'product-list-sample' %}
+    </div>
 
     {{ content_for_layout }}
 

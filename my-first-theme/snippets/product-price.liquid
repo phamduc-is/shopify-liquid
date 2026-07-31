@@ -1,0 +1,26 @@
+<div class="product-price">
+  {% if product.compare_at_price > product.price %}
+    {% comment %} Khi sản phẩm CÓ giảm giá {% endcomment %}
+    <span class="price-compare" style="text-decoration: line-through; color: #888;">
+      {{ product.compare_at_price | money }}
+    </span>
+    <span class="price-sale" style="color: #e74c3c; font-weight: bold; margin-left: 8px;">
+      {{ product.price | money }}
+    </span>
+
+    {% comment %} Tính % giảm giá {% endcomment %}
+    {% assign discount = product.compare_at_price | minus: product.price %}
+    {% assign discount_pct = discount | times: 100.0 | divided_by: product.compare_at_price %}
+    <span
+      class="badge-discount"
+      style="background: #e74c3c; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-left: 8px;"
+    >
+      {{ discount_pct | round }}%
+    </span>
+  {% else %}
+    {% comment %} Khi sản phẩm KHÔNG giảm giá {% endcomment %}
+    <span class="price" style="font-weight: bold; color: #2c3e50;">
+      {{ product.price | money }}
+    </span>
+  {% endif %}
+</div>

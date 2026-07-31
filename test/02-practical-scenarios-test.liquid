@@ -1,0 +1,188 @@
+{% doc %}
+  @file 02-practical-scenarios-test.liquid
+
+  @description File thực hành 5 bài tập tình huống viết code Liquid (Ngày 1 - Ngày 5).
+
+  @instructions Bạn hãy viết đoạn code giải quyết từng bài tập vào vị trí TODO bên dưới.
+{% enddoc %}
+
+{% comment %}
+  ===============================================================================
+  BÀI TẬP 1: HIỂN THỊ GIÁ SẢN PHẨM & TÍNH BADGE DISCOUNT % (NGÀY 3 & 4)
+  -------------------------------------------------------------------------------
+  Yêu cầu:
+  1. Kiểm tra nếu sản phẩm CÓ giảm giá (product.compare_at_price > product.price):
+     - Hiển thị giá gốc gạch ngang (dùng filter money).
+     - Hiển thị giá bán hiện tại chữ màu đỏ nổi bật (dùng filter money).
+     - Tính toán phần trăm giảm giá % (dùng minus, times 100.0, divided_by, round)
+       và hiển thị badge ví dụ "-20%".
+  2. Nếu KHÔNG giảm giá: Chỉ hiển thị giá bán bình thường (dùng filter money).
+  ===============================================================================
+{% endcomment %}
+
+<!-- BÀI 1: VIẾT CODE CỦA BẠN DƯỚI DÒNG NÀY -->
+{% comment %} TODO: Bài 1 {% endcomment %}
+<div>
+  {% if product.compare_at_price > product.price %}
+    <span style="text-decoration: line-through; color: #ccc; margin-right: 8px;">
+      {{ product.compare_at_price | money }}
+    </span>
+    <span style="color: #e63946; font-weight: bold;">
+      {{ product.price | money }}
+    </span>
+    {% assign badge = product.compare_at_price
+      | minus: product.price
+      | times: 100.0
+      | divided_by: product.compare_at_price
+      | round
+    %}
+    <span style="background: red; color: white; font-size: 12px; padding: 2px 4px;"> {{ badge }}% </span>
+  {% else %}
+    <span style="color: #e63946; font-weight: bold;">
+      {{ product.price | money }}
+    </span>
+  {% endif %}
+</div>
+
+{% comment %}
+  ===============================================================================
+  BÀI TẬP 2: TỰ ĐỘNG THÊM CLASS STYLING DỰA VÀO FORLOOP OBJECT (NGÀY 5)
+  -------------------------------------------------------------------------------
+  Yêu cầu:
+  1. Lặp qua danh sách 5 sản phẩm trong collection (limit: 5).
+  2. Khi lặp:
+     - Nếu là phần tử ĐẦU TIÊN (forloop.first): Thêm class "card--featured".
+     - Nếu là phần tử CUỐI CÙNG (forloop.last): Thêm class "card--end".
+     - Kiểm tra chỉ số vòng lặp chẵn/lẻ (forloop.index modulo 2):
+       + Nếu chẵn: Thêm class "bg-even"
+       + Nếu lẻ: Thêm class "bg-odd"
+  3. Hiển thị tên sản phẩm và chỉ số lượt lặp {{ forloop.index }} trên {{ forloop.length }}.
+  ===============================================================================
+{% endcomment %}
+
+<!-- BÀI 2: VIẾT CODE CỦA BẠN DƯỚI DÒNG NÀY -->
+{% comment %} TODO: Bài 2 {% endcomment %}
+{% for product in collection.all_products limit: 5 %}
+  {% if forloop.first %}
+    <div class="card--featured">
+      {{ product.title }}
+      {{ forloop.index }} / {{ forloop.length }}
+    </div>
+    {% elseif forloop.last %}
+    <div class="card--end">
+      {{ product.title }}
+      {{ forloop.index }} / {{ forloop.length }}
+    </div>
+  {% else %}
+    {% if forloop.index %2 == 0 %}
+      <div class="card--even">
+        {{ product.title }}
+        {{ forloop.index }} / {{ forloop.length }}
+      </div>
+    {% else %}
+      <div class="card--odd">
+        {{ product.title }}
+        {{ forloop.index }} / {{ forloop.length }}
+      </div>
+    {% endif %}
+  {% endif %}
+{%- endfor %}
+{% comment %}
+  ===============================================================================
+  BÀI TẬP 3: MENU ĐIỀU HƯỚNG DẠNG DROPDOWN 2 CẤP (NGÀY 5)
+  -------------------------------------------------------------------------------
+  Yêu cầu:
+  1. Lấy menu từ `linklists.main-menu`.
+  2. Lặp qua danh sách `main_menu.links`:
+     - Hiển thị thẻ <a> tên link và href.
+     - Nếu trang hiện tại trùng với link (`link.active`): Thêm class "is-active".
+     - Kiểm tra nếu link này có menu con (`link.links.size > 0`):
+       + Render thẻ <ul> chứa danh sách `link.links`.
+       + Trong menu con, lặp và in từng `child_link.title` và `child_link.url`.
+  ===============================================================================
+{% endcomment %}
+
+<!-- BÀI 3: VIẾT CODE CỦA BẠN DƯỚI DÒNG NÀY -->
+{% comment %} TODO: Bài 3 {% endcomment %}
+{% assign main_menu = linklists['main-menu'] %}
+
+<ul class="nav-menu">
+  {% for link in main_menu.links %}
+    <li class="nav-item {% if link.active %}is-active{% endif %}">
+      <a href="{{ link.url }}">{{ link.title }}</a>
+
+      {% comment %} Kiểm tra nếu link cấp 1 có chứa menu con {% endcomment %}
+      {% if link.links.size > 0 %}
+        <ul class="dropdown-menu">
+          {% for child_link in link.links %}
+            <li class="dropdown-item {% if child_link.active %}is-active{% endif %}">
+              <a href="{{ child_link.url }}">{{ child_link.title }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>
+
+{% comment %}
+  ===============================================================================
+  BÀI TẬP 4: FILTER CHAINING LÀM SẠCH SEO META DESCRIPTION (NGÀY 4)
+  -------------------------------------------------------------------------------
+  Yêu cầu:
+  Viết 1 thẻ <meta name="description" content="..."> chuẩn SEO:
+  1. Giá trị lấy từ `page_description`.
+  2. Nếu `page_description` rỗng, lấy từ `shop.description`.
+  3. Nếu cả 2 đều rỗng, fallback về câu mặc định: "Cửa hàng thời trang cao cấp".
+  4. Đi qua chuỗi filter:
+     - Xóa bỏ thẻ HTML (strip_html)
+     - Cắt ngắn còn 160 ký tự (truncate: 160)
+     - Mã hóa ký tự đặc biệt (escape)
+  ===============================================================================
+{% endcomment %}
+
+<!-- BÀI 4: VIẾT CODE CỦA BẠN DƯỚI DÒNG NÀY -->
+{% comment %} TODO: Bài 4 {% endcomment %}
+<meta
+  name="description"
+  content="{{ page_description | default: shop.description | default: 'Cửa hàng thời trang cao cấp' | strip_html | truncate: 160 | escape }}"
+>
+
+{% comment %}
+  ===============================================================================
+  BÀI TẬP 5: MOCK DATA KHI BỘ SƯU TẬP TRỐNG (NGÀY 5)
+  -------------------------------------------------------------------------------
+  Yêu cầu:
+  1. Kiểm tra nếu `collections.all.products.size == 0`:
+     - Chạy vòng lặp giả lập `for i in (1..4)`.
+     - Sử dụng thẻ `capture` để tạo tên placeholder `product-{{ i }}`.
+     - In thẻ SVG placeholder bằng filter `placeholder_svg_tag: 'placeholder-svg'`.
+     - Dùng `case i` để gán badge giả lập:
+       + i = 1: Badge "Sale"
+       + i = 2: Badge "Hết hàng"
+       + i = 3: Badge "Mới"
+     - Hiển thị tiêu đề mẫu "Sản phẩm mẫu {{ i }}" và giá mẫu "$29.99".
+  ===============================================================================
+{% endcomment %}
+
+<!-- BÀI 5: VIẾT CODE CỦA BẠN DƯỚI DÒNG NÀY -->
+{% comment %} TODO: Bài 5 {% endcomment %}
+{% if collections.all.products.size == 0 %}
+  {% for i in (1..4) %}
+    {% capture placeholder %} product-{{ i }} {% endcapture %}
+    {{ placeholder | placeholder_svg_tag: 'placeholder-svg' }}
+    {% case i %}
+      {% when 1 %}
+        <p>Sale</p>
+      {% when 2 %}
+        <p>Hết hàng</p>
+      {% when 3 %}
+        <p>Mới</p>
+    {% endcase %}
+    <title>
+      Sản phẩm mẫu
+      {{ i }}
+    </title>
+    <p>$29.99</p>
+  {% endfor %}
+{% endif %}

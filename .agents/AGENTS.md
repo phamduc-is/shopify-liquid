@@ -13,6 +13,8 @@ Tài liệu này quy định các nguyên tắc làm việc, tiêu chuẩn viế
    - Người dùng sẽ dùng `/qs` để đánh dấu các câu hỏi thắc mắc kiến thức. Agent giải thích chi tiết, trực quan kèm ví dụ và cập nhật file ghi chú khi được yêu cầu.
 3. **Tự động kích hoạt `interview-me`:**
    - Đối với **mỗi lần nhận prompt từ người dùng**, Agent **TỰ ĐỘNG KÍCH HOẠT SKILL `interview-me`**: phỏng vấn từng câu một để khai thác và làm rõ chính xác 95% mong muốn của người dùng trước khi tiến hành bước tiếp theo.
+4. **Tự động khôi phục quy tắc với `/rule`:**
+   - Khi người dùng gõ lệnh hoặc nhắc tới **`/rule`**, Agent **TỰ ĐỘNG ĐỌC VÀ KÍCH HOẠT LẠI TOÀN BỘ QUY TẮC** trong file [.agents/AGENTS.md](file:///Users/dawn/Documents/workspace/shopify-liquid/.agents/AGENTS.md) để đảm bảo không bỏ sót bất kỳ nguyên tắc tương tác và tiêu chuẩn viết code nào.
 
 ---
 

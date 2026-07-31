@@ -1,0 +1,82 @@
+<div class="product-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+  {% assign product_count = collections.all.products.size %}
+
+  {% if product_count > 0 %}
+    {% comment %} --- 1. HIỂN THỊ SẢN PHẨM THẬT (Nếu Store đã có sản phẩm) --- {% endcomment %}
+    {% for product in collections.all.products limit: 8 %}
+      <div class="product-card" style="border: 1px #ccc solid; padding: 10px; position: relative;">
+        {% if product.available == false %}
+          <span
+            class="badge"
+            style="background: #95a5a6; color: #fff; padding: 3px 8px; position: absolute; top: 10px; left: 10px;"
+            >Hết hàng</span
+          >
+        {% elsif product.compare_at_price > product.price %}
+          <span
+            class="badge"
+            style="background: #e74c3c; color: #fff; padding: 3px 8px; position: absolute; top: 10px; left: 10px;"
+            >Sale</span
+          >
+        {% endif %}
+
+        {% if product.featured_image %}
+          <img
+            src="{{ product.featured_image | image_url: width: 300 }}"
+            alt="{{ product.title | escape }}"
+            width="{{ product.featured_image.width }}"
+            height="{{ product.featured_image.height }}"
+            style="width: 100%; height: auto;"
+          >
+        {% else %}
+          {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+        {% endif %}
+
+        <h4>{{ product.title }}</h4>
+        <p style="color: #27ae60; font-weight: bold;">{{ product.price | money }}</p>
+      </div>
+    {% endfor %}
+
+  {% else %}
+    {% comment %} --- 2. DỮ LIỆU GIẢ LẬP MẪU (MOCK DATA) KHI STORE CHƯA CÓ SP --- {% endcomment %}
+    {% for i in (1..4) %}
+      <div class="product-card" style="border: 1px #ccc solid; padding: 10px; position: relative; background: #fafafa;">
+        {% # Test các loại Badge khác nhau theo từng lượt lặp %}
+        {% case i %}
+          {% when 1 %}
+            <span
+              class="badge"
+              style="background: #e74c3c; color: #fff; padding: 3px 8px; position: absolute; top: 10px; left: 10px; z-index: 2;"
+              >Sale -20%</span
+            >
+          {% when 2 %}
+            <span
+              class="badge"
+              style="background: #95a5a6; color: #fff; padding: 3px 8px; position: absolute; top: 10px; left: 10px; z-index: 2;"
+              >Hết hàng</span
+            >
+          {% when 3 %}
+            <span
+              class="badge"
+              style="background: #2980b9; color: #fff; padding: 3px 8px; position: absolute; top: 10px; left: 10px; z-index: 2;"
+              >Mới</span
+            >
+        {% endcase %}
+
+        {% # Placeholder Ảnh sản phẩm chuẩn Shopify %}
+        {% capture placeholder_name %}product-{{ i }}{% endcapture %}
+        <div style="background: #eee; min-height: 180px; display: flex; align-items: center; justify-content: center;">
+          {{ placeholder_name | placeholder_svg_tag: 'placeholder-svg' }}
+        </div>
+
+        <h4>Sản phẩm mẫu {{ i }}</h4>
+        <p style="color: #27ae60; font-weight: bold;">
+          {% if i == 1 %}
+            <span style="text-decoration: line-through; color: #888; margin-right: 5px;">$50.00</span> $40.00
+          {% else %}
+            $29.99
+          {% endif %}
+        </p>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
