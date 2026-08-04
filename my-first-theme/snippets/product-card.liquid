@@ -1,0 +1,85 @@
+{% doc %}
+  @file snippets/product-card.liquid
+  @description Hiển thị khung thẻ sản phẩm tái sử dụng (Product Card Component).
+
+  @param product {product} Object sản phẩm truyền vào (Bắt buộc)
+  @param [show_vendor] {boolean} Cho phép hiển thị thương hiệu (Default: false)
+  @param [show_quick_add] {boolean} Cho phép hiển thị nút Thêm nhanh (Default: false)
+  @param [lazy_load] {boolean} Sử dụng lazy loading cho ảnh (Default: true)
+
+  @example
+  {% render 'product-card', product: product, show_vendor: true %}
+{% enddoc %}
+
+{% comment %} Aspect Ratio Calculation {% endcomment %}
+{%- liquid
+  assign ratio = 1
+  if product.featured_image and product.featured_image.width > 0
+    assign ratio = product.featured_image.height | divided_by: product.featured_image.width | times: 100.0
+  endif
+-%}
+
+<div class="product-card" style="border: 1px #e5e5e5 solid; border-radius: 8px; padding: 12px; position: relative;">
+  <a href="{{ product.url }}" class="product-card__link" style="text-decoration: none; color: inherit;">
+    {% comment %} # 1. Ảnh sản phẩm có Responsive Srcset {% endcomment %}
+    <div
+      class="product-card__image-wrapper"
+      style="padding-top: {{ ratio }}%; position: relative; overflow: hidden; background: #f9f9f9;"
+    >
+      {%- if product.featured_image -%}
+        <img
+          src="{{ product.featured_image | image_url: width: 400 }}"
+          srcset="
+            {{ product.featured_image | image_url: width: 200 }} 200w,
+            {{ product.featured_image | image_url: width: 400 }} 400w,
+            {{ product.featured_image | image_url: width: 600 }} 600w
+          "
+          sizes="(max-width: 768px) 50vw, 25vw"
+          alt="{{ product.featured_image.alt | escape }}"
+          loading="{% if lazy_load == false %}eager{% else %}lazy{% endif %}"
+          width="{{ product.featured_image.width }}"
+          height="{{ product.featured_image.height }}"
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;"
+        >
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'product-card__placeholder' }}
+      {%- endif -%}
+    </div>
+
+    {% comment %} # 2. Thông tin chi tiết {% endcomment %}
+    <div class="product-card__info" style="margin-top: 10px;">
+      {%- if show_vendor and product.vendor != blank -%}
+        <p class="product-card__vendor" style="font-size: 12px; color: #888; margin: 0 0 4px 0;">
+          {{ product.vendor }}
+        </p>
+      {%- endif -%}
+
+      <h3 class="product-card__title" style="font-size: 15px; margin: 0 0 8px 0;">{{ product.title }}</h3>
+
+      {% comment %} # 3. Giá tiền {% endcomment %}
+      <div class="product-card__price">
+        {%- if product.price_varies -%}
+          <span style="font-weight: bold; color: #2c3e50;">Từ {{ product.price_min | money }}</span>
+        {%- else -%}
+          {%- if product.compare_at_price > product.price -%}
+            <span style="text-decoration: line-through; color: #888; margin-right: 6px;">
+              {{- product.compare_at_price | money -}}
+            </span>
+          {%- endif -%}
+          <span style="font-weight: bold; color: #e74c3c;">{{ product.price | money }}</span>
+        {%- endif -%}
+      </div>
+    </div>
+  </a>
+
+  {% comment %} # 4. Nút Nhanh (Quick Add) {% endcomment %}
+  {%- if show_quick_add and product.available -%}
+    <button
+      class="product-card__quick-add"
+      style="margin-top: 10px; width: 100%; padding: 8px; background: #2980b9; color: #fff; border: none; border-radius: 4px; cursor: pointer;"
+      data-product-id="{{ product.id }}"
+    >
+      Thêm Nhanh
+    </button>
+  {%- endif -%}
+</div>

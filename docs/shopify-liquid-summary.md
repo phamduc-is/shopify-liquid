@@ -23,7 +23,8 @@ Tài liệu tổng hợp toàn bộ lý thuyết, cú pháp, quy tắc kiến tr
 | 11 | **Built-in: Cart Object (item_count, items)** | `3. Đối Tượng cart (Giỏ Hàng)` | [Xem Bài](#3-đối-tượng-cart-giỏ-hàng) |
 | 12 | **Built-in: Shop Object (name, currency)** | `4. Đối Tượng shop (Thông Tin Cửa Hàng)` | [Xem Bài](#4-đối-tượng-shop-thông-tin-cửa-hàng) |
 | 13 | **Built-in: Request Object (page_type, path)** | `5. Đối Tượng request (Thông Tin Yêu Cầu Trang)` | [Xem Bài](#5-đối-tượng-request-thông-tin-yêu-cầu-trang) |
-| 14 | **Bảng Tra Cứu Cheat-Sheet** | `📝 BẢNG TRA CỨU NHANH CÚ PHÁP LIQUID (CHEAT-SHEET)` | [Xem Bài](#-bảng-tra-cứu-nhanh-cú-pháp-liquid-cheat-sheet) |
+| 14 | **Snippet & Render OS 2.0** | `🧩 Ngày 6 — Snippets, Thẻ render & Cấu Trúc Component Tái Sử Dụng` | [Xem Bài](#-ngày-6--snippets-thẻ-render--cấu-trúc-component-tái-sử-dụng) |
+| 15 | **Bảng Tra Cứu Cheat-Sheet** | `📝 BẢNG TRA CỨU NHANH CÚ PHÁP LIQUID (CHEAT-SHEET)` | [Xem Bài](#-bảng-tra-cứu-nhanh-cú-pháp-liquid-cheat-sheet) |
 
 ---
 
@@ -318,6 +319,54 @@ Thẻ `{% assign %}` dùng để khởi tạo hoặc cập nhật một biến. 
 
 ---
 
+### 🧩 Ngày 6 — Snippets, Thẻ `render` & Cấu Trúc Component Tái Sử Dụng
+
+#### 1. Khái niệm Snippet:
+Snippet là các file mã partial nằm trong thư mục `snippets/` (đuôi `.liquid`), đại diện cho các component giao diện tái sử dụng (như Thẻ sản phẩm, Badge, Giá tiền, Menu dropdown...).
+
+#### 2. Phân biệt `{% render %}` vs `{% include %}`:
+* **`{% render %}` (Chuẩn OS 2.0 - Khuyên dùng):** Chạy trong **Isolated Scope (Phạm vi cô lập)**. Không tự động kế thừa các biến local từ file cha (trừ các biến Global như `shop`, `cart`, `request`), giúp tránh đụng độ tên biến ngoài ý muốn và tăng tốc độ tải trang gấp nhiều lần nhờ cơ chế caching.
+* **`{% include %}` (Deprecated - Đã lỗi thời):** Tự động kế thừa toàn bộ biến từ file cha (Parent Scope), dễ làm xung đột tên biến và giảm hiệu năng.
+
+#### 3. Bảng Tổng Hợp Các Dạng Cú Pháp Thẻ `{% render %}`:
+
+| Dạng Cú Pháp | Cú Pháp Code Minh Họa | Bản Chất & Cơ Chế Kỹ Thuật | Trường Hợp Sử Dụng |
+| :--- | :--- | :--- | :--- |
+| **1. Cơ Bản** | `{% render 'header-icon' %}` | Không truyền tham số. Snippet chỉ đọc mã HTML/CSS tĩnh hoặc biến Global (`shop`, `settings`). | Dùng cho icon SVG, thông tin cửa hàng cố định. |
+| **2. Truyền Tham Số** | `{% render 'product-price', product: item, price_color: 'red' %}` | Tạo ra các biến mới trong snippet (`product`, `price_color`). Nhận giá trị nguyên thủy (String, Boolean) hoặc nhận tham chiếu Object từ file cha sang. | Truyền dữ liệu linh hoạt, truyền nhiều biến cùng lúc. |
+| **3. Truyền With / As** | `{% render 'product-card' with featured_product as product %}` | Cách viết tắt của `product: featured_product`. Truyền 1 Object duy nhất từ file cha vào biến `product` trong snippet. | Khi chỉ cần truyền duy nhất 1 Object vào snippet cho gọn code. |
+| **4. Lặp For / As** | `{% render 'product-card' for collection.products as product %}` | Tự động lặp qua mảng `collection.products`. Mỗi lượt lặp render lại snippet 1 lần và gán phần tử vào biến `product` (Tự động có đối tượng `forloop`). | Render danh sách sản phẩm / bài viết (Tối ưu hiệu năng cao nhất). |
+| **5. Nâng Cao: Kết Hợp Lặp For/As & Truyền Tham Số** | `{% render 'product-card' for collections.all.products as product, show_vendor: true, show_quick_add: true, lazy_load: true %}` | Vừa tự động lặp mảng sản phẩm, vừa truyền thêm các cờ bật/tắt (boolean/config) vào từng lượt render snippet. | Render danh sách sản phẩm thực tế linh hoạt theo Theme Settings. |
+
+##### 🔍 Bóc Tách Chi Tiết Cú Pháp Nâng Cao (Dạng 5):
+```liquid
+{% render 'product-card' for collections.all.products as product, show_vendor: true, show_quick_add: true, lazy_load: true %}
+```
+* **`render 'product-card'`**: Nhúng file component `snippets/product-card.liquid`.
+* **`for collections.all.products as product`**: Vừa chạy vòng lặp qua mảng `collections.all.products`, vừa gán phần tử ở từng lượt lặp vào biến `product` (đồng thời cung cấp đối tượng `forloop`).
+* **`show_vendor: true`**: Truyền cờ `show_vendor = true` cho phép snippet hiển thị thương hiệu/nhà sản xuất.
+* **`show_quick_add: true`**: Truyền cờ `show_quick_add = true` cho phép snippet render nút "Thêm Nhanh" (Quick Add).
+* **`lazy_load: true`**: Truyền cờ `lazy_load = true` cho phép snippet gắn `loading="lazy"` tối ưu tốc độ tải ảnh.
+
+#### 4. Chuẩn Ghi Chú LiquidDoc (`{% doc %}`):
+Mọi snippet chuẩn OS 2.0 nên khai báo khối ghi chú ở đầu file để mô tả các `@param` đầu vào:
+```liquid
+{% doc %}
+  @file snippets/product-card.liquid
+  @description Component hiển thị thẻ sản phẩm chuẩn OS 2.0
+  @param {Object} product - Đối tượng sản phẩm cần render (Bắt buộc)
+  @param {Boolean} [show_vendor=false] - Hiển thị tên nhà sản xuất hay không
+  @param {Boolean} [show_quick_add=false] - Hiển thị nút Thêm nhanh hay không
+  @param {Boolean} [lazy_load=true] - Kích hoạt lazy loading cho ảnh
+{% enddoc %}
+```
+
+#### 🛠️ Bài Tập Đã Thực Hiện (Ngày 6):
+- `snippets/product-card.liquid`: Xây dựng component Thẻ sản phẩm chuẩn OS 2.0 có LiquidDoc, tính toán aspect ratio ảnh, responsive `srcset`, hiển thị giá `price_varies` / `compare_at_price`, vendor và nút Quick Add.
+- Nhúng component vào `layout/theme.liquid` bằng cú pháp `{% render 'product-card' for collections.all.products as product, show_vendor: true, show_quick_add: true, lazy_load: true %}`.
+
+---
+
 ## 📚 BẢNG TỔNG HỢP CÁC THUỘC TÍNH BUILT-IN CỐT LÕI (OBJECT PROPERTIES)
 
 ### 1. Đối Tượng `link` (Navigation / Menu)
@@ -377,7 +426,6 @@ Thẻ `{% assign %}` dùng để khởi tạo hoặc cập nhật một biến. 
 
 ## 🔮 CÁC NGÀY TIẾP THEO (SẼ CẬP NHẬT TIẾP TỤC)
 
-- **Ngày 6:** Snippets, Render & Includes (tái sử dụng partial template chuẩn OS 2.0).
 - **Ngày 7:** Liquid nâng cao, `metafields`, `forloop` nâng cao & Thực hành mini-project.
 - **Ngày 8 trở đi:** Layouts, Templates, Sections, Blocks, Theme Settings & Shopify CLI Advanced.
 

@@ -73,6 +73,19 @@
       {% render 'product-list-sample' %}
     </div>
 
+    {% comment %} Render product-card component (Ngày 6 - Task 3) {% endcomment %}
+    <div style="padding: 20px; max-width: 1200px; margin: 20px auto; border: 1px #3498db solid; border-radius: 8px;">
+      <h3 style="color: #2980b9;">Danh sách sản phẩm (Component product-card - Ngày 6):</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;">
+        {% render 'product-card'
+          for collections.all.products as product,
+          show_vendor: true,
+          show_quick_add: true,
+          lazy_load: true
+        %}
+      </div>
+    </div>
+
     {{ content_for_layout }}
 
     {% sections 'footer-group' %}
