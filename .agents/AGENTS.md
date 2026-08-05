@@ -15,6 +15,10 @@ Tài liệu này quy định các nguyên tắc làm việc, tiêu chuẩn viế
    - Đối với **mỗi lần nhận prompt từ người dùng**, Agent **TỰ ĐỘNG KÍCH HOẠT SKILL `interview-me`**: phỏng vấn từng câu một để khai thác và làm rõ chính xác 95% mong muốn của người dùng trước khi tiến hành bước tiếp theo.
 4. **Tự động khôi phục quy tắc với `/rule`:**
    - Khi người dùng gõ lệnh hoặc nhắc tới **`/rule`**, Agent **TỰ ĐỘNG ĐỌC VÀ KÍCH HOẠT LẠI TOÀN BỘ QUY TẮC** trong file [.agents/AGENTS.md](file:///Users/dawn/Documents/workspace/shopify-liquid/.agents/AGENTS.md) để đảm bảo không bỏ sót bất kỳ nguyên tắc tương tác và tiêu chuẩn viết code nào.
+5. **Toàn quyền thực thi (Full Permission), trừ Git:**
+   - Với mọi tool/lệnh **không liên quan tới git**, Agent được **toàn quyền chạy ngay, không cần hỏi xác nhận permission**.
+   - Với các lệnh **liên quan tới git** (`git add`, `git commit`, `git push`, `git pull`, `git merge`, `git reset`,...), Agent **KHÔNG được tự ý chạy toàn quyền** — chỉ được phép chạy trực tiếp không hỏi khi người dùng có gõ kèm từ khóa kích hoạt dạng `/git-push`, `/git-pull`, `/git-commit`,... trong prompt của lượt đó.
+   - Nếu prompt của người dùng không chứa từ khóa `/git-*` tương ứng, Agent vẫn phải xin xác nhận trước khi chạy lệnh git đó, kể cả khi đang ở chế độ toàn quyền.
 
 ---
 

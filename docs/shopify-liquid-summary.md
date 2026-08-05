@@ -24,7 +24,8 @@ Tài liệu tổng hợp toàn bộ lý thuyết, cú pháp, quy tắc kiến tr
 | 12 | **Built-in: Shop Object (name, currency)** | `4. Đối Tượng shop (Thông Tin Cửa Hàng)` | [Xem Bài](#4-đối-tượng-shop-thông-tin-cửa-hàng) |
 | 13 | **Built-in: Request Object (page_type, path)** | `5. Đối Tượng request (Thông Tin Yêu Cầu Trang)` | [Xem Bài](#5-đối-tượng-request-thông-tin-yêu-cầu-trang) |
 | 14 | **Snippet & Render OS 2.0** | `🧩 Ngày 6 — Snippets, Thẻ render & Cấu Trúc Component Tái Sử Dụng` | [Xem Bài](#-ngày-6--snippets-thẻ-render--cấu-trúc-component-tái-sử-dụng) |
-| 15 | **Bảng Tra Cứu Cheat-Sheet** | `📝 BẢNG TRA CỨU NHANH CÚ PHÁP LIQUID (CHEAT-SHEET)` | [Xem Bài](#-bảng-tra-cứu-nhanh-cú-pháp-liquid-cheat-sheet) |
+| 15 | **Whitespace, Metafields & Content-For** | `🚀 Ngày 7 — Liquid Nâng Cao & Mini-Project Collection Page` | [Xem Bài](#-ngày-7--liquid-nâng-cao--mini-project-collection-page) |
+| 16 | **Bảng Tra Cứu Cheat-Sheet** | `📝 BẢNG TRA CỨU NHANH CÚ PHÁP LIQUID (CHEAT-SHEET)` | [Xem Bài](#-bảng-tra-cứu-nhanh-cú-pháp-liquid-cheat-sheet) |
 
 ---
 
@@ -37,8 +38,8 @@ graph TD
         D2 --> D3["Ngày 3: Liquid Objects & Output"]
         D3 --> D4["Ngày 4: Liquid Filters & Chaining"]
         D4 --> D5["Ngày 5: Liquid Tags & Logic Flow"]
-        D5 --> D6["Ngày 6: Snippets, Render & Includes (Sắp học)"]
-        D6 --> D7["Ngày 7: Liquid Nâng Cao & Tổng Hợp (Sắp học)"]
+        D5 --> D6["Ngày 6: Snippets, Render & Includes (Đã học)"]
+        D6 --> D7["Ngày 7: Liquid Nâng Cao & Tổng Hợp (Đã học)"]
     end
     
     subgraph Giai_Doan_Tiep_Theo ["Giai Đoạn 3+: Architecture & Advanced Theme"]
@@ -367,6 +368,114 @@ Mọi snippet chuẩn OS 2.0 nên khai báo khối ghi chú ở đầu file đ�
 
 ---
 
+### 🚀 Ngày 7 — Liquid Nâng Cao & Mini-Project Collection Page
+
+#### 1. Whitespace Control `{%- -%}` / `{{- -}}`
+
+Liquid mặc định **giữ nguyên** mọi khoảng trắng/xuống dòng quanh thẻ `{% %}`. Với `for`/`if` lồng nhau nhiều lớp, HTML output sẽ bị thừa rất nhiều dòng trắng (không lỗi, nhưng "bẩn").
+
+| Cú pháp | Ý nghĩa |
+| :--- | :--- |
+| `{%- tag %}` | Xóa khoảng trắng **phía trước** thẻ |
+| `{% tag -%}` | Xóa khoảng trắng **phía sau** thẻ |
+| `{%- tag -%}` | Xóa cả hai phía |
+| `{{- output -}}` | Áp dụng tương tự cho output tag `{{ }}` |
+
+```liquid
+{%- for i in (1..3) -%}
+  <li>{{ i }}</li>
+{%- endfor -%}
+```
+
+> 💡 Quy tắc thực dụng: dùng `-` cho tag **logic thuần** (`assign`, `if`, `for`, `liquid`, `paginate`...) vì chúng không xuất HTML. Tag **output** (`{{ product.title }}`) thường giữ nguyên để tránh dính chữ liền nhau.
+
+#### 2. Metafields — `object.metafields`
+
+Metafields là **dữ liệu tùy chỉnh** gắn thêm vào các object (`product`, `collection`, `shop`, `variant`...) mà theme mặc định không có field sẵn.
+
+```liquid
+{{ product.metafields.<namespace>.<key> }}
+```
+
+- `namespace`: nhóm chứa metafield (vd: `custom`, hoặc namespace riêng của app).
+- `key`: tên field cụ thể.
+
+Metafield trả về là **Object có type riêng**, phải truy cập qua `.value`, và luôn kiểm tra tồn tại trước khi dùng (rất hay `nil` nếu admin chưa nhập liệu):
+
+```liquid
+{%- assign material = product.metafields.custom.material -%}
+{%- if material != blank -%}
+  <p>Chất liệu: {{ material.value }}</p>
+{%- endif -%}
+```
+
+| Type Metafield | Cách dùng |
+| :--- | :--- |
+| `single_line_text_field` | `{{ mf.value }}` — string trực tiếp |
+| `number_integer` / `number_decimal` | `{{ mf.value }}` — dùng được với filter số |
+| `boolean` | `{% if mf.value %}` |
+| `list.single_line_text_field` | `{% for item in mf.value %}` (là array) |
+| `file_reference` / `product_reference` | `{{ mf.value.title }}`, `{{ mf.value \| image_url }}` |
+| `rich_text` | `{{ mf.value }}` (đã render sẵn HTML) |
+| `json` | `{{ mf.value.some_key }}` — object JSON |
+
+#### 3. `content_for_header` & `content_for_layout` (trong `layout/theme.liquid`)
+
+2 thẻ **hệ thống bắt buộc**, không tự viết logic, chỉ đặt đúng vị trí trong layout:
+
+```liquid
+<head>
+  ...
+  {{ content_for_header }}
+</head>
+<body>
+  {{ content_for_layout }}
+</body>
+```
+
+| Thẻ | Vai trò |
+| :--- | :--- |
+| `content_for_header` | Shopify tự bơm script Analytics, Pixel, app scripts, meta checkout... **Bắt buộc trong `<head>`**, thiếu sẽ làm hỏng nhiều app/tracking. |
+| `content_for_layout` | Nơi nội dung **template hiện tại** (section được chỉ định trong file `.json` của template) được "bơm" vào layout. Thiếu thẻ này → trang luôn trống rỗng. |
+
+→ Đây là cơ chế cốt lõi của kiến trúc **Layout (khung cố định) → Template (định tuyến JSON) → Section (nội dung thật)**.
+
+#### 4. Mini-Project: Trang Collection chuẩn OS 2.0
+
+Vì `templates/collection.json` là **JSON Template**, nội dung thực sự nằm ở section được khai báo trong đó (`"type": "collection"` → trỏ tới `sections/collection.liquid`). Đã nâng cấp trực tiếp file này thay vì tạo `templates/collection.liquid` kiểu Vintage (file đó sẽ không được Shopify route tới nếu JSON template cùng tên đã tồn tại).
+
+```liquid
+{%- paginate collection.products by section.settings.products_per_page -%}
+  <p>Hiển thị {{ collection.products.size }} / {{ collection.products_count }} sản phẩm</p>
+
+  <div class="collection-page__grid">
+    {%- render 'product-card'
+      for collection.products as product,
+      show_vendor: section.settings.show_vendor,
+      show_quick_add: true,
+      lazy_load: true
+    -%}
+  </div>
+
+  {%- if paginate.pages > 1 -%}
+    <div class="collection-page__pagination">
+      {{ paginate | default_pagination }}
+    </div>
+  {%- endif -%}
+{%- endpaginate -%}
+```
+
+Điểm mới so với bản Vintage ban đầu:
+- Grid responsive 4 → 2 → 1 cột qua `@media` trong khối `{% stylesheet %}` (co giãn theo màn hình thay vì cố định `repeat(4, 1fr)`).
+- Số sản phẩm/trang và toggle hiển thị vendor được đưa vào `{% schema %}` (`products_per_page`, `show_vendor`) — cho phép merchant chỉnh trong Theme Editor thay vì hard-code.
+- Tái sử dụng lại `product-card` component đã xây ở Ngày 6 qua cú pháp `render 'for as'`.
+
+#### 🛠️ Bài Tập Đã Thực Hiện (Ngày 7):
+- `sections/collection.liquid`: Nâng cấp thành mini-project Collection Page — whitespace control, `paginate by section.settings.products_per_page`, grid responsive, tái sử dụng `product-card`, `default_pagination`.
+- Xác nhận `shopify theme check --path my-first-theme` chạy sạch (43 files, không lỗi).
+
+---
+
 ## 📚 BẢNG TỔNG HỢP CÁC THUỘC TÍNH BUILT-IN CỐT LÕI (OBJECT PROPERTIES)
 
 ### 1. Đối Tượng `link` (Navigation / Menu)
@@ -426,7 +535,6 @@ Mọi snippet chuẩn OS 2.0 nên khai báo khối ghi chú ở đầu file đ�
 
 ## 🔮 CÁC NGÀY TIẾP THEO (SẼ CẬP NHẬT TIẾP TỤC)
 
-- **Ngày 7:** Liquid nâng cao, `metafields`, `forloop` nâng cao & Thực hành mini-project.
 - **Ngày 8 trở đi:** Layouts, Templates, Sections, Blocks, Theme Settings & Shopify CLI Advanced.
 
 ---

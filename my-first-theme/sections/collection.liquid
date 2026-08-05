@@ -6,36 +6,27 @@
 {% endcomment %}
 
 <h1>{{ collection.title }}</h1>
+<h2>{{ collection.products_count }} products found</h2>
 
 <div class="collection-products">
-  {% paginate collection.products by 20 %}
-    {% for product in collection.products %}
-      <div class="collection-product">
-        {% if product.featured_image %}
-          {% render 'image',
-            class: 'collection-product__image',
-            image: product.featured_image,
-            url: product.url,
-            width: 400,
-            height: 400,
-            crop: 'center'
-          %}
-        {% endif %}
-        <div class="collection-product__content">
-          <p>{{ product.title | escape | link_to: product.url }}</p>
-          <p>{{ product.price | money }}</p>
-        </div>
-      </div>
-    {% endfor %}
-
-    {{ paginate | default_pagination }}
+  {% paginate collection.products by 12 %}
+    {% render 'product-card' for collection.products as product, show_vendor: false, lazy_load: true %}
+    {% if paginate.pages > 1 %}
+      {{ paginate | default_pagination }}
+    {% endif %}
   {% endpaginate %}
 </div>
 
 {% stylesheet %}
   .collection-products {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+    grid-template-columns: repeat(4, minmax(500px, 1fr));
+    gap: 20px;
+  }
+  @media (max-width: 768px) {
+    .collection-products {
+      grid-template-columns: repeat(2, minmax(500, 1fr));
+    }
   }
 {% endstylesheet %}
 

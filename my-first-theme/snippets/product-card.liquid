@@ -44,6 +44,10 @@
       {%- else -%}
         {{ 'product-1' | placeholder_svg_tag: 'product-card__placeholder' }}
       {%- endif -%}
+      {%  if product.compare_at_price > product.price %}
+        <span class="bage-sale" style="position: absolute; top: 10%; left: 10%; background-color: red; color: white"> sale  </span>
+        
+      {% endif %}
     </div>
 
     {% comment %} # 2. Thông tin chi tiết {% endcomment %}

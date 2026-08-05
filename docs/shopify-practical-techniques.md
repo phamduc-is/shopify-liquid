@@ -11,6 +11,7 @@ Tài liệu này lưu trữ các kỹ thuật lập trình Liquid, tối ưu hi�
 3. [Kỹ thuật 3: Isolated Scope Component & Thẻ Render Lặp Tối Ưu (`render for as`)](#3-kỹ-thuật-3-isolated-scope-component--thẻ-render-lặp-tối-ưu-render-for-as)
 4. [Kỹ thuật 4: Filter Chaining Làm Sạch SEO Meta Description](#4-kỹ-thuật-4-filter-chaining-làm-sạch-seo-meta-description)
 5. [Kỹ thuật 5: Fallback Mock Data Khi Cửa Hàng Chưa Có Sản Phẩm](#5-kỹ-thuật-5-fallback-mock-data-khi-cửa-hàng-chưa-có-sản-phẩm)
+6. [Kỹ thuật 6: `Handle` — Định Danh URL Của Resource & Cách Test Nhanh 1 Trang](#6-kỹ-thuật-6-handle--định-danh-url-của-resource--cách-test-nhanh-1-trang)
 
 ---
 
@@ -192,3 +193,47 @@ Sử dụng phép kiểm tra `collections.all.products.size == 0` kết hợp v�
   </div>
 {% endif %}
 ```
+
+---
+
+## 6. Kỹ thuật 6: `Handle` — Định Danh URL Của Resource & Cách Test Nhanh 1 Trang
+
+### 🚨 Vấn đề thực tế (Problem):
+Khi mới học Liquid, rất dễ nhầm giữa **tên hiển thị** (title) và **định danh dùng trong URL** của 1 collection/product/page. Muốn mở thử `sections/collection.liquid` trên trình duyệt nhưng không biết gõ URL nào, hoặc gọi nhầm `{% render 'collection' %}` (chỉ dùng được cho snippet) thay vì cách đúng để xem 1 section phụ thuộc object động như `collection`.
+
+### 💡 Giải pháp (Solution):
+**`handle`** là chuỗi định danh duy nhất, dạng slug (chữ thường, không dấu, cách nhau bằng `-`), được Shopify **tự sinh ra** từ title khi tạo resource (collection, product, page, blog, article, menu...). Handle chính là phần xuất hiện trong URL, khác với `title` (dùng để hiển thị cho người dùng đọc).
+
+| Field | Ý nghĩa | Ví dụ |
+|---|---|---|
+| `collection.title` | Tên hiển thị | `Áo Thun Nam` |
+| `collection.handle` | Định danh trong URL | `ao-thun-nam` |
+| URL thực tế | `title` + `handle` kết hợp qua route | `/collections/ao-thun-nam` |
+
+Mỗi loại resource có route riêng gắn với handle của nó:
+```liquid
+/collections/{{ collection.handle }}
+/products/{{ product.handle }}
+/pages/{{ page.handle }}
+/blogs/{{ blog.handle }}/{{ article.handle }}
+```
+
+Shopify luôn có sẵn 1 collection đặc biệt chứa **toàn bộ sản phẩm** với handle cố định là `all` — dùng để test nhanh khi chưa tạo collection riêng nào:
+```
+/collections/all
+```
+
+### 💻 Ví dụ Code Thực Tế:
+
+```liquid
+{% comment %} Lấy handle để tự build link, thay vì hard-code URL {% endcomment %}
+<a href="/collections/{{ collection.handle }}">{{ collection.title }}</a>
+
+{% comment %} Cách chuẩn hơn — dùng sẵn field .url đã build route đúng {% endcomment %}
+<a href="{{ collection.url }}">{{ collection.title }}</a>
+```
+
+#### 🔍 Lưu ý quan trọng khi kiểm thử section phụ thuộc object động:
+- `{% render %}` **chỉ render được snippet** (`/snippets`). Muốn nhúng section thủ công phải dùng `{% section 'ten-section' %}`.
+- Nhưng 1 section như `collection.liquid` phụ thuộc global object `collection` — object này **chỉ tự động có giá trị khi bạn đang đứng đúng route `/collections/<handle>`**. Nhúng section đó vào `layout/theme.liquid` (chạy trên mọi trang) sẽ khiến `collection` = `nil` ở các trang khác, gây lỗi hoặc không hiển thị gì.
+- → Cách đúng để test: **truy cập trực tiếp URL route tương ứng** (`/collections/all` hoặc `/collections/<handle-thật>`) trên bản preview, không cần render thủ công.
