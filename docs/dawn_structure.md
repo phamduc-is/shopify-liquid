@@ -10,7 +10,8 @@ dawn/
 ├── locales/        ← Chứa các file đa ngôn ngữ (.json)
 ├── sections/       ← Chứa các thành phần giao diện động (Sections)
 ├── snippets/       ← Chứa các đoạn code tái sử dụng (Snippets)
-└── templates/      ← Chứa các file cấu hình trang (JSON & Liquid templates)
+├── templates/      ← Chứa các file cấu hình trang (JSON & Liquid templates)
+└── blocks/         ← Chứa các Theme Block tái sử dụng chéo qua nhiều section
 ```
 
 ---
@@ -52,3 +53,10 @@ Chứa các đoạn mã nhỏ tái sử dụng nhiều lần trong các section 
 Định nghĩa cấu trúc giao diện cho từng loại trang của Shopify (Trang chủ, Trang sản phẩm, Trang bộ sưu tập...):
 - Hầu hết các templates hiện đại (Online Store 2.0) là dạng **JSON templates** (như `index.json`, `product.json`, `collection.json`, `cart.json`).
 - Các file JSON này định nghĩa thứ tự hiển thị và tham số của các **sections** trên trang tương ứng.
+
+### 8. `blocks/`
+Chứa **Theme Block** — khác với "block" khai báo bên trong `{% schema %}` của 1 section cụ thể, mỗi file trong `blocks/` là 1 component **độc lập, tái sử dụng chéo qua nhiều section khác nhau** (thậm chí lồng vào nhau):
+- Có `{% schema %}` riêng (giống Section) để merchant tự customize trong Theme Editor.
+- Chỉ được 1 section/block khác "nhúng" vào nếu section/block đó khai báo `"blocks": [{ "type": "@theme" }]` và gọi `{% content_for 'blocks' %}` tại vị trí muốn hiển thị.
+- Ví dụ: `group.liquid` (bọc layout cho các block con), `text.liquid` (hiển thị đoạn text tuỳ chỉnh).
+- Giới hạn: tối đa 8 tầng lồng nhau (nested blocks depth) — xem [shopify_theme_roadmap_detail.md](shopify_theme_roadmap_detail.md) mục Ngày 8.

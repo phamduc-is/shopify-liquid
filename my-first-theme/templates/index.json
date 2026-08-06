@@ -12,9 +12,49 @@
     "main": {
       "type": "hello-world",
       "settings": {}
+    },
+    "feature_banner_1": {
+      "type": "feature-banner",
+      "settings": {
+        "content_alignment": "center",
+        "overlay_color": "#000000"
+      },
+      "blocks": {
+        "group_1": {
+          "type": "group",
+          "settings": {
+            "layout_direction": "group--horizontal",
+            "padding": 20
+          },
+          "block_order": [
+            "text_1",
+            "text_2"
+          ],
+          "blocks": {
+            "text_1": {
+              "type": "text",
+              "settings": {
+                "text": "Sale 50%",
+                "text_style": "text--title"
+              }
+            },
+            "text_2": {
+              "type": "text",
+              "settings": {
+                "text": "Chỉ hôm nay",
+                "text_style": "text--subtitle"
+              }
+            }
+          }
+        }
+      },
+      "block_order": [
+        "group_1"
+      ]
     }
   },
   "order": [
-    "main"
+    "main",
+    "feature_banner_1"
   ]
 }

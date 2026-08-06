@@ -25,7 +25,9 @@ Tài liệu tổng hợp toàn bộ lý thuyết, cú pháp, quy tắc kiến tr
 | 13 | **Built-in: Request Object (page_type, path)** | `5. Đối Tượng request (Thông Tin Yêu Cầu Trang)` | [Xem Bài](#5-đối-tượng-request-thông-tin-yêu-cầu-trang) |
 | 14 | **Snippet & Render OS 2.0** | `🧩 Ngày 6 — Snippets, Thẻ render & Cấu Trúc Component Tái Sử Dụng` | [Xem Bài](#-ngày-6--snippets-thẻ-render--cấu-trúc-component-tái-sử-dụng) |
 | 15 | **Whitespace, Metafields & Content-For** | `🚀 Ngày 7 — Liquid Nâng Cao & Mini-Project Collection Page` | [Xem Bài](#-ngày-7--liquid-nâng-cao--mini-project-collection-page) |
-| 16 | **Bảng Tra Cứu Cheat-Sheet** | `📝 BẢNG TRA CỨU NHANH CÚ PHÁP LIQUID (CHEAT-SHEET)` | [Xem Bài](#-bảng-tra-cứu-nhanh-cú-pháp-liquid-cheat-sheet) |
+| 16 | **Layout, Template & Limits** | `🏛️ Ngày 8 — Layout & Templates (Theme Architecture)` | [Xem Bài](#️-ngày-8--layout--templates-theme-architecture) |
+| 17 | **Section Schema: settings/blocks/presets** | `🧱 Ngày 9 — Sections Cơ Bản & Section Schema` | [Xem Bài](#-ngày-9--sections-cơ-bản--section-schema) |
+| 18 | **Bảng Tra Cứu Cheat-Sheet** | `📝 BẢNG TRA CỨU NHANH CÚ PHÁP LIQUID (CHEAT-SHEET)` | [Xem Bài](#-bảng-tra-cứu-nhanh-cú-pháp-liquid-cheat-sheet) |
 
 ---
 
@@ -42,8 +44,13 @@ graph TD
         D6 --> D7["Ngày 7: Liquid Nâng Cao & Tổng Hợp (Đã học)"]
     end
     
-    subgraph Giai_Doan_Tiep_Theo ["Giai Đoạn 3+: Architecture & Advanced Theme"]
-        D7 --> D8_Plus["Ngày 8+: Layouts, Templates, Sections, Blocks..."]
+    subgraph Giai_Doan_3 ["Giai Đoạn 3: Theme Architecture (Ngày 8–9, Đã học)"]
+        D7 --> D8["Ngày 8: Layout & Templates"]
+        D8 --> D9["Ngày 9: Sections & Section Schema"]
+    end
+
+    subgraph Giai_Doan_Tiep_Theo ["Giai Đoạn 3+ tiếp theo"]
+        D9 --> D10_Plus["Ngày 10+: Blocks nâng cao, Section Groups, Global Settings..."]
     end
 ```
 
@@ -476,6 +483,182 @@ Vì `templates/collection.json` là **JSON Template**, nội dung thực sự n�
 
 ---
 
+### 🏛️ Ngày 8 — Layout & Templates (Theme Architecture)
+
+#### 1. `layout/theme.liquid` — Khung xương của mọi trang
+
+```
+layout/theme.liquid
+  └── <head>: SEO, {{ content_for_header }}  ← BẮT BUỘC
+  └── <body>
+       ├── {% section 'header' %}
+       ├── <main>{{ content_for_layout }}</main>  ← "khoét lỗ" cho nội dung template
+       └── {% section 'footer' %}
+```
+
+Layout không cố định 1 file — template có thể **override** layout mặc định qua field `"layout"` trong JSON template:
+```json
+// templates/password.json
+{ "layout": "password", "sections": {...}, "order": [...] }
+```
+→ Route password dùng `layout/password.liquid` (không header/footer) thay vì `layout/theme.liquid` mặc định — dùng cho các trang cần khung tối giản (password, checkout embed...).
+
+#### 2. Templates — quyết định nội dung theo route
+
+| Kiểu | Ví dụ | Đặc điểm |
+| :--- | :--- | :--- |
+| `.json` (chuẩn OS 2.0) | `index.json`, `product.json`, `collection.json` | Merchant kéo-thả section trong Theme Editor, không cần code |
+| `.liquid` (kiểu cũ) | `gift_card.liquid` | Code viết cứng, merchant không customize được |
+
+**Custom page template**: tạo `templates/page.<tên>.json` (VD `page.about.json`) → Admin → Pages sẽ có thêm lựa chọn template "about" cho merchant chọn.
+
+#### 3. Bảng Limits cần nhớ
+
+| Giới hạn | Giá trị | Ý nghĩa thực tế |
+| :--- | :--- | :--- |
+| Sections / template | 25 | Không nhồi quá nhiều section/trang |
+| Blocks / section | 50 | |
+| Nested blocks depth | 8 | Block lồng block tối đa 8 tầng |
+| `for` loop iterations | 50 | Vượt quá bắt buộc dùng `paginate` |
+| File size / section-snippet | 100KB | |
+| Tổng số file theme | 1,000 | |
+
+> 💡 Giới hạn "50 iterations" chính là lý do bắt buộc dùng `paginate` khi render `collection.products` — không chỉ vì UX, Liquid sẽ cắt ngang nếu `for` quá 50 phần tử.
+
+#### 🛠️ Ghi chú (Ngày 8):
+Ngày này thiên về đọc hiểu kiến trúc, roadmap không có mini-project riêng.
+
+---
+
+### 🧱 Ngày 9 — Sections Cơ Bản & Section Schema
+
+#### 1. Anatomy 1 file Section
+
+```
+sections/my-section.liquid
+├── HTML markup       → dùng {{ section.settings.xxx }}
+├── {% schema %}       → name, tag, class, settings[], blocks[], max_blocks, presets[]
+├── {% stylesheet %}   → CSS riêng (Shopify tự dedupe, dù section lặp nhiều lần/trang chỉ load 1 lần)
+└── {% javascript %}   → JS riêng (optional)
+```
+
+`name`/`tag`/`class` — 3 vai trò độc lập, KHÔNG phải để "nhận diện":
+
+| Field | Vai trò thật |
+| :--- | :--- |
+| `name` | Tên hiển thị trong danh sách "Add section" (UI merchant) |
+| `tag` | Thẻ HTML Shopify tự bọc quanh output (`section`/`div`/`article`) |
+| `class` | CSS class thêm vào đúng thẻ bọc đó |
+
+#### 2. `settings[]` — bảng type đầy đủ
+
+| Type | Field đặc thù | Giá trị trả về |
+| :--- | :--- | :--- |
+| `text`, `textarea` | — | string |
+| `richtext` | — | string **có sẵn HTML** |
+| `select`, `radio` | `options: [{value,label}]` | value đã chọn |
+| `checkbox` | — | `true`/`false` |
+| `range` | `min`, `max`, `step`, `unit` | number |
+| `color` | — | string mã màu |
+| `image_picker` | — | **image object** (cần `\| image_url`) |
+| `product`/`collection`/`page` | — | **object** đầy đủ |
+| `text_alignment` | tự có left/center/right | string |
+| `header`, `paragraph` | — | **không có `id`**, không lưu giá trị, chỉ hiển thị UI |
+
+> ⚠️ Mỗi phần tử trong `settings[]` gọi là **"setting field"**, KHÔNG gọi là "block" — tránh nhầm với khái niệm Block (mục 3).
+
+#### 2b. 2 file locale khác nhau — dễ nhầm
+
+| File | Dùng cho | Gọi bằng |
+| :--- | :--- | :--- |
+| `locales/en.default.json` | Text khách hàng thấy ngoài storefront | filter `\| t` trong HTML, VD `{{ 'password.enter' \| t }}` |
+| `locales/en.default.schema.json` | Text merchant thấy **trong Theme Editor** (label, tên section) | tiền tố `t:` **trong `{% schema %}`**, VD `"name": "t:general.group"` |
+
+#### 3. `blocks[]` — Classic block vs Theme block (`@theme`)
+
+| | Classic block | Theme block (`@theme`) |
+| :--- | :--- | :--- |
+| Khai báo | `"blocks": [{"type":"text_block","settings":[...]}]` ngay trong schema section | File riêng trong thư mục `blocks/`, section chỉ ghi `"blocks":[{"type":"@theme"}]` |
+| Tái dùng chéo section khác | ❌ Không | ✅ Có |
+| Render | `{% for block in section.blocks %}{% case block.type %}...{% endcase %}{% endfor %}` | `{% content_for 'blocks' %}` |
+| Lồng block trong block | Không hỗ trợ | ✅ Có (VD Group chứa Text, tối đa 8 tầng) |
+
+Ví dụ thật trong project: [sections/custom-section.liquid](../my-first-theme/sections/custom-section.liquid) dùng `@theme`, cho phép nhúng [blocks/group.liquid](../my-first-theme/blocks/group.liquid) và [blocks/text.liquid](../my-first-theme/blocks/text.liquid). Dữ liệu block instance (id, settings, `block_order`) được lưu trong file JSON template (VD `templates/index.json`), không nằm trong file `.liquid`.
+
+#### 4. `presets[]` — ⚠️ dễ hiểu sai nhất
+
+`preset.settings` **KHÔNG PHẢI** nơi viết CSS tự do. Nó chỉ set giá trị mặc định cho **đúng những `id` đã tồn tại trong `settings[]`** — không thể thêm key tuỳ ý hay property CSS:
+```json
+"presets": [
+  { "name": "Feature Banner — Sale", "settings": { "height": "large" } }
+  // "height" PHẢI đã khai báo id ở settings[] phía trên, không phải CSS
+]
+```
+`preset.name` = tên hiện trong khay "Add section" (catalog chọn), không phải text hiển thị thật trên trang.
+
+#### 5. Block Instance trong file JSON Template — cú pháp đầy đủ & cách hoạt động
+
+Có 2 việc hoàn toàn khác nhau, dễ lẫn lộn:
+
+| | Khai báo Ở ĐÂU | Vai trò |
+| :--- | :--- | :--- |
+| **Schema `blocks[]`** (mục 3) | Trong file `.liquid` | Định nghĩa **LUẬT**: loại block nào ĐƯỢC PHÉP thêm |
+| **Block instance** (mục này) | Trong file `.json` (template) | Lưu **THỰC THỂ CỤ THỂ** đã thêm — id nào, settings gì, thứ tự nào |
+
+**Cú pháp đầy đủ 1 block instance** — chỉ đúng 5 field built-in này, thêm key lạ sẽ bị Shopify âm thầm bỏ qua:
+
+```json
+"block_key_tuỳ_đặt": {
+  "type": "text",
+  "settings": { "id_setting": "giá_trị" },
+  "blocks": { "block_key_con": { ... } },
+  "block_order": ["block_key_con"],
+  "disabled": false
+}
+```
+
+| Field | Bắt buộc? | Ý nghĩa |
+| :--- | :--- | :--- |
+| `type` | ✅ | Khớp tên block đã khai (classic type trong schema, hoặc tên file trong `blocks/` nếu section cha dùng `@theme`) |
+| `settings` | Tuỳ chọn | Key phải trùng đúng `id` đã khai trong `settings[]` của schema block đó; thiếu field nào tự lấy `default` |
+| `blocks` | Tuỳ chọn | Chỉ có tác dụng nếu **chính block này** cũng khai `"blocks":[{"type":"@theme"}]` trong schema của nó (VD `group.liquid`) — chứa block CON lồng bên trong |
+| `block_order` | Bắt buộc nếu có `blocks` | Thứ tự hiển thị các key trong `blocks` — vì JSON object `{}` không đảm bảo giữ thứ tự như array `[]`, nên cần mảng riêng để chỉ rõ thứ tự |
+| `disabled` | Tuỳ chọn | `true` = ẩn block khi render, giữ nguyên config (khác xoá hẳn) |
+
+> ⚠️ `"group_1"`, `"text_1"`... chỉ là **key bạn tự đặt** để làm ID nhận diện (miễn không trùng key khác cùng cấp) — **không phải** giá trị của 1 field tên `"name"`. Đừng nhầm với `"name"` trong `{% schema %}` (đó là field khác, hiện tên trong Theme Editor).
+
+**Ví dụ trace 3 tầng lồng nhau — đúng cấu trúc thật trong project:**
+```json
+"feature_banner_1": {
+  "type": "custom-section",
+  "settings": { "background_image": "banner.jpg" },
+  "blocks": {
+    "group_1": {
+      "type": "group",
+      "settings": { "layout_direction": "group--horizontal", "padding": 20 },
+      "blocks": {
+        "text_1": { "type": "text", "settings": { "text": "Sale 50%", "text_style": "text--title" } },
+        "text_2": { "type": "text", "settings": { "text": "Chỉ hôm nay", "text_style": "text--subtitle" } }
+      },
+      "block_order": ["text_1", "text_2"]
+    }
+  },
+  "block_order": ["group_1"]
+}
+```
+→ HTML render ra: `<div class="custom-section">` → `<div class="group group--horizontal">` → 2 `<div class="text ...">` lồng bên trong, đúng thứ tự `block_order`.
+
+#### ⚠️ 3 hiểu lầm phổ biến cần tránh (đã sửa qua thực hành)
+
+1. **"Viết `feature_banner_1` vào JSON = đổi router tới `feature-banner.liquid`"** — SAI. Route (URL nào dùng template nào) không hề đổi. `index.json` **đã cố định** cho route `/` từ trước; thêm object mới chỉ là **thêm 1 khối nội dung mới** vào trang đã tồn tại sẵn, `"type"` chỉ chọn dùng file `.liquid` nào để vẽ khối đó — không liên quan gì tới định tuyến URL.
+2. **"Thêm block = chèn code HTML+schema vào bên trong file section"** — SAI. Code của block (`blocks/group.liquid`, `blocks/text.liquid`) **đã tồn tại sẵn** ở file riêng, không hề bị copy/chèn vào `feature-banner.liquid`. JSON chỉ tạo 1 **tham chiếu (reference)**: "tại vị trí `{% content_for 'blocks' %}`, hãy chạy giùm file này rồi dán KẾT QUẢ vào đây" — file gốc không đổi 1 dòng nào.
+3. **"Các object trong JSON được lấy từ schema"** — SAI. Object trong JSON là do **người viết theme tự gõ ra** (hoặc Theme Editor tự ghi khi merchant kéo-thả), **không phải** Shopify tự sinh/copy từ schema. Schema chỉ đóng vai trò **luật kiểm tra** (id/type nào hợp lệ) — JSON phải *tuân theo* luật đó, không phải *lấy từ* luật đó.
+
+#### 🛠️ Bài Tập Đang Thực Hiện (Ngày 9):
+- `sections/feature-banner.liquid`: Section áp dụng đủ `image_picker`, `text_alignment`, `header`, `@theme` blocks, `tag`/`class`, 2 `presets` — đang trong quá trình hoàn thiện.
+
+---
+
 ## 📚 BẢNG TỔNG HỢP CÁC THUỘC TÍNH BUILT-IN CỐT LÕI (OBJECT PROPERTIES)
 
 ### 1. Đối Tượng `link` (Navigation / Menu)
@@ -535,7 +718,7 @@ Vì `templates/collection.json` là **JSON Template**, nội dung thực sự n�
 
 ## 🔮 CÁC NGÀY TIẾP THEO (SẼ CẬP NHẬT TIẾP TỤC)
 
-- **Ngày 8 trở đi:** Layouts, Templates, Sections, Blocks, Theme Settings & Shopify CLI Advanced.
+- **Ngày 10 trở đi:** Blocks nâng cao & Section Groups, Global Settings/Config/Theme Editor, Locales & Best Practices tổng quan.
 
 ---
 

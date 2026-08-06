@@ -1,0 +1,126 @@
+{% comment %}
+  Ngày 9 — Feature Banner: áp dụng settings đủ type, {% content_for 'blocks' %}
+  cho theme block (@theme), tag/class ở schema, presets đúng chuẩn.
+{% endcomment %}
+
+{%- if section.settings.bg_image -%}
+  <div class="feature-banner__image">
+    <img
+      src="{{ section.settings.bg_image | image_url: width: 1920 }}"
+      srcset="
+        {{ section.settings.bg_image | image_url: width: 768 }} 768w,
+        {{ section.settings.bg_image | image_url: width: 1200 }} 1200w,
+        {{ section.settings.bg_image | image_url: width: 1920 }} 1920w
+      "
+      sizes="100vw"
+      alt="{{ section.settings.bg_image.alt | escape }}"
+      loading="lazy"
+      width="{{ section.settings.bg_image.width }}"
+      height="{{ section.settings.bg_image.height }}"
+    >
+  </div>
+{%- endif -%}
+
+<div
+  class="feature-banner__content feature-banner__content--{{ section.settings.height }}"
+  style="
+    text-align: {{ section.settings.content_alignment }};
+    background-color: {{ section.settings.overlay_color }};
+  "
+>
+  {% content_for 'blocks' %}
+</div>
+
+{% stylesheet %}
+  .feature-banner {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .feature-banner__image {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  .feature-banner__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .feature-banner__content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .feature-banner__content--small {
+    min-height: 400px;
+  }
+
+  .feature-banner__content--medium {
+    min-height: 600px;
+  }
+
+  .feature-banner__content--large {
+    min-height: 100vh;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Feature Banner",
+  "tag": "section",
+  "class": "feature-banner",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Background"
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "label": "Height Section",
+      "options": [
+        { "value": "small", "label": "Small (400px)" },
+        { "value": "medium", "label": "Medium (600px)" },
+        { "value": "large", "label": "Large (full)" }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text_alignment",
+      "id": "content_alignment",
+      "label": "Text Alignment",
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Content in here"
+    }
+  ],
+  "blocks": [
+    { "type": "@theme" }
+  ],
+  "presets": [
+    {
+      "name": "Feature Banner - Sale",
+      "settings": { "height": "large", "overlay_color": "#cccccc" }
+    },
+    {
+      "name": "Feature Banner - New Arrival",
+      "settings": { "height": "small", "overlay_color": "#2980b9" }
+    }
+  ]
+}
+{% endschema %}
