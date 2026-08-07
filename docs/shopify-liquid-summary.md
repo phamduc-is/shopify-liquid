@@ -27,7 +27,8 @@ Tài liệu tổng hợp toàn bộ lý thuyết, cú pháp, quy tắc kiến tr
 | 15 | **Whitespace, Metafields & Content-For** | `🚀 Ngày 7 — Liquid Nâng Cao & Mini-Project Collection Page` | [Xem Bài](#-ngày-7--liquid-nâng-cao--mini-project-collection-page) |
 | 16 | **Layout, Template & Limits** | `🏛️ Ngày 8 — Layout & Templates (Theme Architecture)` | [Xem Bài](#️-ngày-8--layout--templates-theme-architecture) |
 | 17 | **Section Schema: settings/blocks/presets** | `🧱 Ngày 9 — Sections Cơ Bản & Section Schema` | [Xem Bài](#-ngày-9--sections-cơ-bản--section-schema) |
-| 18 | **Bảng Tra Cứu Cheat-Sheet** | `📝 BẢNG TRA CỨU NHANH CÚ PHÁP LIQUID (CHEAT-SHEET)` | [Xem Bài](#-bảng-tra-cứu-nhanh-cú-pháp-liquid-cheat-sheet) |
+| 18 | **Section Groups & Classic Block (limit/case)** | `🧩 Ngày 10 — Sections Nâng Cao: Blocks & Section Groups` | [Xem Bài](#-ngày-10--sections-nâng-cao-blocks--section-groups) |
+| 19 | **Bảng Tra Cứu Cheat-Sheet** | `📝 BẢNG TRA CỨU NHANH CÚ PHÁP LIQUID (CHEAT-SHEET)` | [Xem Bài](#-bảng-tra-cứu-nhanh-cú-pháp-liquid-cheat-sheet) |
 
 ---
 
@@ -44,13 +45,14 @@ graph TD
         D6 --> D7["Ngày 7: Liquid Nâng Cao & Tổng Hợp (Đã học)"]
     end
     
-    subgraph Giai_Doan_3 ["Giai Đoạn 3: Theme Architecture (Ngày 8–9, Đã học)"]
+    subgraph Giai_Doan_3 ["Giai Đoạn 3: Theme Architecture (Ngày 8–10, Đã học)"]
         D7 --> D8["Ngày 8: Layout & Templates"]
         D8 --> D9["Ngày 9: Sections & Section Schema"]
+        D9 --> D10["Ngày 10: Classic Block & Section Groups"]
     end
 
     subgraph Giai_Doan_Tiep_Theo ["Giai Đoạn 3+ tiếp theo"]
-        D9 --> D10_Plus["Ngày 10+: Blocks nâng cao, Section Groups, Global Settings..."]
+        D10 --> D11_Plus["Ngày 11+: Global Settings/Config, Theme Editor, Locales..."]
     end
 ```
 
@@ -659,6 +661,89 @@ Có 2 việc hoàn toàn khác nhau, dễ lẫn lộn:
 
 ---
 
+### 🧩 Ngày 10 — Sections Nâng Cao: Blocks & Section Groups
+
+#### 1. Section Groups — khác hẳn "Block", dễ nhầm vì tên gần giống
+
+| | `{% section 'x' %}` (số ít) | `{% sections 'x-group' %}` (số nhiều) |
+| :--- | :--- | :--- |
+| Render | Đúng 1 section | **Cả 1 NHÓM section** khai báo trong file `x-group.json` |
+| Merchant tuỳ chỉnh | Không thêm/bớt được section khác | **Thêm/bớt/sắp xếp lại** nhiều section trong nhóm |
+| File cấu hình | Không cần | `sections/<tên>-group.json` — cùng cấu trúc `sections{}`+`order[]` như template |
+
+Ví dụ thật trong project — [layout/theme.liquid](../my-first-theme/layout/theme.liquid):
+```liquid
+{% sections 'header-group' %}
+...
+{{ content_for_layout }}
+...
+{% sections 'footer-group' %}
+```
+[sections/header-group.json](../my-first-theme/sections/header-group.json):
+```json
+{
+  "type": "header",
+  "sections": { "header": { "type": "header", "settings": {} } },
+  "order": ["header"]
+}
+```
+→ Dùng Section Group cho header/footer để merchant có thể **tự thêm section khác vào giữa** (VD 1 thanh khuyến mãi phía trên header) mà không cần dev sửa code — vì file `*-group.json` cũng có `order[]` y hệt template.
+
+#### 2. Classic Block nâng cao — `limit` + nhiều `type` trong 1 section
+
+**Quan trọng nhất cần nhớ**: Classic block **KHÔNG có file riêng** như Theme block (`@theme`, Ngày 9) — toàn bộ settings khai báo **ngay bên trong `schema.blocks[]` của chính section đó**:
+
+```json
+"blocks": [
+  {
+    "type": "icon_with_text",
+    "name": "Icon with text",
+    "limit": 4,
+    "settings": [
+      { "type": "select", "id": "icon", "label": "Icon", "options": [...] },
+      { "type": "text", "id": "heading", "label": "Heading" }
+    ]
+  }
+]
+```
+- `limit: 4` → merchant tối đa thêm 4 block loại này (giới hạn riêng từng `type`, độc lập nhau).
+- Classic block **chỉ tồn tại và dùng được trong đúng 1 file section đã khai nó** — muốn dùng lại ở section khác phải **copy y nguyên khai báo** sang, sửa 1 bên không tự đồng bộ bên kia (khác hẳn `@theme` dùng chung 1 file cho mọi section).
+
+**Render bằng `case`/`when` — cú pháp chuẩn (hay viết sai):**
+```liquid
+{% for block in section.blocks %}
+  <div {{ block.shopify_attributes }}>
+    {% case block.type %}
+      {% when 'icon_with_text' %}
+        <h3>{{ block.settings.heading }}</h3>
+      {% when 'image_with_text' %}
+        <img src="{{ block.settings.image | image_url: width: 600 }}">
+    {% endcase %}
+  </div>
+{% endfor %}
+```
+> ⚠️ Lỗi hay gặp: viết `{% case block.icon_with_text %}` — SAI. `case` phải đặt **tên biến** (`block.type`), còn `'icon_with_text'` chỉ xuất hiện trong `when` để so sánh giá trị.
+
+`{{ block.shopify_attributes }}` — **luôn phải có** trên thẻ HTML gốc của mỗi block, để Theme Editor highlight đúng block khi merchant hover/click.
+
+#### 3. `presets.blocks` — tạo sẵn NỘI DUNG mặc định, không phải "hiển thị mặc định"
+
+```json
+"presets": [{
+  "name": "Feature Columns",
+  "blocks": [
+    { "type": "icon_with_text", "settings": { "icon": "truck", "heading": "Free Shipping" }},
+    { "type": "icon_with_text", "settings": { "icon": "lock", "heading": "Secure Payment" }}
+  ]
+}]
+```
+→ Khi merchant lần đầu thêm section này, Shopify **tự động tạo sẵn các block instance thật** (có data cụ thể) — không phải chỉnh CSS/style hiển thị. Không có `presets.blocks` → section thêm vào sẽ **trống trơn**, merchant phải tự bấm "Add block" từng cái.
+
+#### 🛠️ Bài Tập Đã Thực Hiện (Ngày 10):
+- `sections/trust-badge.liquid`: Section dùng classic block `icon_with_text` (`limit: 3`), render bằng `for` + `case block.type` + `block.shopify_attributes`, `presets.blocks` tạo sẵn 2 block mặc định.
+
+---
+
 ## 📚 BẢNG TỔNG HỢP CÁC THUỘC TÍNH BUILT-IN CỐT LÕI (OBJECT PROPERTIES)
 
 ### 1. Đối Tượng `link` (Navigation / Menu)
@@ -718,7 +803,7 @@ Có 2 việc hoàn toàn khác nhau, dễ lẫn lộn:
 
 ## 🔮 CÁC NGÀY TIẾP THEO (SẼ CẬP NHẬT TIẾP TỤC)
 
-- **Ngày 10 trở đi:** Blocks nâng cao & Section Groups, Global Settings/Config/Theme Editor, Locales & Best Practices tổng quan.
+- **Ngày 11 trở đi:** Global Settings/Config, Theme Editor, Locales & Best Practices tổng quan.
 
 ---
 
