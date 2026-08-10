@@ -1,0 +1,77 @@
+{
+  "general": {
+    "404": "Introuvable",
+    "article": "Article",
+    "block": "Bloc",
+    "blog": "Blog",
+    "cart": "Panier",
+    "collection": "Collection",
+    "collections": "Collections",
+    "collection_card": "Carte de collection",
+    "collections_grid": "Grille de collections",
+    "colors": "Couleurs",
+    "column": "Colonne",
+    "content": "Contenu",
+    "custom_section": "Section personnalisée",
+    "fonts": "Polices",
+    "footer": "Pied de page",
+    "group": "Groupe",
+    "header": "En-tête",
+    "layout": "Mise en page",
+    "main": "Principal",
+    "page": "Page",
+    "password": "Mot de passe",
+    "primary": "Principal",
+    "product": "Produit",
+    "row": "Ligne",
+    "search": "Recherche",
+    "secondary": "Secondaire",
+    "section": "Section",
+    "settings": "Paramètres",
+    "sidebar": "Barre latérale",
+    "text": "Texte",
+    "theme": "Thème",
+    "typography": "Typographie"
+  },
+  "labels": {
+    "alignment": "Alignement",
+    "background": "Arrière-plan",
+    "foreground": "Couleur du texte",
+    "grid_gap": "Espacement de la grille",
+    "grid_item_width": "Largeur des éléments",
+    "input_corner_radius": "Rayon des champs de saisie",
+    "layout_direction": "Direction de la mise en page",
+    "menu": "Menu",
+    "customer_account_menu": "Menu du compte client",
+    "padding": "Marge intérieure",
+    "page_margin": "Marge de page",
+    "page_width": "Largeur de page",
+    "show_payment_icons": "Afficher les icônes de paiement",
+    "text_style": "Style de texte",
+    "text": "Texte"
+  },
+  "options": {
+    "alignment": {
+      "left": "Gauche",
+      "center": "Centre",
+      "right": "Droite"
+    },
+    "direction": {
+      "horizontal": "Horizontal",
+      "vertical": "Vertical"
+    },
+    "page_width": {
+      "narrow": "Étroite",
+      "wide": "Large"
+    },
+    "size": {
+      "large": "Grand",
+      "small": "Petit"
+    },
+    "text_style": {
+      "title": "Titre",
+      "subtitle": "Sous-titre",
+      "normal": "Texte normal"
+    }
+  }
+}

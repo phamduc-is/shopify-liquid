@@ -79,5 +79,32 @@
         "default": 4
       }
     ]
+  },
+  {
+    "name": "Buttons",
+    "settings": [
+      {
+        "type": "color",
+        "id": "button_bg_color",
+        "label": "Button background",
+        "default": "#2980b9"
+      },
+      {
+        "type": "color",
+        "id": "button_text_color",
+        "label": "Button text",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "range",
+        "id": "button_corner_radius",
+        "label": "Button corner radius",
+        "min": 0,
+        "max": 20,
+        "step": 1,
+        "unit": "px",
+        "default": 4
+      }
+    ]
   }
 ]

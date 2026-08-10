@@ -28,7 +28,9 @@ Tài liệu tổng hợp toàn bộ lý thuyết, cú pháp, quy tắc kiến tr
 | 16 | **Layout, Template & Limits** | `🏛️ Ngày 8 — Layout & Templates (Theme Architecture)` | [Xem Bài](#️-ngày-8--layout--templates-theme-architecture) |
 | 17 | **Section Schema: settings/blocks/presets** | `🧱 Ngày 9 — Sections Cơ Bản & Section Schema` | [Xem Bài](#-ngày-9--sections-cơ-bản--section-schema) |
 | 18 | **Section Groups & Classic Block (limit/case)** | `🧩 Ngày 10 — Sections Nâng Cao: Blocks & Section Groups` | [Xem Bài](#-ngày-10--sections-nâng-cao-blocks--section-groups) |
-| 19 | **Bảng Tra Cứu Cheat-Sheet** | `📝 BẢNG TRA CỨU NHANH CÚ PHÁP LIQUID (CHEAT-SHEET)` | [Xem Bài](#-bảng-tra-cứu-nhanh-cú-pháp-liquid-cheat-sheet) |
+| 19 | **Global Settings: settings_schema.json, font_picker** | `⚙️ Ngày 11 — Global Settings, Config & Theme Editor` | [Xem Bài](#️-ngày-11--global-settings-config--theme-editor) |
+| 20 | **Locales: \| t, t:, publish ngôn ngữ** | `🌐 Ngày 12 — Locales, Ôn tập & Best Practices` | [Xem Bài](#-ngày-12--locales-ôn-tập--best-practices) |
+| 21 | **Bảng Tra Cứu Cheat-Sheet** | `📝 BẢNG TRA CỨU NHANH CÚ PHÁP LIQUID (CHEAT-SHEET)` | [Xem Bài](#-bảng-tra-cứu-nhanh-cú-pháp-liquid-cheat-sheet) |
 
 ---
 
@@ -45,14 +47,16 @@ graph TD
         D6 --> D7["Ngày 7: Liquid Nâng Cao & Tổng Hợp (Đã học)"]
     end
     
-    subgraph Giai_Doan_3 ["Giai Đoạn 3: Theme Architecture (Ngày 8–10, Đã học)"]
+    subgraph Giai_Doan_3 ["Giai Đoạn 3: Theme Architecture (Ngày 8–12, Đã học)"]
         D7 --> D8["Ngày 8: Layout & Templates"]
         D8 --> D9["Ngày 9: Sections & Section Schema"]
         D9 --> D10["Ngày 10: Classic Block & Section Groups"]
+        D10 --> D11["Ngày 11: Global Settings & Config"]
+        D11 --> D12["Ngày 12: Locales & Checkpoint"]
     end
 
-    subgraph Giai_Doan_Tiep_Theo ["Giai Đoạn 3+ tiếp theo"]
-        D10 --> D11_Plus["Ngày 11+: Global Settings/Config, Theme Editor, Locales..."]
+    subgraph Giai_Doan_4_Tiep_Theo ["Giai Đoạn 4 tiếp theo"]
+        D12 --> D13_Plus["Ngày 13+: Header & Footer hoàn chỉnh, Product Page..."]
     end
 ```
 
@@ -744,6 +748,105 @@ Ví dụ thật trong project — [layout/theme.liquid](../my-first-theme/layout
 
 ---
 
+### ⚙️ Ngày 11 — Global Settings, Config & Theme Editor
+
+#### 1. `config/settings_schema.json` — cấu trúc MẢNG lồng NHÓM, khác Section Schema
+
+```json
+[
+  { "name": "theme_info", "theme_name": "...", ... },   ← phần tử ĐẶC BIỆT đầu tiên, không có "settings"
+  { "name": "Typography", "settings": [ ... ] },         ← 1 NHÓM = 1 tab trong Theme Settings panel
+  { "name": "Colors", "settings": [ ... ] }
+]
+```
+
+| So với Section Schema | `settings_schema.json` |
+| :--- | :--- |
+| `settings[]` là 1 mảng phẳng duy nhất | `settings[]` nằm lồng bên trong từng object nhóm, các nhóm nằm trong 1 mảng ngoài cùng |
+| `name` = tên hiện "Add section" | `name` (ở object nhóm) = **tên tab** trong Theme Settings |
+| Không có `theme_info` | Phần tử đầu tiên **luôn phải là `theme_info`** (metadata theme, không có `settings`) |
+
+#### 2. `font_picker` — trả về Font Object, không phải string
+
+```liquid
+{{ settings.type_primary_font.family }}              → "Work Sans"
+{{ settings.type_primary_font.fallback_families }}    → "sans-serif"
+{{ settings.type_primary_font.style }}                → "normal"/"italic"
+{{ settings.type_primary_font.weight }}                → 400/700
+```
+**`font_face` filter** — bắt buộc gọi thì trình duyệt mới thực sự tải file font (lấy `.family` chỉ ra tên, không phải file):
+```liquid
+{{ settings.type_primary_font | font_face: font_display: 'swap' }}
+{{ settings.type_primary_font | font_modify: 'weight', 'bold' | font_face: font_display: 'swap' }}
+```
+→ Gọi nhiều lần với `font_modify` để tải đủ biến thể bold/italic, tránh trình duyệt tự giả lập (faux bold/italic bị vỡ nét).
+
+#### 3. `{% style %}` khác `{% stylesheet %}`
+
+| | `{% stylesheet %}` (Ngày 9) | `{% style %}` |
+| :--- | :--- | :--- |
+| Dùng ở đâu | Chỉ trong `sections/`, `blocks/` | Dùng được ở **bất kỳ đâu** (snippet, layout...) |
+| Chạy Liquid động? | Không | **Có** — dùng được `{{ settings.xxx }}` |
+
+Ví dụ thật — [snippets/css-variables.liquid](../my-first-theme/snippets/css-variables.liquid) dùng `{% style %}` để sinh CSS variable từ `settings.xxx` toàn cục, load đầu tiên trong `<head>` theo đúng rule CSS đã học Ngày 2.
+
+#### 4. `settings.xxx` (global) vs `section.settings.xxx` (scoped)
+- `settings.xxx` → đọc từ `config/settings_schema.json`, áp dụng **toàn site**.
+- `section.settings.xxx` → đọc từ `{% schema %}` của **1 section instance cụ thể**, chỉ đổi theo section đó.
+
+#### 🛠️ Bài Tập Đã Thực Hiện (Ngày 11):
+- Thêm nhóm "Buttons" (`button_bg_color`, `button_text_color`, `button_corner_radius`) vào `config/settings_schema.json`.
+- Sinh CSS variable tương ứng trong `snippets/css-variables.liquid`.
+- Áp dụng `var(--color-button-bg)`, `var(--color-button-text)`, `var(--button-corner-radius)` vào nút Quick Add trong `snippets/product-card.liquid`.
+- ⚠️ Lỗi thực tế đã gặp: gõ nhầm `id` (`buttno_corner_radius` thay vì `button_corner_radius`) giữa 2 file → biến CSS rỗng, không lỗi rõ ràng (Liquid không báo lỗi khi gọi property không tồn tại, chỉ trả về rỗng) — bài học: luôn đối chiếu `id` khớp tuyệt đối giữa nơi khai báo và nơi sử dụng.
+
+---
+
+### 🌐 Ngày 12 — Locales, Ôn tập & Best Practices
+
+#### 1. Mỗi ngôn ngữ = 2 file riêng biệt, vai trò khác hẳn nhau
+
+| File | Ai thấy | "Dây nối" trong code |
+| :--- | :--- | :--- |
+| `<mã>.json` (VD `vi.json`) | **Khách hàng** ngoài storefront | `{{ 'key.path' \| t }}` |
+| `<mã>.schema.json` (VD `vi.schema.json`) | **Merchant** trong Theme Editor | `"t:key.path"` bên trong `{% schema %}` |
+
+**Cú pháp key trong JSON — tên tuỳ đặt, không cố định:**
+```json
+{ "cart": { "checkout": "Thanh toán", "remove": "Xoá" } }
+```
+`checkout`/`remove` là tên tự đặt — điều bắt buộc duy nhất là **key trong JSON phải khớp CHÍNH XÁC đường dẫn gọi trong code** (`{{ 'cart.checkout' | t }}`). Thiếu `| t` hoặc `t:` → Shopify in ra **nguyên văn chuỗi key**, không tra cứu file locale nào, dù file dịch có đầy đủ tới đâu.
+
+#### 2. Phạm vi: chỉ dịch được chữ CỐ ĐỊNH của theme, không dịch nội dung merchant tự nhập
+
+| Loại nội dung | Dịch qua đâu |
+| :--- | :--- |
+| Chữ cố định do dev viết trong theme (nút, label, tiêu đề section) | ✅ `locales/*.json` + `*.schema.json` |
+| Nội dung merchant tự nhập (tên sản phẩm, mô tả, tên trang) | ❌ Phải dùng app **Shopify Translate & Adapt** riêng |
+
+#### 3. Thêm ngôn ngữ vào theme KHÔNG tự động publish lên store
+
+Tạo file `vi.json`/`vi.schema.json` chỉ là **tạo sẵn nội dung dịch**. Muốn hiện trong Theme Editor / storefront thật:
+1. Admin → **Settings → Languages** → **Add language** → chọn ngôn ngữ.
+2. Ngôn ngữ mới sẽ ở trạng thái **"Not published"** — phải bấm menu `...` → **Publish** (không cần chờ dịch xong nội dung sản phẩm, chữ cố định của theme dùng ngay file locale đã có).
+
+#### 4. Checkpoint cuối Giai đoạn 3 — bộ khung section cần có
+
+| File yêu cầu | Trạng thái project |
+| :--- | :--- |
+| `header.liquid`, `footer.liquid` | ✅ Đã có |
+| `hero-banner.liquid` | ⚠️ Làm tương đương ở `feature-banner.liquid` (Ngày 9) |
+| `feature-columns.liquid` | ⚠️ Làm tương đương ở `trust-badge.liquid` (Ngày 10) |
+| `announcement-bar.liquid`, `featured-collection.liquid`, `rich-text.liquid` | ❌ Chưa có |
+
+> ✅ Checkpoint chính thức roadmap: "Tạo được theme với sections drag-and-drop trong Theme Editor" — đã đạt về mặt kỹ năng.
+
+#### 🛠️ Bài Tập Đã Thực Hiện (Ngày 12):
+- Tạo `locales/vi.json` + `locales/vi.schema.json` (tiếng Việt) và `locales/fr.json` + `locales/fr.schema.json` (tiếng Pháp), dịch đầy đủ tương ứng từng key với `en.default.json`/`en.default.schema.json`.
+- Sửa kèm 1 bug JSON có sẵn (trailing comma) trong `en.default.schema.json`.
+
+---
+
 ## 📚 BẢNG TỔNG HỢP CÁC THUỘC TÍNH BUILT-IN CỐT LÕI (OBJECT PROPERTIES)
 
 ### 1. Đối Tượng `link` (Navigation / Menu)
@@ -803,7 +906,7 @@ Ví dụ thật trong project — [layout/theme.liquid](../my-first-theme/layout
 
 ## 🔮 CÁC NGÀY TIẾP THEO (SẼ CẬP NHẬT TIẾP TỤC)
 
-- **Ngày 11 trở đi:** Global Settings/Config, Theme Editor, Locales & Best Practices tổng quan.
+- **Ngày 13 trở đi (Giai đoạn 4 — Xây dựng các trang cốt lõi):** Header & Footer hoàn chỉnh, Product Page, Collection Page, Cart Page, Search/404.
 
 ---
 

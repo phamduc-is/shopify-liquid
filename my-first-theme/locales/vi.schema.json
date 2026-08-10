@@ -1,0 +1,77 @@
+{
+  "general": {
+    "404": "Không tìm thấy",
+    "article": "Bài viết",
+    "block": "Khối",
+    "blog": "Blog",
+    "cart": "Giỏ hàng",
+    "collection": "Bộ sưu tập",
+    "collections": "Các bộ sưu tập",
+    "collection_card": "Thẻ bộ sưu tập",
+    "collections_grid": "Lưới bộ sưu tập",
+    "colors": "Màu sắc",
+    "column": "Cột",
+    "content": "Nội dung",
+    "custom_section": "Section tuỳ chỉnh",
+    "fonts": "Phông chữ",
+    "footer": "Chân trang",
+    "group": "Nhóm",
+    "header": "Đầu trang",
+    "layout": "Bố cục",
+    "main": "Chính",
+    "page": "Trang",
+    "password": "Mật khẩu",
+    "primary": "Chính",
+    "product": "Sản phẩm",
+    "row": "Hàng",
+    "search": "Tìm kiếm",
+    "secondary": "Phụ",
+    "section": "Section",
+    "settings": "Cài đặt",
+    "sidebar": "Thanh bên",
+    "text": "Văn bản",
+    "theme": "Theme",
+    "typography": "Kiểu chữ"
+  },
+  "labels": {
+    "alignment": "Căn lề",
+    "background": "Nền",
+    "foreground": "Màu chữ/nội dung",
+    "grid_gap": "Khoảng cách lưới",
+    "grid_item_width": "Độ rộng ô lưới",
+    "input_corner_radius": "Bo góc ô nhập liệu",
+    "layout_direction": "Hướng bố cục",
+    "menu": "Menu",
+    "customer_account_menu": "Menu tài khoản khách hàng",
+    "padding": "Khoảng đệm",
+    "page_margin": "Lề trang",
+    "page_width": "Độ rộng trang",
+    "show_payment_icons": "Hiện icon thanh toán",
+    "text_style": "Kiểu văn bản",
+    "text": "Văn bản"
+  },
+  "options": {
+    "alignment": {
+      "left": "Trái",
+      "center": "Giữa",
+      "right": "Phải"
+    },
+    "direction": {
+      "horizontal": "Ngang",
+      "vertical": "Dọc"
+    },
+    "page_width": {
+      "narrow": "Hẹp",
+      "wide": "Rộng"
+    },
+    "size": {
+      "large": "Lớn",
+      "small": "Nhỏ"
+    },
+    "text_style": {
+      "title": "Tiêu đề",
+      "subtitle": "Tiêu đề phụ",
+      "normal": "Văn bản thường"
+    }
+  }
+}

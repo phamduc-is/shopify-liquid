@@ -1,0 +1,52 @@
+{
+  "404": {
+    "title": "404",
+    "not_found": "Không tìm thấy trang.",
+    "back_to_shopping": "Quay lại mua sắm"
+  },
+  "blog": {
+    "article_comments": "Bình luận",
+    "article_metadata_html": "{{ date }} bởi {{ author }}",
+    "comment_form_body": "Bình luận",
+    "comment_form_email": "Email",
+    "comment_form_name": "Tên",
+    "comment_form_submit": "Đăng",
+    "comment_form_title": "Thêm bình luận"
+  },
+  "cart": {
+    "checkout": "Thanh toán",
+    "title": "Giỏ hàng",
+    "update": "Cập nhật",
+    "remove": "Xoá"
+  },
+  "customers": {
+    "login": {
+      "email": "Email",
+      "password": "Mật khẩu",
+      "submit": "Đăng nhập",
+      "title": "Đăng nhập"
+    }
+  },
+  "collections": {
+    "title": "Bộ sưu tập"
+  },
+  "gift_card": {
+    "add_to_apple_wallet": "Thêm vào Apple Wallet",
+    "card": "Thẻ quà tặng",
+    "expired": "Thẻ quà tặng này đã hết hạn",
+    "expires_on": "Hết hạn vào {{ expires_on }}",
+    "use_at_checkout": "Dùng thẻ quà tặng này khi thanh toán"
+  },
+  "password": {
+    "title": "Cửa hàng này đang ở chế độ riêng tư",
+    "password": "Mật khẩu",
+    "enter": "Vào xem"
+  },
+  "search": {
+    "title": "Tìm kiếm",
+    "placeholder": "Tìm bài viết, trang hoặc sản phẩm",
+    "submit": "Tìm kiếm",
+    "no_results_html": "Không tìm thấy kết quả cho {{ terms }}",
+    "results_for_html": "{{ count }} kết quả cho {{ terms }}"
+  }
+}

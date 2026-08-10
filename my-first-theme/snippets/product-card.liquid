@@ -1,11 +1,12 @@
 {% doc %}
   @file snippets/product-card.liquid
+
   @description Hiển thị khung thẻ sản phẩm tái sử dụng (Product Card Component).
 
-  @param product {product} Object sản phẩm truyền vào (Bắt buộc)
-  @param [show_vendor] {boolean} Cho phép hiển thị thương hiệu (Default: false)
-  @param [show_quick_add] {boolean} Cho phép hiển thị nút Thêm nhanh (Default: false)
-  @param [lazy_load] {boolean} Sử dụng lazy loading cho ảnh (Default: true)
+  @param product - {product} Object sản phẩm truyền vào (Bắt buộc)
+  @param [show_vendor] - {boolean} Cho phép hiển thị thương hiệu (Default: false)
+  @param [show_quick_add] - {boolean} Cho phép hiển thị nút Thêm nhanh (Default: false)
+  @param [lazy_load] - {boolean} Sử dụng lazy loading cho ảnh (Default: true)
 
   @example
   {% render 'product-card', product: product, show_vendor: true %}
@@ -44,9 +45,10 @@
       {%- else -%}
         {{ 'product-1' | placeholder_svg_tag: 'product-card__placeholder' }}
       {%- endif -%}
-      {%  if product.compare_at_price > product.price %}
-        <span class="bage-sale" style="position: absolute; top: 10%; left: 10%; background-color: red; color: white"> sale  </span>
-        
+      {% if product.compare_at_price > product.price %}
+        <span class="bage-sale" style="position: absolute; top: 10%; left: 10%; background-color: red; color: white">
+          sale
+        </span>
       {% endif %}
     </div>
 
@@ -80,7 +82,7 @@
   {%- if show_quick_add and product.available -%}
     <button
       class="product-card__quick-add"
-      style="margin-top: 10px; width: 100%; padding: 8px; background: #2980b9; color: #fff; border: none; border-radius: 4px; cursor: pointer;"
+      style="margin-top: 10px; width: 100%; padding: 8px; background: var(--color-button-bg); color: var(--color-button-text); border: none; border-radius: var(--button-corner-radius); cursor: pointer;"
       data-product-id="{{ product.id }}"
     >
       Thêm Nhanh
