@@ -12,6 +12,7 @@ Tài liệu này lưu trữ các kỹ thuật lập trình Liquid, tối ưu hi�
 4. [Kỹ thuật 4: Filter Chaining Làm Sạch SEO Meta Description](#4-kỹ-thuật-4-filter-chaining-làm-sạch-seo-meta-description)
 5. [Kỹ thuật 5: Fallback Mock Data Khi Cửa Hàng Chưa Có Sản Phẩm](#5-kỹ-thuật-5-fallback-mock-data-khi-cửa-hàng-chưa-có-sản-phẩm)
 6. [Kỹ thuật 6: `Handle` — Định Danh URL Của Resource & Cách Test Nhanh 1 Trang](#6-kỹ-thuật-6-handle--định-danh-url-của-resource--cách-test-nhanh-1-trang)
+7. [Kỹ thuật 7: `<shopify-account>` — Custom Element Có Sẵn Cho Khu Vực Tài Khoản](#7-kỹ-thuật-7-shopify-account--custom-element-có-sẵn-cho-khu-vực-tài-khoản)
 
 ---
 
@@ -237,3 +238,31 @@ Shopify luôn có sẵn 1 collection đặc biệt chứa **toàn bộ sản ph�
 - `{% render %}` **chỉ render được snippet** (`/snippets`). Muốn nhúng section thủ công phải dùng `{% section 'ten-section' %}`.
 - Nhưng 1 section như `collection.liquid` phụ thuộc global object `collection` — object này **chỉ tự động có giá trị khi bạn đang đứng đúng route `/collections/<handle>`**. Nhúng section đó vào `layout/theme.liquid` (chạy trên mọi trang) sẽ khiến `collection` = `nil` ở các trang khác, gây lỗi hoặc không hiển thị gì.
 - → Cách đúng để test: **truy cập trực tiếp URL route tương ứng** (`/collections/all` hoặc `/collections/<handle-thật>`) trên bản preview, không cần render thủ công.
+
+---
+
+## 7. Kỹ thuật 7: `<shopify-account>` — Custom Element Có Sẵn Cho Khu Vực Tài Khoản
+
+### 🚨 Vấn đề thực tế (Problem):
+Icon tài khoản trên header cần xử lý 2 trạng thái hoàn toàn khác nhau: khách **chưa đăng nhập** (hiện dropdown "Đăng nhập/Đăng ký") và khách **đã đăng nhập** (hiện dropdown "Đơn hàng của tôi/Đăng xuất"). Tự viết Liquid + JS xử lý toàn bộ luồng này (session, dropdown, đóng khi click ra ngoài...) tốn nhiều công sức và dễ sai sót bảo mật.
+
+### 💡 Giải pháp (Solution):
+Dùng **Custom Element** (Web Component) `<shopify-account>` — Shopify tự cung cấp sẵn qua script nạp trong `{{ content_for_header }}` (Ngày 7). Đây **không phải thẻ HTML chuẩn**, trình duyệt không tự hiểu — script của Shopify sẽ "nâng cấp" thẻ này thành UI tương tác thật, tự xử lý toàn bộ logic trạng thái đăng nhập.
+
+### 💻 Ví dụ Code Thực Tế:
+
+```liquid
+{% if shop.customer_accounts_enabled %}
+  <shopify-account menu="{{ section.settings.customer_account_menu }}">
+    {{ 'icon-account.svg' | inline_asset_content }}
+  </shopify-account>
+{% endif %}
+```
+
+#### 🔍 Bóc tách từng phần:
+- **`shop.customer_accounts_enabled`**: property của Global Object `shop` — kiểm tra merchant có bật tính năng tài khoản khách hàng hay không (có thể tắt hẳn trong Admin).
+- **`menu="{{ section.settings.customer_account_menu }}"`**: truyền handle của 1 `link_list` setting để component biết hiển thị menu nào trong dropdown.
+- **`inline_asset_content`**: filter nhúng thẳng **nội dung SVG** vào HTML (khác `asset_url` chỉ ra link tới file) — cho phép CSS chỉnh `fill`/màu icon trực tiếp bằng `svg { fill: ... }`, điều mà `<img src="...svg">` không làm được.
+
+#### ⚠️ Lưu ý khi dùng:
+`<shopify-account>` chỉ hoạt động đúng khi được đặt bên trong 1 trang có nạp đầy đủ `content_for_header` (tức mọi trang dùng `layout/theme.liquid` bình thường) — không tự viết logic phân biệt đăng nhập/chưa đăng nhập bằng `{% if customer %}` thủ công nữa, để component tự xử lý.

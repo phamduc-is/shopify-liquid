@@ -6,87 +6,53 @@
 
 ## 🗺️ Tiến độ chung
 
-Đang học tới **Ngày 11 — Global Settings, Config & Theme Editor** (`config/settings_schema.json`, `settings.xxx`, `font_picker`, `{% style %}`).
-
-- Ngày 1–10: đã hoàn thành, tổng hợp đầy đủ lý thuyết + code mẫu trong [docs/shopify-liquid-summary.md](shopify-liquid-summary.md) (mục lục ở đầu file, Cmd+F theo tên ngày).
-- Ngày 8/10/11: roadmap không có mini-project riêng — bài tập do agent tự đề xuất thêm để thực hành (không phải nội dung gốc của roadmap).
-- File rule của agent: [.agents/AGENTS.md](../.agents/AGENTS.md) — nhớ gõ `/process` khi muốn agent tự sửa code, `/git-push` (hoặc `/git-pull`...) khi muốn agent chạy lệnh git không cần hỏi permission.
+- **`my-first-theme/`** — đã hoàn thành đầy đủ **Ngày 1–12** (lý thuyết + bài tập theo roadmap). Toàn bộ kiến thức đã tổng hợp trong [docs/shopify-liquid-summary.md](shopify-liquid-summary.md) (mục lục Cmd+F ở đầu file). Bài tập dở dang `sections/header.liquid` (Ngày 13, Bước 1 — HTML tĩnh dropdown) ở theme này **coi như dừng lại, không tiếp tục nữa** — đã quyết định chuyển hẳn Ngày 13 trở đi sang project mới bên dưới.
+- **`ecommerce-theme/`** — theme Shopify **độc lập, mới tinh** (chạy `shopify theme init`, chưa custom gì — mới ở dạng skeleton mặc định, 39 file, `theme check` sạch). Đây là nơi tiếp tục học **Ngày 13 trở đi**, đồng thời là project thật: **clone lại thiết kế Figma** bên dưới.
+- File rule agent: [.agents/AGENTS.md](../.agents/AGENTS.md) — gõ `/process` khi muốn agent tự sửa code, `/git-push`/`/git-pull` khi muốn agent chạy git không cần hỏi permission.
 
 ---
 
-## 🎯 Bài tập đang làm (Ngày 11) — CHƯA XONG, làm tiếp ở đây
+## 🎨 Dự án đang làm: Clone Figma "SHOP.CO" E-commerce Template
 
-**Mục tiêu**: Thêm 1 setting mới vào Theme Settings (`config/settings_schema.json`) → sinh CSS variable trong `snippets/css-variables.liquid` → áp dụng vào nút "Thêm Nhanh" đã có sẵn trong `product-card.liquid`.
+**Link Figma**: https://www.figma.com/design/AXFvzD9Zu9A2xkNwOItGWL/E-commerce-Website-Template--Freebie---Community-?node-id=0-1
 
-### Bước 1 — Thêm nhóm mới vào [config/settings_schema.json](../my-first-theme/config/settings_schema.json)
-Thêm object này vào **cuối mảng** (nhớ dấu `,` sau `}` của nhóm `"t:general.colors"` phía trước):
-```json
-{
-  "name": "Buttons",
-  "settings": [
-    {
-      "type": "color",
-      "id": "button_bg_color",
-      "label": "Button background",
-      "default": "#2980b9"
-    },
-    {
-      "type": "color",
-      "id": "button_text_color",
-      "label": "Button text",
-      "default": "#ffffff"
-    },
-    {
-      "type": "range",
-      "id": "button_corner_radius",
-      "label": "Button corner radius",
-      "min": 0,
-      "max": 20,
-      "step": 1,
-      "unit": "px",
-      "default": 4
-    }
-  ]
-}
-```
+> ⚠️ Agent không tự mở được link Figma — cần cung cấp lại screenshot nếu agent cần xem lại thiết kế ở máy khác.
 
-### Bước 2 — Thêm CSS variable vào [snippets/css-variables.liquid](../my-first-theme/snippets/css-variables.liquid)
-Thêm 3 dòng vào bên trong `:root { ... }`:
-```liquid
---color-button-bg: {{ settings.button_bg_color }};
---color-button-text: {{ settings.button_text_color }};
---button-corner-radius: {{ settings.button_corner_radius }}px;
-```
+### Các trang cần build (đã phân tích từ ảnh Figma)
 
-### Bước 3 — Áp dụng vào nút Quick Add trong [snippets/product-card.liquid](../my-first-theme/snippets/product-card.liquid)
-Tìm đoạn:
-```liquid
-<button
-  class="product-card__quick-add"
-  style="margin-top: 10px; width: 100%; padding: 8px; background: #2980b9; color: #fff; border: none; border-radius: 4px; cursor: pointer;"
-  data-product-id="{{ product.id }}"
->
-```
-Đổi phần `style` thành:
-```liquid
-style="margin-top: 10px; width: 100%; padding: 8px; background: var(--color-button-bg); color: var(--color-button-text); border: none; border-radius: var(--button-corner-radius); cursor: pointer;"
-```
+| Trang | Thành phần chính |
+|---|---|
+| **Homepage** | Header (logo + nav + search + cart), Hero "Find Clothes That Matches Your Style" + banner brand logos, "New Arrivals"/"Top Selling" (product grid + rating), "Browse by Dress Style" (grid ảnh categories), "Our Happy Customers" (testimonial), Newsletter banner đen, Footer |
+| **Product Detail Page** | Gallery ảnh (thumbnail dọc), giá + rating + review count, chọn màu/size, quantity + Add to cart, tab Reviews (rating breakdown + list), "You might also like" |
+| **Category Page** | Sidebar Filters (dropdown Casual, Price slider, Colors, Size, Dress Style), product grid + pagination |
+| **Cart** | Danh sách item (ảnh + size/color + số lượng), Order Summary (subtotal/discount/delivery/total), promo code input |
 
-### Bước 4 — Test
-```bash
-cd my-first-theme
-shopify theme dev
-```
-Vào **Customize** → **Theme settings** (KHÔNG phải setting riêng của 1 section) → tìm tab **"Buttons"** → đổi màu/bo góc → xem nút "Thêm Nhanh" đổi theo thời gian thực.
+### Component dùng chung — PHẢI build 1 lần, tái sử dụng (đã nhận diện ở Bước 0)
 
-### Lỗi hay gặp cần soi lại khi review
-- Quên dấu `,` giữa 2 object trong mảng ngoài cùng của `settings_schema.json`.
-- `id` viết lệch giữa `settings_schema.json` và `css-variables.liquid` (VD `button_bg_color` vs `button_bg`).
-- Quên đổi `var(--...)` đúng tên biến trong `product-card.liquid`.
+| Component | Xuất hiện ở |
+|---|---|
+| **Product Card** (ảnh + tên + rating sao + giá + giá gạch) | Homepage (New Arrivals, Top Selling), Category Page, Product Detail (You might also like) |
+| **Rating sao** (★★★★☆) | Product Card, trang Review |
+| **Badge giảm giá %** | Product Card |
+| **Newsletter banner đen** | Cuối mọi trang |
+| **Footer** | Mọi trang |
 
 ---
 
-## ✅ Khi làm xong bài tập này
-1. Chạy `shopify theme check` xác nhận không lỗi.
-2. Gọi agent review lại 3 file đã sửa (theo đúng flow đã làm ở Ngày 9/10).
-3. Tiếp tục **Ngày 12 — Locales, Ôn tập & Best Practices tổng quan** (roadmap: [docs/shopify_theme_roadmap_detail.md:1247](shopify_theme_roadmap_detail.md#L1247)).
+## 📋 Quy trình đã thống nhất — làm theo đúng thứ tự này, KHÔNG nhảy cóc
+
+1. ~~Bước 0 — Phân tích Figma tìm component dùng chung~~ ✅ Đã xong (bảng trên).
+2. **Bước 1 — Thiết lập Design System** (màu/font/spacing từ Figma → `config/settings_schema.json` + `snippets/css-variables.liquid`, đúng kỹ thuật Ngày 11) — **CHƯA LÀM, làm tiếp từ đây**.
+3. Bước 2 — Dựng khung `layout/theme.liquid` (content_for_header/layout, thứ tự load CSS đúng rule Ngày 2).
+4. Bước 3 — Build trước các Snippet dùng chung (`product-card`, `rating-stars`...) — dùng kỹ thuật `render for as` (Ngày 6).
+5. Bước 4 — Build từng trang theo đúng thứ tự roadmap: **Header/Footer (13-14) → Homepage → Product Page (15-16) → Category (17) → Cart (18)**. Mỗi section vẫn theo phương pháp đã luyện: **HTML tĩnh (dữ liệu giả) → thay dần bằng Liquid động → thêm `{% schema %}` cuối cùng, thêm dần từng setting một, test bằng Theme Editor sau mỗi lần thêm**.
+
+### Lỗi/bài học đã rút ra, nhớ áp dụng tiếp
+- Luôn chạy `shopify theme check` sau mỗi thay đổi — đã từng bắt được lỗi locale key sai (`cart.general.title` không tồn tại, phải dùng đúng `cart.title` khớp `en.default.json`).
+- Đối chiếu `id` giữa nơi khai báo setting và nơi dùng biến CSS — dễ gõ nhầm (VD Ngày 11: `buttno_corner_radius` vs `button_corner_radius`).
+- Các file trong theme (`my-first-theme` lẫn `ecommerce-theme`) đều có thể **xoá sạch viết lại từ đầu** khi thực hành — không cần giữ nguyên code skeleton gốc (agent đã ghi nhớ điều này trong memory, không cảnh báo khi thấy file bị ghi đè toàn bộ).
+
+---
+
+## ✅ Việc cần làm ngay khi tiếp tục
+Bắt đầu từ **Bước 1** — lấy màu sắc (đen/trắng + accent) và font chữ từ ảnh Figma "SHOP.CO", thêm vào `ecommerce-theme/config/settings_schema.json` + sinh CSS variable trong `ecommerce-theme/snippets/css-variables.liquid` (file này **đã có sẵn từ skeleton** với vài biến mặc định — chỉnh/thêm tiếp theo đúng màu Figma, không cần tạo file mới).

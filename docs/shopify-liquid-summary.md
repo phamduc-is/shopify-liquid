@@ -98,6 +98,7 @@ graph TD
   - `{{ cart }}`: `item_count`, `total_price`, `items`.
   - `{{ customer }}`: `first_name`, `email` *(nil khi chưa login)*.
   - `{{ request }}`: `page_type` ('product', 'index'...).
+  - `{{ routes }}`: URL chuẩn các trang hệ thống — `root_url` (trang chủ), `cart_url`, `account_url`, `account_login_url`, `all_products_collection_url`, `search_url`. Nên dùng thay vì hard-code path (VD `routes.cart_url` thay vì viết tay `"/cart"`) vì tự đúng theo market/ngôn ngữ hiện tại (VD `/vi/cart`).
 - **Lưu ý giá tiền:** `product.price` lưu bằng số nguyên cents (`1000` = $10.00).
 - **Mẹo Debug:** `{{ product | json }}` xem cấu trúc dữ liệu JSON.
 - **Thực hành:** Snippet `snippets/store-info.liquid`.
