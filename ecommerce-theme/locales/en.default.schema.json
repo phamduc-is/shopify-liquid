@@ -17,6 +17,7 @@
     "footer": "Footer",
     "group": "Group",
     "header": "Header",
+    "heading": "Heading",
     "layout": "Layout",
     "main": "Main",
     "page": "Page",
@@ -40,6 +41,7 @@
     "grid_gap": "Grid spacing",
     "grid_item_width": "Grid item width",
     "input_corner_radius": "Input corner radius",
+    "button_corner_radius": "Button corner radius",
     "layout_direction": "Layout direction",
     "menu": "Menu",
     "customer_account_menu": "Customer account menu",
@@ -48,7 +50,14 @@
     "page_width": "Page width",
     "show_payment_icons": "Show payment icons",
     "text_style": "Text style",
-    "text": "Text"
+    "text": "Text",
+    "text_secondary": "Secondary text",
+    "border": "Border",
+    "surface_secondary": "Secondary surface",
+    "sale_badge_background": "Sale badge background",
+    "sale_badge_text": "Sale badge text",
+    "rating_star": "Rating star",
+    "success": "Success / verified"
   },
   "options": {
     "alignment": {
@@ -72,6 +81,6 @@
       "title": "Title",
       "subtitle": "Subtitle",
       "normal": "Normal text"
-    },
+    }
   }
 }

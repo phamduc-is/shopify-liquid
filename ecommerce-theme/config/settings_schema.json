@@ -16,6 +16,12 @@
       },
       {
         "type": "font_picker",
+        "id": "type_heading_font",
+        "default": "archivo_black_n4",
+        "label": "t:general.heading"
+      },
+      {
+        "type": "font_picker",
         "id": "type_primary_font",
         "default": "work_sans_n4",
         "label": "t:general.primary"
@@ -65,18 +71,78 @@
       {
         "type": "color",
         "id": "foreground_color",
-        "default": "#333333",
+        "default": "#000000",
         "label": "t:labels.foreground"
+      },
+      {
+        "type": "color",
+        "id": "text_secondary_color",
+        "default": "#6C7275",
+        "label": "t:labels.text_secondary"
+      },
+      {
+        "type": "color",
+        "id": "border_color",
+        "default": "#E8E8E8",
+        "label": "t:labels.border"
+      },
+      {
+        "type": "color",
+        "id": "surface_secondary_color",
+        "default": "#F0F0F0",
+        "label": "t:labels.surface_secondary"
+      },
+      {
+        "type": "header",
+        "content": "t:general.product"
+      },
+      {
+        "type": "color",
+        "id": "sale_badge_background",
+        "default": "#FFE1DD",
+        "label": "t:labels.sale_badge_background"
+      },
+      {
+        "type": "color",
+        "id": "sale_badge_text",
+        "default": "#FF3333",
+        "label": "t:labels.sale_badge_text"
+      },
+      {
+        "type": "color",
+        "id": "rating_star_color",
+        "default": "#FFC633",
+        "label": "t:labels.rating_star"
+      },
+      {
+        "type": "color",
+        "id": "success_color",
+        "default": "#01AB31",
+        "label": "t:labels.success"
+      },
+      {
+        "type": "header",
+        "content": "t:general.layout"
       },
       {
         "type": "range",
         "id": "input_corner_radius",
         "min": 0,
-        "max": 10,
+        "max": 40,
         "step": 1,
         "unit": "px",
         "label": "t:labels.input_corner_radius",
-        "default": 4
+        "default": 8
+      },
+      {
+        "type": "range",
+        "id": "button_corner_radius",
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "unit": "px",
+        "label": "t:labels.button_corner_radius",
+        "default": 24
       }
     ]
   }
