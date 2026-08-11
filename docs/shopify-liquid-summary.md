@@ -376,6 +376,41 @@ Mọi snippet chuẩn OS 2.0 nên khai báo khối ghi chú ở đầu file đ�
 {% enddoc %}
 ```
 
+#### 5. Bẫy thường gặp: Global "tình cờ" trùng tên vs Param tường minh
+
+`{% render %}` tạo ra **Isolated Scope thật sự** — snippet **không tự nhìn thấy** bất kỳ biến local nào của file gọi nó, kể cả khi 2 file đứng cạnh nhau. Ngoại lệ **duy nhất** là các **object toàn cục** (`shop`, `cart`, `settings`, `request`...) — nhưng cần phân biệt rõ 2 loại global:
+
+| Loại global | Có ở đâu | Rủi ro khi snippet đọc trực tiếp (không qua param) |
+| :--- | :--- | :--- |
+| **Toàn cục thật** (`shop`, `cart`, `settings`, `request`) | Có mặt ở **MỌI trang**, luôn tồn tại | An toàn — đọc trực tiếp không sao |
+| **Object theo ngữ cảnh** (`product`, `collection`, `article`, `blog`) | Chỉ tự có sẵn ở **1 số trang/vòng lặp nhất định** (VD `product` chỉ tự có ở template Product, hoặc bên trong `{% for product in collection.products %}` vì biến lặp **trùng tên**) | ⚠️ Snippet chạy đúng là do **trùng tên tình cờ** với biến lặp/context hiện tại, không phải do thiết kế chắc chắn |
+
+**Ví dụ bẫy thực tế:**
+```liquid
+{# snippets/product-card.liquid — đọc "product" như thể nó luôn tồn tại #}
+<h3>{{ product.title }}</h3>
+```
+Chạy đúng khi gọi từ:
+```liquid
+{% for product in collection.products %}
+  {% render 'product-card' %}   {# ✅ tình cờ đúng vì biến lặp tên là "product" #}
+{% endfor %}
+```
+Nhưng **âm thầm hỏng** (không báo lỗi, chỉ ra rỗng) khi gọi từ nơi khác:
+```liquid
+{% for item in recommended_products %}
+  {% render 'product-card' %}   {# ❌ product = nil, vì biến lặp tên "item" không phải "product" #}
+{% endfor %}
+```
+
+**Cách sửa đúng — luôn khai báo `product` là param nhận vào** (nội dung bên trong snippet dùng `product.xxx` y hệt, không đổi gì), rồi ở **mọi nơi gọi** đều truyền tường minh:
+```liquid
+{% render 'product-card', product: item %}
+```
+`product: item` = "bên trong snippet đặt tên là `product`, giá trị lấy từ biến `item` ở ngoài" — người gọi tự do đặt tên biến ngoài là gì cũng được (`item`, `featured_product`...), snippet không phụ thuộc vào tên đó.
+
+> 💡 Quy tắc thực dụng: viết snippet giống viết 1 **hàm (function)** — input nào cũng nên đi qua param tường minh (và khai báo trong `{% doc %}` bằng `@param`), tránh dựa vào "biến tình cờ có sẵn trong scope" dù nó có chạy đúng lúc test ban đầu.
+
 #### 🛠️ Bài Tập Đã Thực Hiện (Ngày 6):
 - `snippets/product-card.liquid`: Xây dựng component Thẻ sản phẩm chuẩn OS 2.0 có LiquidDoc, tính toán aspect ratio ảnh, responsive `srcset`, hiển thị giá `price_varies` / `compare_at_price`, vendor và nút Quick Add.
 - Nhúng component vào `layout/theme.liquid` bằng cú pháp `{% render 'product-card' for collections.all.products as product, show_vendor: true, show_quick_add: true, lazy_load: true %}`.

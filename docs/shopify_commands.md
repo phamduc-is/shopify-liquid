@@ -60,6 +60,10 @@ shopify theme pull --store dawn-jwz4ezbj.myshopify.com --live
 
 # Tải một Theme ID cụ thể từ store về
 shopify theme pull --store dawn-jwz4ezbj.myshopify.com --theme <THEME_ID>
+
+# Force pull ngay 1 file cụ thể (VD settings_data.json sau khi Save trong Theme Editor)
+# Dùng khi không muốn chờ auto 2-way sync của `theme dev` (có thể delay vài chục giây)
+shopify theme pull --theme <THEME_ID> --only=config/settings_data.json
 ```
 
 ---
