@@ -1,0 +1,44 @@
+{% doc %}
+  Renders a product card — image, title, rating, price (+ sale badge if on sale).
+
+   @param product {product} - Sản phẩm cần hiển thị
+   
+  TODO (Liquid động): thay data giả bên dưới bằng biến thật (product object,
+  {% render 'product-card', ... %} với param từ vòng lặp {% for %}).
+{% enddoc %}
+
+{%- assign product_card_title = product.title -%}
+<div class="product-card">
+  <div class="product-card__media">
+    {% render 'image',
+      class: 'product-card__image',
+      image: product.featured_image,
+      width: 600,
+      height: 600,
+      crop: 'center'
+    %}
+  </div>
+
+  <div class="product-card__info">
+    <h3 class="product-card__title">{{ product_card_title }}</h3>
+
+    {% render 'rating-stars', rating: 3.5 %}
+
+    <div class="product-card__price">
+      {% if product.compare_at_price and product.compare_at_price > product.price %}
+        {%- assign discount_percent = product.compare_at_price
+          | minus: product.price
+          | times: 100.0
+          | divided_by: product.compare_at_price
+          | round
+        -%}
+
+        <span class="product-card__price-current">{{ product.price | money }}</span>
+        <span class="product-card__price-compare">{{ product.compare_at_price | money }}</span>
+        <span class="product-card__badge">{{ discount_percent }}%</span>
+      {% else %}
+        <span class="product-card__price-current">{{ product.price | money }}</span>
+      {% endif %}
+    </div>
+  </div>
+</div>

@@ -1,0 +1,18 @@
+{% doc %}
+  Render a star rating
+
+  @param rating - {number} - Rating Value from 0 to 5
+{% enddoc %}
+
+{%- assign fill_percent = rating | divided_by: 5.0 | times: 100 -%}
+{%- assign max_rating = 5 -%}
+
+{%- capture star_icons -%}
+  {%- for i in (1..max_rating) -%}★{%- endfor -%}
+{%- endcapture -%}
+
+<div class="rating-stars">
+    <div class="rating-stars__track">{{ star_icons }}</div>
+      <div class="rating-stars__fill" style="width: {{ fill_percent }}%;">{{ star_icons }}</div>
+    <div class="rating-stars_value"> {{ rating }}/5 </div>
+</div>
