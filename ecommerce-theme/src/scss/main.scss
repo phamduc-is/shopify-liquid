@@ -1,0 +1,22 @@
+// ------------------------------------------------------------
+// Entry point — import tất cả file SCSS con vào đây.
+// Compile ra assets/theme.css (xem script "build:css" / "watch:css" trong package.json).
+//
+// Lưu ý: màu/font/spacing lấy từ CSS custom properties do
+// snippets/css-variables.liquid render ra (var(--color-foreground)...),
+// KHÔNG khai báo lại $variables SCSS cho design token ở đây.
+// ------------------------------------------------------------
+
+@use 'abstracts/variables' as vars;
+@use 'abstracts/mixins' as mix;
+
+@use 'base/reset';
+@use 'base/typography';
+
+// @use 'layout/header';
+// @use 'layout/footer';
+
+// @use 'components/button';
+@use 'components/product-card';
+
+@use 'components/rating-stars';

@@ -1,0 +1,40 @@
+// ------------------------------------------------------------
+// Typography cơ bản — dùng font/color đã setup ở Design System
+// (settings_schema.json → css-variables.liquid), KHÔNG hardcode lại
+// font-family/color ở đây.
+// ------------------------------------------------------------
+
+body {
+  font-family: var(--font-primary--family);
+  font-style: var(--font-primary--style);
+  font-weight: var(--font-primary--weight);
+  color: var(--color-foreground);
+  background-color: var(--color-background);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading--family);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+}
+
+h2 {
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+h3 {
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+}
+
+p {
+  color: var(--color-text-secondary);
+}

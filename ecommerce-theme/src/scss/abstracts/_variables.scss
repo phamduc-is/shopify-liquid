@@ -1,0 +1,22 @@
+// ------------------------------------------------------------
+// Biến SCSS (compile-time) — CHỈ chứa những giá trị KHÔNG có ở
+// CSS custom properties (settings_schema.json + css-variables.liquid).
+//
+// KHÔNG khai báo lại màu / font / border-radius ở đây — nguồn sự thật
+// duy nhất cho design token là settings_schema.json, dùng var(--color-...)
+// trực tiếp trong file style. Trùng 2 nguồn sẽ gây lệch khi merchant
+// đổi setting trong Theme Editor mà SCSS vẫn còn giá trị cũ hardcode.
+// ------------------------------------------------------------
+
+// Breakpoints (dùng với mixin respond-to trong _mixins.scss)
+$breakpoint-sm: 480px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+
+// Z-index scale — tránh magic number rải rác nhiều file
+$z-dropdown: 100;
+$z-sticky-header: 200;
+$z-modal-overlay: 300;
+$z-modal: 310;
+$z-toast: 400;

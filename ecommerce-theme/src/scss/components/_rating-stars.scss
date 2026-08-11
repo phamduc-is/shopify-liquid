@@ -1,0 +1,24 @@
+.rating-stars {
+    position: relative; // làm điểm neo cho 2 lớp con absolute
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.rating-stars__track,
+.rating-stars__fill {
+    position: absolute; // 2 lớp chồng đúng vị trí (0,0)
+    top: 0;
+    left: 0;
+    white-space: nowrap; // ★★★★★ không bị xuống dòng
+    overflow: hidden; // fill bị "cắt" theo width % → lộ ra bao nhiêu sao vàng
+}
+
+.rating-stars__track {
+    color: var(--color-border);
+}
+
+// xám nhạt, không phải màu sao rỗng nữa
+.rating-stars__fill {
+    color: var(--color-rating-star);
+}
