@@ -1,0 +1,40 @@
+@use '../abstracts/mixins' as mix;
+
+.announcement-bar {
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+}
+
+.announcement-bar__inner {
+  @include mix.flex-center;
+  position: relative;
+  gap: 8px;
+  padding-block: 10px;
+  font-size: 0.8125rem;
+  text-align: center;
+}
+
+.announcement-bar__text {
+  color: #fff;
+}
+
+.announcement-bar__link {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.announcement-bar__close {
+  position: absolute;
+  right: var(--page-margin);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.announcement-bar__close svg {
+  width: 1rem;
+}

@@ -17,3 +17,7 @@ release
 *.zip
 
 .claude/settings.local.json
+
+# SCSS build artifacts — tự sinh lại bằng `npm run build:css`, không commit
+*.css.map
+ecommerce-theme/src/scss/**/*.css

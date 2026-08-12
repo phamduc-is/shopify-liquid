@@ -1,0 +1,109 @@
+@use '../abstracts/mixins' as mix;
+
+.header {
+  background-color: var(--color-background);
+}
+
+.header__inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-block: 16px; // padding-inline giờ do .container lo
+}
+
+.header__logo {
+  font-family: var(--font-heading--family);
+  font-size: 1.5rem;
+  color: var(--color-foreground);
+  text-decoration: none;
+  margin-right: auto;
+}
+
+.header__menu-toggle,
+.header__icon-button {
+  display: flex;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-foreground);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.header__menu-toggle svg,
+.header__icon-button svg {
+  width: 1.5rem;
+}
+
+.header__nav,
+.header__search {
+  display: none; // ẩn mặc định (mobile), hiện lại ở breakpoint md
+}
+
+.header__nav-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--color-foreground);
+  text-decoration: none;
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+
+.header__nav-link svg {
+  width: 1rem;
+}
+
+.header__search {
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  max-width: 26rem;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background-color: var(--color-surface-secondary);
+}
+
+.header__search svg {
+  width: 1.25rem;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.header__search-input {
+  flex: 1;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 0.9375rem;
+}
+
+.header__icons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+@include mix.respond-to('md') {
+  .header__menu-toggle,
+  .header__icon-button--search {
+    display: none; // desktop: có nav + search bar riêng, khỏi cần hamburger/icon search
+  }
+
+  .header__logo {
+    margin-right: 40px;
+  }
+
+  .header__nav {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-right: 24px;
+  }
+
+  .header__search {
+    display: flex;
+  }
+}
