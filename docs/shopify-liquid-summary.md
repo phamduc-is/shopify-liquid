@@ -940,9 +940,52 @@ Tạo file `vi.json`/`vi.schema.json` chỉ là **tạo sẵn nội dung dịch*
 
 ---
 
+### 🔍 Ngày 13 — Header động: Cart/Account/Search binding (ecommerce-theme)
+
+> Từ đây trở đi làm ở project `ecommerce-theme/` (clone Figma SHOP.CO), không còn ở `my-first-theme/`. Xem [continue-here.md](continue-here.md) để biết tiến độ chi tiết.
+
+#### 1. `<form>` search — submit thật không cần JS
+
+```liquid
+<form action="{{ routes.search_url }}" method="get" role="search">
+  <input type="search" name="q" value="{{ search.terms | escape }}">
+</form>
+```
+
+| Thuộc tính | Vai trò |
+| :--- | :--- |
+| `action="{{ routes.search_url }}"` | Object route có sẵn, luôn resolve ra `/search` |
+| `method="get"` | Search chỉ đọc, không đổi state → dùng GET để URL kết quả **share/bookmark được** (`?q=...`) |
+| `name="q"` | **Bắt buộc đúng tên này** — key Shopify backend đọc từ khoá tìm kiếm. Đặt tên khác thì `/search` load lên nhưng không tìm được gì |
+| `value="{{ search.terms | escape }}"` | `search` là object toàn cục chỉ có data khi đang ở trang `/search` — dùng để tự điền lại từ khoá đã tìm vào ô input, nơi khác `search.terms` rỗng |
+| `role="search"` | ARIA landmark — không ảnh hưởng hiển thị, chỉ giúp screen reader nhảy thẳng tới vùng search |
+
+**Cơ chế cốt lõi**: với `method="get"`, trình duyệt tự ghép mọi input trong form thành query string dùng `name` làm key khi submit — không cần 1 dòng JS nào:
+```
+Gõ "áo thun" vào input name="q" → Enter → trình duyệt tự tạo URL
+/search?q=áo+thun
+```
+
+#### 2. Phân loại "Liquid động" — không phải cái gì cũng bind được ngay
+
+Khi chuyển 1 section từ HTML tĩnh sang Liquid động, chia 2 nhóm:
+
+| Nhóm | Đặc điểm | Ví dụ (header) |
+| :--- | :--- | :--- |
+| **Bind vào object có sẵn** | Làm ngay, không cần schema | `cart.item_count`, `routes.account_url`, `routes.search_url` |
+| **Cần setting merchant tự nhập** | Phải có `{% schema %}` mới có gì để đọc — code Liquid viết trước (VD `section.settings.menu.links`), tạm rỗng, add schema ở bước sau mới chạy đúng | nav menu (`link_list`), text announcement bar (`text`) |
+
+Đúng thứ tự luyện tập: **HTML tĩnh (data giả) → Liquid động (bind object có sẵn trước) → thêm `{% schema %}` từng setting một** (phần cần setting mới thật sự "sống" ở bước này).
+
+#### 🛠️ Bài Tập Đang Thực Hiện (Ngày 13):
+- `sections/header.liquid`: cart icon (`cart.item_count` + badge số), account icon (`routes.account_url`), search form (`routes.search_url` + `name="q"` + `search.terms`).
+- Nav menu (`section.settings.menu`) và text announcement bar: đã viết code Liquid, **chờ thêm schema** ở bước kế tiếp.
+
+---
+
 ## 🔮 CÁC NGÀY TIẾP THEO (SẼ CẬP NHẬT TIẾP TỤC)
 
-- **Ngày 13 trở đi (Giai đoạn 4 — Xây dựng các trang cốt lõi):** Header & Footer hoàn chỉnh, Product Page, Collection Page, Cart Page, Search/404.
+- **Ngày 14 (Footer) → Ngày 15-18 (Product/Category/Cart Page):** tiếp tục ở `ecommerce-theme/`.
 
 ---
 
