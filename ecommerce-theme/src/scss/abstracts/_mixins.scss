@@ -23,6 +23,20 @@
   }
 }
 
+// Ngược với respond-to (min-width) — dùng khi viết style CHÍNH ở tỷ lệ desktop,
+// rồi override đè xuống cho mobile trong 1 khối max-width riêng.
+@mixin respond-to-max($breakpoint) {
+  @if $breakpoint == 'sm' {
+    @media (max-width: vars.$breakpoint-sm - 1px) { @content; }
+  } @else if $breakpoint == 'md' {
+    @media (max-width: vars.$breakpoint-md - 1px) { @content; }
+  } @else if $breakpoint == 'lg' {
+    @media (max-width: vars.$breakpoint-lg - 1px) { @content; }
+  } @else if $breakpoint == 'xl' {
+    @media (max-width: vars.$breakpoint-xl - 1px) { @content; }
+  }
+}
+
 @mixin truncate-lines($lines: 1) {
   display: -webkit-box;
   -webkit-box-orient: vertical;

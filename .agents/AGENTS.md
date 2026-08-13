@@ -19,6 +19,10 @@ Tài liệu này quy định các nguyên tắc làm việc, tiêu chuẩn viế
    - Với mọi tool/lệnh **không liên quan tới git**, Agent được **toàn quyền chạy ngay, không cần hỏi xác nhận permission**.
    - Với các lệnh **liên quan tới git** (`git add`, `git commit`, `git push`, `git pull`, `git merge`, `git reset`,...), Agent **KHÔNG được tự ý chạy toàn quyền** — chỉ được phép chạy trực tiếp không hỏi khi người dùng có gõ kèm từ khóa kích hoạt dạng `/git-push`, `/git-pull`, `/git-commit`,... trong prompt của lượt đó.
    - Nếu prompt của người dùng không chứa từ khóa `/git-*` tương ứng, Agent vẫn phải xin xác nhận trước khi chạy lệnh git đó, kể cả khi đang ở chế độ toàn quyền.
+6. **Timeline thay đổi code ngay trong chat:**
+   - Sau **mỗi lần tác động vào code** (sửa/xoá/tạo file, dù qua `/process` hay do người dùng tự làm rồi agent verify), Agent phải **in tóm tắt diff ngay trong câu trả lời** — liệt kê rõ dòng/đoạn nào **thêm (+)**, **xoá (-)**, **sửa (~)**, kèm tên file.
+   - Lý do: **Local History của VSCode không bắt được các lần agent sửa file trực tiếp** (chỉ bắt lần Save thủ công qua UI editor) — nên không dùng Timeline/Local History của VSCode làm nguồn xem lại lịch sử sửa code được. Bản tóm tắt trong chat là nguồn thay thế đáng tin cậy.
+   - Không cần tạo file log riêng, không tự động git commit cho mục đích này (git vẫn theo đúng rule mục 5 — chỉ commit khi có `/git-commit`).
 
 ---
 

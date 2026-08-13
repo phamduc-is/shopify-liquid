@@ -966,7 +966,30 @@ Gõ "áo thun" vào input name="q" → Enter → trình duyệt tự tạo URL
 /search?q=áo+thun
 ```
 
-#### 2. Phân loại "Liquid động" — không phải cái gì cũng bind được ngay
+#### 2. `link.url` — không tự gõ, Shopify tự resolve theo merchant chọn gì ở Admin
+
+Khác HTML tĩnh (`href` là chuỗi mình gõ tay), `link.url` trong Liquid **luôn tự động resolve** dựa trên loại resource merchant chọn khi tạo menu ở `Admin → Online Store → Navigation`:
+
+| Merchant chọn | `link.type` | `link.url` tự resolve ra |
+| :--- | :--- | :--- |
+| Trang chủ | `frontpage_link` | `/` |
+| 1 Collection cụ thể | `collection_link` | `/collections/handle` |
+| 1 Product cụ thể | `product_link` | `/products/handle` |
+| 1 Page | `page_link` | `/pages/handle` |
+| Link ngoài tự nhập | `http_link` | y hệt URL merchant gõ |
+| Item cha có sub-menu (dropdown) | — | `link.links` chứa mảng link con (dùng `{% if link.links != blank %}` để biết render dropdown hay `<a>` thường) |
+
+`link.title` = label hiển thị merchant tự đặt, không liên quan tên collection/product thật.
+
+**Vì sao section cần biết dùng menu nào**: 1 store có thể có nhiều menu (Main menu, Footer menu...). Setting kiểu `link_list` trong schema chính là **dropdown cho merchant chọn menu nào** áp vào section đó:
+```json
+{ "type": "link_list", "id": "menu", "label": "Menu điều hướng", "default": "main-menu" }
+```
+`default: "main-menu"` — handle menu mặc định Shopify tự tạo cho mọi store mới.
+
+**Điểm mấu chốt**: merchant thêm/xoá/sắp xếp lại nav item, đổi collection nào link tới — làm hết ở Admin, **theme code không đổi 1 dòng**. Code chỉ định nghĩa cách hiển thị, Admin định nghĩa nội dung — đây là lý do Shopify tách 2 phần này ra.
+
+#### 3. Phân loại "Liquid động" — không phải cái gì cũng bind được ngay
 
 Khi chuyển 1 section từ HTML tĩnh sang Liquid động, chia 2 nhóm:
 
@@ -976,6 +999,17 @@ Khi chuyển 1 section từ HTML tĩnh sang Liquid động, chia 2 nhóm:
 | **Cần setting merchant tự nhập** | Phải có `{% schema %}` mới có gì để đọc — code Liquid viết trước (VD `section.settings.menu.links`), tạm rỗng, add schema ở bước sau mới chạy đúng | nav menu (`link_list`), text announcement bar (`text`) |
 
 Đúng thứ tự luyện tập: **HTML tĩnh (data giả) → Liquid động (bind object có sẵn trước) → thêm `{% schema %}` từng setting một** (phần cần setting mới thật sự "sống" ở bước này).
+
+#### 4. Tiền tố `t:` trong `{% schema %}` — TUỲ CHỌN, không bắt buộc
+
+Dễ hiểu lầm là mọi `"name"`/`"label"` trong schema đều PHẢI tra cứu qua `locales/*.schema.json`. Thực tế đây là 2 cách viết song song, cả 2 đều hợp lệ:
+
+| Cách viết | Kết quả | Khi nào dùng |
+| :--- | :--- | :--- |
+| `"label": "t:labels.menu"` | Tra key `labels.menu` trong `en.default.schema.json` (hoặc `vi.schema.json` nếu Theme Editor đang bật tiếng Việt) → ra chữ tương ứng | Field **merchant thấy được** (label setting, name section) và muốn hỗ trợ đa ngôn ngữ |
+| `"label": "Menu"` (viết thẳng) | Hiện đúng y "Menu", **không tra file nào** | Không cần đa ngôn ngữ, hoặc field chỉ code dùng nội bộ (VD `"id"` — merchant không thấy `id`, không liên quan `t:` gì cả) |
+
+Cả 2 cách render UI giống nhau; khác nhau duy nhất ở việc **có tự đổi theo ngôn ngữ Theme Editor hay không**. Case thực tế: header đang tái dùng `t:general.header`/`t:labels.menu` vì skeleton gốc đã có sẵn 2 key này trong `en.default.schema.json` — dùng lại cho tiện, không phải vì bắt buộc phải có `t:`.
 
 #### 🛠️ Bài Tập Đang Thực Hiện (Ngày 13):
 - `sections/header.liquid`: cart icon (`cart.item_count` + badge số), account icon (`routes.account_url`), search form (`routes.search_url` + `name="q"` + `search.terms`).

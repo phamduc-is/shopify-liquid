@@ -1,19 +1,17 @@
 {% comment %}
-  TODO (Liquid động, làm sau):
-  - Nav "Shop" cần dropdown menu thật (linklist) khi wiring dynamic
-  - Cart icon cần badge số lượng thật: cart.item_count
-  - Account icon cần shopify-account/routes.account_url thật
-  - Announcement bar text/link lấy từ setting
   TODO (hành vi, chưa phải bước này):
   - Nút hamburger (.header__menu-toggle) mở mobile nav — chưa có JS
   - Nút X (.announcement-bar__close) đóng announcement bar — chưa có JS
 {% endcomment %}
-
 <div class="announcement-bar">
-  <div class="announcement-bar__inner container">
+  <div class="announcement-bar__inner container-fullwidth">
     <p class="announcement-bar__text">
-      Sign up and get 20% off to your first order.
-      <a href="#" class="announcement-bar__link">Sign Up Now</a>
+      {{ section.settings.announcement_text }}
+      {% if section.settings.announcement_link_url != blank %}
+        <a href="{{ section.settings.announcement_link_url }}" class="announcement-bar__link">
+          {{ section.settings.announcement_link_text }}
+        </a>
+      {% endif %}
     </p>
     <button type="button" class="announcement-bar__close" aria-label="Đóng thông báo">
       {{ 'icon-close.svg' | inline_asset_content }}
@@ -30,21 +28,17 @@
     <a href="{{ routes.root_url }}" class="header__logo">SHOP.CO</a>
 
     <nav class="header__nav">
-      <button type="button" class="header__nav-link header__nav-link--dropdown">
-        Shop
-        {{ 'icon-chevron-down.svg' | inline_asset_content }}
-      </button>
-      <a href="#" class="header__nav-link">On Sale</a>
-      <a href="#" class="header__nav-link">New Arrivals</a>
-      <a href="#" class="header__nav-link">Brands</a>
+      {% for link in section.settings.menu.links %}
+        {% if link.links != blank %}
+          <button type="button" class="header__nav-link header__nav-link--dropdown">
+            {{ link.title }}
+            {{ 'icon-chevron-down.svg' | inline_asset_content }}
+          </button>
+        {% else %}
+          <a href="{{ link.url }}" class="header__nav-link">{{ link.title }}</a>
+        {% endif %}
+      {% endfor %}
     </nav>
-
-    {% comment %}
-      <div class="header__search">
-        {{ 'icon-search.svg' | inline_asset_content }}
-        <input type="search" class="header__search-input" placeholder="Search for products...">
-      </div>
-    {% endcomment %}
 
     <form action="{{ routes.search_url }}" method="get" role="search" class="header__search">
       {{ 'icon-search.svg' | inline_asset_content }}
@@ -73,3 +67,34 @@
     </div>
   </div>
 </header>
+
+{% schema %}
+{
+  "name": "t:general.header",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "t:labels.menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "text",
+      "id": "announcement_text",
+      "label": "announcement content",
+      "default": "Sign up and get 20% off to your first order."
+    },
+    {
+      "type": "url",
+      "id": "announcement_link_url",
+      "label": "Announcement link"
+    },
+    {
+      "type": "text",
+      "id": "announcement_link_text",
+      "label": "Link text",
+      "default": "Sign Up Now"
+    }
+  ]
+}
+{% endschema %}

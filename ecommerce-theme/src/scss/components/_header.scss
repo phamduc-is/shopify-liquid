@@ -7,8 +7,9 @@
 .header__inner {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
-  padding-block: 16px; // padding-inline giờ do .container lo
+  padding-block: 16px;
 }
 
 .header__logo {
@@ -16,7 +17,6 @@
   font-size: 1.5rem;
   color: var(--color-foreground);
   text-decoration: none;
-  margin-right: auto;
 }
 
 .header__menu-toggle,
@@ -35,9 +35,15 @@
   width: 1.5rem;
 }
 
-.header__nav,
-.header__search {
-  display: none; // ẩn mặc định (mobile), hiện lại ở breakpoint md
+.header__menu-toggle,
+.header__icon-button--search {
+  display: none; // desktop mặc định: dùng nav + search bar riêng, không cần hamburger/icon search
+}
+
+.header__nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
 }
 
 .header__nav-link {
@@ -57,6 +63,7 @@
 }
 
 .header__search {
+  display: flex;
   align-items: center;
   gap: 8px;
   flex: 1;
@@ -86,24 +93,18 @@
   gap: 16px;
 }
 
-@include mix.respond-to('md') {
+@include mix.respond-to-max('md') {
+  .header__logo {
+    margin-right: auto; // chỉ cần ở đây — ép hamburger+logo dính nhau, đẩy icons ra phải
+  }
+
   .header__menu-toggle,
   .header__icon-button--search {
-    display: none; // desktop: có nav + search bar riêng, khỏi cần hamburger/icon search
-  }
-
-  .header__logo {
-    margin-right: 40px;
-  }
-
-  .header__nav {
     display: flex;
-    align-items: center;
-    gap: 24px;
-    margin-right: 24px;
   }
 
+  .header__nav,
   .header__search {
-    display: flex;
+    display: none;
   }
 }
