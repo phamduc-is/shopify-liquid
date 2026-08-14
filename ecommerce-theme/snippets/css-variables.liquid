@@ -35,5 +35,35 @@
     {% # Border radius %}
     --style-border-radius-inputs: {{ settings.input_corner_radius }}px;
     --style-border-radius-buttons: {{ settings.button_corner_radius }}px;
+    --style-border-radius-full: 62px;
+
+    {% # Figma design tokens (from design-tokens.css) not yet exposed as theme settings. Static values — not merchant-editable. %}
+
+    --fw-regular: 400;
+    --fw-medium: 500;
+    --fw-bold: 700;
+
+    {% # Font-size scale %}
+    --fs-hero-xl: 64px;
+    --fs-hero-lg: 48px;
+    --fs-hero-md: 40px;
+    --fs-hero-sm: 32px;
+    --fs-heading: 24px;
+    --fs-subheading: 20px;
+    --fs-body-lg: 16px;
+    --fs-body: 14px;
+    --fs-label: 12px;
+    --fs-caption: 10px;
+
+    {% # Spacing scale %}
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-2-5: 10px;
+    --space-3: 12px;
+    --space-3-5: 14px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-6-5: 26px;
   }
 {% endstyle %}

@@ -1,9 +1,4 @@
-{% comment %}
-  TODO (hành vi, chưa phải bước này):
-  - Nút hamburger (.header__menu-toggle) mở mobile nav — chưa có JS
-  - Nút X (.announcement-bar__close) đóng announcement bar — chưa có JS
-{% endcomment %}
-<div class="announcement-bar">
+<div class="announcement-bar full-width">
   <div class="announcement-bar__inner container-fullwidth">
     <p class="announcement-bar__text">
       {{ section.settings.announcement_text }}
@@ -19,7 +14,7 @@
   </div>
 </div>
 
-<header class="header">
+<header class="header full-width">
   <div class="header__inner container">
     <button type="button" class="header__menu-toggle" aria-label="Mở menu">
       {{ 'icon-menu.svg' | inline_asset_content }}
@@ -66,7 +61,53 @@
       </a>
     </div>
   </div>
+
+  <dialog class="mobile-nav" scroll-lock aria-label="Menu">
+    <button type="button" class="mobile-nav__close" aria-label="Đóng menu">
+      {{ 'icon-close.svg' | inline_asset_content }}
+    </button>
+
+    <nav class="mobile-nav__links">
+      {% for link in section.settings.menu.links %}
+        {% if link.links != blank %}
+          <button type="button" class="header__nav-link header__nav-link--dropdown">
+            {{ link.title }}
+            {{ 'icon-chevron-down.svg' | inline_asset_content }}
+          </button>
+        {% else %}
+          <a href="{{ link.url }}" class="header__nav-link">{{ link.title }}</a>
+        {% endif %}
+      {% endfor %}
+    </nav>
+  </dialog>
 </header>
+
+{% javascript %}
+  const announcementCloseButton = document.querySelector('.announcement-bar__close');
+
+  announcementCloseButton?.addEventListener('click', () => {
+    document.querySelector('.announcement-bar')?.remove();
+  });
+
+  // hamburger btn
+  const menuToggleButton = document.querySelector('.header__menu-toggle');
+  const mobileNav = document.querySelector('.mobile-nav');
+  const mobileNavCloseButton = document.querySelector('.mobile-nav__close');
+
+  menuToggleButton?.addEventListener('click', () => {
+    mobileNav?.showModal();
+  });
+
+  mobileNavCloseButton?.addEventListener('click', () => {
+    mobileNav?.close();
+  });
+
+  mobileNav?.addEventListener('click', (event) => {
+    if (event.target === mobileNav) {
+      mobileNav.close();
+    }
+  });
+{% endjavascript %}
 
 {% schema %}
 {
