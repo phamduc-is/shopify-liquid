@@ -60,7 +60,6 @@ Scope `local` lưu trong `~/.claude.json`, và Claude Code **khoá theo đúng �
 ```
 /Users/dawn/Documents/workspace
 ```
-
 **KHÔNG PHẢI** `shopify-liquid/` hay bất kỳ thư mục con nào bên trong (bài học y hệt lỗi từng gặp khi đặt hook nhầm ở `shopify-liquid/.claude/` — xem [continue-here.md](continue-here.md)). Nếu bạn chạy lệnh trong lúc `cd` vào `shopify-liquid/`, config sẽ bị lưu vào 1 project-key khác (`/Users/dawn/Documents/workspace/shopify-liquid`), và Claude Code (mở ở `workspace/`) **sẽ không thấy** server này.
 
 Luôn `cd` về đúng thư mục gốc trước:

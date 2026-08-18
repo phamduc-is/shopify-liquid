@@ -10,7 +10,6 @@ Tài liệu tổng hợp toàn bộ các câu lệnh Shopify CLI (`@shopify/cli`
 |---|---|
 | `shopify auth login` | Đăng nhập tài khoản Shopify CLI qua trình duyệt |
 | `shopify auth logout` | Đăng xuất tài khoản hiện tại |
-| `shopify auth whoami` | Kiểm tra tài khoản và cửa hàng đang kết nối hiện tại |
 
 ---
 
