@@ -19,6 +19,12 @@
     "update": "Update",
     "remove": "Remove"
   },
+  "footer": {
+    "newsletter_placeholder": "Enter your email address",
+    "newsletter_submit": "Subscribe to Newsletter",
+    "newsletter_success": "Thanks for subscribing!",
+    "newsletter_error": "Please enter a valid email address."
+  },
   "customers": {
     "login": {
       "email": "Email",

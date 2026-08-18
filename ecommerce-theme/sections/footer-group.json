@@ -13,9 +13,39 @@
   "sections": {
     "footer": {
       "type": "footer",
+      "blocks": {
+        "company": {
+          "type": "link_list",
+          "settings": {
+            "heading": "Company"
+          }
+        },
+        "help": {
+          "type": "link_list",
+          "settings": {
+            "heading": "Help"
+          }
+        },
+        "faq": {
+          "type": "link_list",
+          "settings": {
+            "heading": "FAQ"
+          }
+        },
+        "resources": {
+          "type": "link_list",
+          "settings": {
+            "heading": "Resources"
+          }
+        }
+      },
+      "block_order": ["company", "help", "faq", "resources"],
       "settings": {
-        "menu": "",
-        "show_payment_icons": true
+        "show_payment_icons": true,
+        "social_twitter_link": "https://twitter.com",
+        "social_facebook_link": "https://facebook.com",
+        "social_instagram_link": "https://instagram.com",
+        "social_github_link": "https://github.com"
       }
     }
   },

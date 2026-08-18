@@ -80,6 +80,23 @@
       {% endfor %}
     </nav>
   </dialog>
+
+  <dialog class="search-popup" scroll-lock aria-label="Tìm kiếm">
+    <button type="button" class="search-popup__close" aria-label="Đóng tìm kiếm">
+      {{ 'icon-close.svg' | inline_asset_content }}
+    </button>
+
+    <form action="{{ routes.search_url }}" method="get" role="search" class="search-popup__form">
+      {{ 'icon-search.svg' | inline_asset_content }}
+      <input
+        type="search"
+        name="q"
+        class="search-popup__input"
+        placeholder="Search for products..."
+        value="{{ search.terms | escape }}"
+      >
+    </form>
+  </dialog>
 </header>
 
 {% javascript %}
@@ -105,6 +122,25 @@
   mobileNav?.addEventListener('click', (event) => {
     if (event.target === mobileNav) {
       mobileNav.close();
+    }
+  });
+
+  // search popup
+  const searchToggleButton = document.querySelector('.header__icon-button--search');
+  const searchPopup = document.querySelector('.search-popup');
+  const searchPopupCloseButton = document.querySelector('.search-popup__close');
+
+  searchToggleButton?.addEventListener('click', () => {
+    searchPopup?.showModal();
+  });
+
+  searchPopupCloseButton?.addEventListener('click', () => {
+    searchPopup?.close();
+  });
+
+  searchPopup?.addEventListener('click', (event) => {
+    if (event.target === searchPopup) {
+      searchPopup.close();
     }
   });
 {% endjavascript %}

@@ -1,56 +1,156 @@
-<footer>
-  <div class="footer__copyright">
-    &copy;
-    {{ 'now' | date: '%Y' }}
-    {{ shop.name | link_to: routes.root_url }}, {{ powered_by_link }}
-  </div>
+<footer class="footer full-width">
+  <div class="container">
+    <div class="footer__newsletter">
+      <h2 class="footer__newsletter-heading">{{ section.settings.newsletter_heading }}</h2>
 
-  <div class="footer__links">
-    {% for link in section.settings.menu.links %}
-      {{ link.title | link_to: link.url }}
-    {% endfor %}
-  </div>
+      {%- form 'customer', id: 'FooterNewsletter', class: 'footer__newsletter-form' -%}
+        <input type="hidden" name="contact[tags]" value="newsletter">
 
-  <div class="footer__payment">
-    {% if section.settings.show_payment_icons %}
-      {% for type in shop.enabled_payment_types %}
-        {{ type | payment_type_svg_tag }}
-      {% endfor %}
-    {% endif %}
+        <div class="footer__newsletter-field">
+          {{ 'icon-mail.svg' | inline_asset_content }}
+          <input
+            type="email"
+            name="contact[email]"
+            id="FooterNewsletter-email"
+            class="footer__newsletter-input"
+            placeholder="{{ 'footer.newsletter_placeholder' | t }}"
+            autocomplete="email"
+            required
+          >
+        </div>
+
+        <button type="submit" class="footer__newsletter-submit">
+          {{ 'footer.newsletter_submit' | t }}
+        </button>
+
+        {%- if form.posted_successfully? -%}
+          <p class="footer__newsletter-message" role="status">{{ 'footer.newsletter_success' | t }}</p>
+        {%- elsif form.errors -%}
+          <p class="footer__newsletter-message footer__newsletter-message--error" role="alert">
+            {{ 'footer.newsletter_error' | t }}
+          </p>
+        {%- endif -%}
+      {%- endform -%}
+    </div>
+
+    <div class="footer__main">
+      <div class="footer__brand">
+        <a href="{{ routes.root_url }}" class="footer__logo">SHOP.CO</a>
+        {%- if section.settings.description != blank -%}
+          <p class="footer__description">{{ section.settings.description }}</p>
+        {%- endif -%}
+
+        {%- if section.settings.social_twitter_link != blank
+          or section.settings.social_facebook_link != blank
+          or section.settings.social_instagram_link != blank
+          or section.settings.social_github_link != blank
+        -%}
+          <div class="footer__social">
+            {%- if section.settings.social_twitter_link != blank -%}
+              <a href="{{ section.settings.social_twitter_link }}" class="footer__social-link" aria-label="Twitter">
+                {{ 'icon-twitter.svg' | inline_asset_content }}
+              </a>
+            {%- endif -%}
+            {%- if section.settings.social_facebook_link != blank -%}
+              <a href="{{ section.settings.social_facebook_link }}" class="footer__social-link" aria-label="Facebook">
+                {{ 'icon-facebook.svg' | inline_asset_content }}
+              </a>
+            {%- endif -%}
+            {%- if section.settings.social_instagram_link != blank -%}
+              <a href="{{ section.settings.social_instagram_link }}" class="footer__social-link" aria-label="Instagram">
+                {{ 'icon-instagram.svg' | inline_asset_content }}
+              </a>
+            {%- endif -%}
+            {%- if section.settings.social_github_link != blank -%}
+              <a href="{{ section.settings.social_github_link }}" class="footer__social-link" aria-label="GitHub">
+                {{ 'icon-github.svg' | inline_asset_content }}
+              </a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      {% content_for 'blocks' %}
+    </div>
+
+    <div class="footer__bottom">
+      <p class="footer__copyright">
+        &copy; {{ 'now' | date: '%Y' }} {{ shop.name | link_to: routes.root_url }}, {{ powered_by_link }}
+      </p>
+
+      {%- if section.settings.show_payment_icons -%}
+        <div class="footer__payment">
+          {%- for type in shop.enabled_payment_types -%}
+            <span class="footer__payment-icon">{{ type | payment_type_svg_tag }}</span>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
   </div>
 </footer>
-
-{% stylesheet %}
-  footer {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 2rem;
-  }
-  footer a {
-    text-decoration: none;
-    color: var(--color-foreground);
-  }
-  footer .footer__links,
-  footer .footer__payment {
-    display: flex;
-    gap: 1rem;
-  }
-{% endstylesheet %}
 
 {% schema %}
 {
   "name": "t:general.footer",
   "settings": [
     {
-      "type": "link_list",
-      "id": "menu",
-      "label": "t:labels.menu"
+      "type": "header",
+      "content": "t:general.newsletter"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_heading",
+      "label": "t:labels.newsletter_heading",
+      "default": "Stay upto date about our latest offers"
+    },
+    {
+      "type": "header",
+      "content": "t:general.brand"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "t:labels.description",
+      "default": "We have clothes that suits your style and which you're proud to wear. From women to men."
+    },
+    {
+      "type": "header",
+      "content": "t:general.social"
+    },
+    {
+      "type": "url",
+      "id": "social_twitter_link",
+      "label": "t:labels.social_twitter_link"
+    },
+    {
+      "type": "url",
+      "id": "social_facebook_link",
+      "label": "t:labels.social_facebook_link"
+    },
+    {
+      "type": "url",
+      "id": "social_instagram_link",
+      "label": "t:labels.social_instagram_link"
+    },
+    {
+      "type": "url",
+      "id": "social_github_link",
+      "label": "t:labels.social_github_link"
+    },
+    {
+      "type": "header",
+      "content": "t:general.payment"
     },
     {
       "type": "checkbox",
       "id": "show_payment_icons",
       "label": "t:labels.show_payment_icons",
       "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "link_list"
     }
   ]
 }
