@@ -1,0 +1,174 @@
+{% doc %}
+  Renders one slideshow slide: background image, heading, text and a CTA
+  button. Used inside sections/slideshow.liquid.
+
+  @example
+  {% content_for 'block', type: 'slide', id: 'slide' %}
+{% enddoc %}
+
+{%- comment -%}
+  content_for 'blocks' không cho forloop, nên dùng section.blocks.first.id để
+  biết mình có phải slide đầu không — cần cho 2 việc:
+  1. LCP: slide đầu là ảnh above-the-fold, không được lazy-load.
+  2. SEO/a11y: chỉ slide đầu được là <h1>, các slide sau xuống <h2> (nhiều
+     <h1> trên 1 trang là sai outline).
+{%- endcomment -%}
+{%- assign is_first_slide = false -%}
+{%- if section.blocks.first.id == block.id -%}
+  {%- assign is_first_slide = true -%}
+{%- endif -%}
+
+<div class="slideshow__slide" {{ block.shopify_attributes }}>
+  {%- if block.settings.image != blank -%}
+    <div class="slideshow__image">
+      {%- if is_first_slide -%}
+        {{
+          block.settings.image
+          | image_url: width: 1920
+          | image_tag:
+            loading: 'eager',
+            fetchpriority: 'high',
+            sizes: '100vw',
+            widths: '768, 1200, 1920, 2560',
+            alt: block.settings.image.alt
+        }}
+      {%- else -%}
+        {{
+          block.settings.image
+          | image_url: width: 1920
+          | image_tag:
+            loading: 'lazy',
+            sizes: '100vw',
+            widths: '768, 1200, 1920, 2560',
+            alt: block.settings.image.alt
+        }}
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  <div class="slideshow__content container">
+    {%- if block.settings.heading != blank -%}
+      {%- if is_first_slide -%}
+        <h1 class="slideshow__heading">{{ block.settings.heading }}</h1>
+      {%- else -%}
+        <h2 class="slideshow__heading">{{ block.settings.heading }}</h2>
+      {%- endif -%}
+    {%- endif -%}
+    {%- if block.settings.text != blank -%}
+      <p class="slideshow__text">{{ block.settings.text }}</p>
+    {%- endif -%}
+    {%- if block.settings.button_label != blank -%}
+      <a href="{{ block.settings.button_link | default: '#' }}" class="slideshow__button">
+        {{ block.settings.button_label }}
+      </a>
+    {%- endif -%}
+
+    {%- comment -%}
+      Hàng số liệu (200+ / 2,000+ / 30,000+). Mỗi cặp value/label để trống thì
+      tự ẩn — slide thứ 2, 3 có thể không cần số liệu. Dấu phân cách dọc giữa
+      các cột do CSS vẽ (border), không phải element riêng.
+    {%- endcomment -%}
+    {%- if block.settings.stat_1_value != blank
+      or block.settings.stat_2_value != blank
+      or block.settings.stat_3_value != blank
+    -%}
+      <dl class="slideshow__stats">
+        {%- if block.settings.stat_1_value != blank -%}
+          <div class="slideshow__stat">
+            <dt class="slideshow__stat-value">{{ block.settings.stat_1_value }}</dt>
+            <dd class="slideshow__stat-label">{{ block.settings.stat_1_label }}</dd>
+          </div>
+        {%- endif -%}
+        {%- if block.settings.stat_2_value != blank -%}
+          <div class="slideshow__stat">
+            <dt class="slideshow__stat-value">{{ block.settings.stat_2_value }}</dt>
+            <dd class="slideshow__stat-label">{{ block.settings.stat_2_label }}</dd>
+          </div>
+        {%- endif -%}
+        {%- if block.settings.stat_3_value != blank -%}
+          <div class="slideshow__stat">
+            <dt class="slideshow__stat-value">{{ block.settings.stat_3_value }}</dt>
+            <dd class="slideshow__stat-label">{{ block.settings.stat_3_label }}</dd>
+          </div>
+        {%- endif -%}
+      </dl>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:general.slide",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:labels.image"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Find clothes that matches your style"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "t:labels.text",
+      "default": "Browse through our diverse range of meticulously crafted garments, designed to bring out your individuality and cater to your sense of style."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "t:labels.button_label",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "t:labels.button_link"
+    },
+    {
+      "type": "header",
+      "content": "t:general.stats"
+    },
+    {
+      "type": "text",
+      "id": "stat_1_value",
+      "label": "t:labels.stat_1_value",
+      "default": "200+"
+    },
+    {
+      "type": "text",
+      "id": "stat_1_label",
+      "label": "t:labels.stat_1_label",
+      "default": "International Brands"
+    },
+    {
+      "type": "text",
+      "id": "stat_2_value",
+      "label": "t:labels.stat_2_value",
+      "default": "2,000+"
+    },
+    {
+      "type": "text",
+      "id": "stat_2_label",
+      "label": "t:labels.stat_2_label",
+      "default": "High-Quality Products"
+    },
+    {
+      "type": "text",
+      "id": "stat_3_value",
+      "label": "t:labels.stat_3_value",
+      "default": "30,000+"
+    },
+    {
+      "type": "text",
+      "id": "stat_3_label",
+      "label": "t:labels.stat_3_label",
+      "default": "Happy Customers"
+    }
+  ],
+  "presets": [{ "name": "t:general.slide" }]
+}
+{% endschema %}

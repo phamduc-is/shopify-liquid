@@ -1,0 +1,61 @@
+{% doc %}
+  Renders one brand logo inside the logo band. The uploaded image should be a
+  WHITE / transparent version — the band background is black.
+  Used inside sections/logo-list.liquid.
+
+  @example
+  {% content_for 'block', type: 'logo', id: 'logo' %}
+{% enddoc %}
+
+{%- liquid
+  assign logo_image = block.settings.image
+  assign logo_link = block.settings.link
+-%}
+
+<div class="logo-list__item" {{ block.shopify_attributes }}>
+  {%- if logo_link != blank -%}
+    <a href="{{ logo_link }}" class="logo-list__link">
+  {%- endif -%}
+
+  {%- if logo_image != blank -%}
+    {{
+      logo_image
+      | image_url: width: 320
+      | image_tag:
+        loading: 'lazy',
+        widths: '80, 120, 160, 240, 320',
+        sizes: '(min-width: 768px) 160px, 100px',
+        class: 'logo-list__image',
+        alt: logo_image.alt
+    }}
+  {%- else -%}
+    {%- comment -%}
+      Không có ảnh thì vẫn phải vẽ 1 placeholder — nếu render rỗng, block sẽ
+      "tàng hình" trong Theme Editor và merchant không biết mình vừa thêm gì.
+    {%- endcomment -%}
+    {{ 'image' | placeholder_svg_tag: 'logo-list__placeholder' }}
+  {%- endif -%}
+
+  {%- if logo_link != blank -%}
+    </a>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "t:general.logo",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:labels.image",
+      "info": "t:info.logo_white"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "t:labels.link"
+    }
+  ]
+}
+{% endschema %}

@@ -9,12 +9,45 @@
  */
 {
   "sections": {
+    "slideshow": {
+      "type": "slideshow",
+      "blocks": {
+        "slide-1": {
+          "type": "slide",
+          "settings": {
+            "heading": "Find clothes that matches your style",
+            "text": "Browse through our diverse range of meticulously crafted garments, designed to bring out your individuality and cater to your sense of style.",
+            "button_label": "Shop Now",
+            "button_link": "/collections/all"
+          }
+        }
+      },
+      "block_order": ["slide-1"],
+      "settings": {
+        "autoplay": true,
+        "autoplay_speed": 5
+      }
+    },
+    "logo-list": {
+      "type": "logo-list",
+      "blocks": {
+        "logo-1": { "type": "logo", "settings": {} },
+        "logo-2": { "type": "logo", "settings": {} },
+        "logo-3": { "type": "logo", "settings": {} },
+        "logo-4": { "type": "logo", "settings": {} },
+        "logo-5": { "type": "logo", "settings": {} }
+      },
+      "block_order": ["logo-1", "logo-2", "logo-3", "logo-4", "logo-5"],
+      "settings": {}
+    },
     "main": {
       "type": "hello-world",
       "settings": {}
     }
   },
   "order": [
+    "slideshow",
+    "logo-list",
     "main"
   ]
 }

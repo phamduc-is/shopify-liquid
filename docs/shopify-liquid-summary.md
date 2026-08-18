@@ -27,10 +27,11 @@ Tài liệu tổng hợp toàn bộ lý thuyết, cú pháp, quy tắc kiến tr
 | 15 | **Whitespace, Metafields & Content-For** | `🚀 Ngày 7 — Liquid Nâng Cao & Mini-Project Collection Page` | [Xem Bài](#-ngày-7--liquid-nâng-cao--mini-project-collection-page) |
 | 16 | **Layout, Template & Limits** | `🏛️ Ngày 8 — Layout & Templates (Theme Architecture)` | [Xem Bài](#️-ngày-8--layout--templates-theme-architecture) |
 | 17 | **Section Schema: settings/blocks/presets** | `🧱 Ngày 9 — Sections Cơ Bản & Section Schema` | [Xem Bài](#-ngày-9--sections-cơ-bản--section-schema) |
-| 18 | **Section Groups & Classic Block (limit/case)** | `🧩 Ngày 10 — Sections Nâng Cao: Blocks & Section Groups` | [Xem Bài](#-ngày-10--sections-nâng-cao-blocks--section-groups) |
-| 19 | **Global Settings: settings_schema.json, font_picker** | `⚙️ Ngày 11 — Global Settings, Config & Theme Editor` | [Xem Bài](#️-ngày-11--global-settings-config--theme-editor) |
-| 20 | **Locales: \| t, t:, publish ngôn ngữ** | `🌐 Ngày 12 — Locales, Ôn tập & Best Practices` | [Xem Bài](#-ngày-12--locales-ôn-tập--best-practices) |
-| 21 | **Bảng Tra Cứu Cheat-Sheet** | `📝 BẢNG TRA CỨU NHANH CÚ PHÁP LIQUID (CHEAT-SHEET)` | [Xem Bài](#-bảng-tra-cứu-nhanh-cú-pháp-liquid-cheat-sheet) |
+| 18 | **⚠️ "No blocks available" — presets ở file block** | `4b. presets trong file THEME BLOCK` | [Xem Bài](#4b-presets-trong-file-theme-block--vai-trò-khác-hẳn-quyết-định-block-có-hiện-trong-khay-add-block-hay-không) |
+| 19 | **Section Groups & Classic Block (limit/case)** | `🧩 Ngày 10 — Sections Nâng Cao: Blocks & Section Groups` | [Xem Bài](#-ngày-10--sections-nâng-cao-blocks--section-groups) |
+| 20 | **Global Settings: settings_schema.json, font_picker** | `⚙️ Ngày 11 — Global Settings, Config & Theme Editor` | [Xem Bài](#️-ngày-11--global-settings-config--theme-editor) |
+| 21 | **Locales: \| t, t:, publish ngôn ngữ** | `🌐 Ngày 12 — Locales, Ôn tập & Best Practices` | [Xem Bài](#-ngày-12--locales-ôn-tập--best-practices) |
+| 22 | **Bảng Tra Cứu Cheat-Sheet** | `📝 BẢNG TRA CỨU NHANH CÚ PHÁP LIQUID (CHEAT-SHEET)` | [Xem Bài](#-bảng-tra-cứu-nhanh-cú-pháp-liquid-cheat-sheet) |
 
 ---
 
@@ -637,6 +638,39 @@ Ví dụ thật trong project: [sections/custom-section.liquid](../my-first-them
 ]
 ```
 `preset.name` = tên hiện trong khay "Add section" (catalog chọn), không phải text hiển thị thật trên trang.
+
+##### 4b. `presets` trong file THEME BLOCK — vai trò khác hẳn: quyết định block có hiện trong khay "Add block" hay không
+
+Cùng tên `presets` nhưng đặt trong `blocks/*.liquid` thì ý nghĩa **khác hẳn** so với đặt trong `sections/*.liquid`:
+
+| `presets` nằm ở đâu | Tác dụng |
+| :--- | :--- |
+| `sections/xxx.liquid` | Section hiện trong khay **"Add section"**, kèm cấu hình mặc định |
+| `blocks/xxx.liquid` | Theme block hiện trong khay **"Add block"** — **không có `presets` = không add được** |
+
+⚠️ **Bẫy lớn nhất**: thiếu `presets` ở file block thì **KHÔNG có lỗi nào cả** — theme check pass sạch, block vẫn render đúng, vẫn sửa được settings ở sidebar. Chỉ có đúng 1 triệu chứng: bấm "Add block" thì báo *"No blocks available for this section"*. Rất dễ chẩn đoán nhầm sang lỗi môi trường (CORS/`theme dev`/cache trình duyệt).
+
+Lý do dễ nhầm: nhiều người tưởng khai `"blocks": [{"type": "slide"}]` bên section là đủ. **Không đủ** — 2 thứ đó trả lời 2 câu hỏi khác nhau:
+
+```
+sections/slideshow.liquid  "blocks": [{"type": "slide"}]   → "Section này CHO PHÉP chứa loại block nào?"
+blocks/slide.liquid        "presets": [{"name": "..."}]    → "Block này có được PHÉP tự thêm mới không?"
+```
+
+Thiếu vế 2 → block chỉ tồn tại được nếu đã ghi sẵn trong file JSON data (`templates/index.json`, `sections/*-group.json`), merchant không tự thêm được cái thứ hai.
+
+```json
+// blocks/slide.liquid — schema tối thiểu để add được từ Theme Editor
+{
+  "name": "t:general.slide",
+  "settings": [ /* ... */ ],
+  "presets": [{ "name": "t:general.slide" }]   // ← thiếu dòng này là "No blocks available"
+}
+```
+
+Ví dụ thật trong project: [blocks/slide.liquid](../ecommerce-theme/blocks/slide.liquid) (dùng bởi `sections/slideshow.liquid`) và [blocks/link_list.liquid](../ecommerce-theme/blocks/link_list.liquid) (dùng bởi `sections/footer.liquid`) — cả 2 lúc đầu đều thiếu `presets` nên không add được, đối chiếu với [blocks/text.liquid](../ecommerce-theme/blocks/text.liquid) / [blocks/group.liquid](../ecommerce-theme/blocks/group.liquid) từ skeleton thì thấy rõ 2 file này có `presets` từ đầu.
+
+> 💡 Mẹo debug: nếu "Add block" trống ở **nhiều section khác nhau** cùng lúc → gần như chắc chắn là thiếu `presets` ở các file block, không phải lỗi mạng/dev server. Cách kiểm tra nhanh toàn bộ: `grep -c presets blocks/*.liquid` — file nào ra `0` là file đó không add được.
 
 #### 5. Block Instance trong file JSON Template — cú pháp đầy đủ & cách hoạt động
 

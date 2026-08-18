@@ -1,0 +1,120 @@
+<div
+  class="slideshow full-width"
+  id="Slideshow-{{ section.id }}"
+  data-autoplay="{{ section.settings.autoplay }}"
+  data-autoplay-speed="{{ section.settings.autoplay_speed }}"
+>
+  <div class="slideshow__slides">
+    {% content_for 'blocks' %}
+  </div>
+
+  {%- if section.blocks.size > 1 -%}
+    <button type="button" class="slideshow__nav slideshow__nav--prev" aria-label="Slide trước">
+      {{ 'icon-arrow-left.svg' | inline_asset_content }}
+    </button>
+    <button type="button" class="slideshow__nav slideshow__nav--next" aria-label="Slide sau">
+      {{ 'icon-arrow-right.svg' | inline_asset_content }}
+    </button>
+
+    <div class="slideshow__dots">
+      {%- for i in (1..section.blocks.size) -%}
+        <button type="button" class="slideshow__dot" aria-label="Đến slide {{ i }}"></button>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</div>
+
+{% javascript %}
+  (function () {
+    function initSlideshow(root) {
+      const track = root.querySelector('.slideshow__slides');
+      const slides = root.querySelectorAll('.slideshow__slide');
+      const prevBtn = root.querySelector('.slideshow__nav--prev');
+      const nextBtn = root.querySelector('.slideshow__nav--next');
+      const dots = root.querySelectorAll('.slideshow__dot');
+      const total = slides.length;
+
+      if (!track || total <= 1) return;
+
+      const autoplay = root.dataset.autoplay === 'true';
+      const speed = (parseFloat(root.dataset.autoplaySpeed) || 5) * 1000;
+      let current = 0;
+      let timer = null;
+
+      function goToSlide(index) {
+        current = (index + total) % total;
+        track.style.transform = `translateX(-${current * 100}%)`;
+        dots.forEach((dot, i) => dot.classList.toggle('is-active', i === current));
+      }
+
+      function stopAutoplay() {
+        clearInterval(timer);
+        timer = null;
+      }
+
+      function startAutoplay() {
+        if (!autoplay) return;
+        stopAutoplay();
+        timer = setInterval(() => goToSlide(current + 1), speed);
+      }
+
+      // Chuyển slide do user chủ động -> hẹn lại đồng hồ autoplay từ đầu.
+      function userGoTo(index) {
+        goToSlide(index);
+        startAutoplay();
+      }
+
+      prevBtn?.addEventListener('click', () => userGoTo(current - 1));
+      nextBtn?.addEventListener('click', () => userGoTo(current + 1));
+      dots.forEach((dot, i) => dot.addEventListener('click', () => userGoTo(i)));
+
+      root.addEventListener('mouseenter', stopAutoplay);
+      root.addEventListener('mouseleave', startAutoplay);
+
+      goToSlide(0);
+      startAutoplay();
+    }
+
+    document.querySelectorAll('.slideshow').forEach(initSlideshow);
+
+    // Theme editor thay lại DOM của section mà không reload trang.
+    document.addEventListener('shopify:section:load', (event) => {
+      event.target.querySelectorAll('.slideshow').forEach(initSlideshow);
+    });
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "t:general.slideshow",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "t:labels.autoplay",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "t:labels.autoplay_speed",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "default": 5
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.slideshow",
+      "blocks": [{ "type": "slide" }]
+    }
+  ]
+}
+{% endschema %}

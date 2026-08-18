@@ -3785,3 +3785,1876 @@
 +  }
  }
 ```
+
+### 2026-08-18 11:20:00 — Tạo file `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/assets/icon-arrow-left.svg`
++3 / -0
+
+```diff
+--- before
++++ after
+@@ -0,0 +1,3 @@
++<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
++  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="var(--icon-stroke-width)" d="M12.5 5l-5 5 5 5" />
++</svg>
+```
+
+### 2026-08-18 11:20:01 — Tạo file `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/assets/icon-arrow-right.svg`
++3 / -0
+
+```diff
+--- before
++++ after
+@@ -0,0 +1,3 @@
++<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
++  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="var(--icon-stroke-width)" d="M7.5 5l5 5-5 5" />
++</svg>
+```
+
+### 2026-08-18 11:20:12 — Tạo file `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/blocks/slide.liquid`
++73 / -0
+
+```diff
+--- before
++++ after
+@@ -0,0 +1,73 @@
++{% doc %}
++  Renders one slideshow slide: background image, heading, text and a CTA
++  button. Used inside sections/slideshow.liquid.
++
++  @example
++  {% content_for 'block', type: 'slide', id: 'slide' %}
++{% enddoc %}
++
++<div class="slideshow__slide" {{ block.shopify_attributes }}>
++  {%- if block.settings.image != blank -%}
++    <div class="slideshow__image">
++      {{
++        block.settings.image
++        | image_url: width: 1920
++        | image_tag:
++          loading: 'lazy',
++          sizes: '100vw',
++          widths: '768, 1200, 1920, 2560',
++          alt: block.settings.image.alt
++      }}
++    </div>
++  {%- endif -%}
++
++  <div class="slideshow__content container">
++    {%- if block.settings.heading != blank -%}
++      <h1 class="slideshow__heading">{{ block.settings.heading }}</h1>
++    {%- endif -%}
++    {%- if block.settings.text != blank -%}
++      <p class="slideshow__text">{{ block.settings.text }}</p>
++    {%- endif -%}
++    {%- if block.settings.button_label != blank -%}
++      <a href="{{ block.settings.button_link | default: '#' }}" class="slideshow__button">
++        {{ block.settings.button_label }}
++      </a>
++    {%- endif -%}
++  </div>
++</div>
++
++{% schema %}
++{
++  "name": "t:general.slide",
++  "settings": [
++    {
++      "type": "image_picker",
++      "id": "image",
++      "label": "t:labels.image"
++    },
++    {
++      "type": "text",
++      "id": "heading",
++      "label": "t:labels.heading",
++      "default": "Find clothes that matches your style"
++    },
++    {
++      "type": "textarea",
++      "id": "text",
++      "label": "t:labels.text",
++      "default": "Browse through our diverse range of meticulously crafted garments, designed to bring out your individuality and cater to your sense of style."
++    },
++    {
++      "type": "text",
++      "id": "button_label",
++      "label": "t:labels.button_label",
++      "default": "Shop Now"
++    },
++    {
++      "type": "url",
++      "id": "button_link",
++      "label": "t:labels.button_link"
++    }
++  ]
++}
++{% endschema %}
+```
+
+### 2026-08-18 11:20:26 — Tạo file `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/sections/slideshow.liquid`
++70 / -0
+
+```diff
+--- before
++++ after
+@@ -0,0 +1,70 @@
++<div
++  class="slideshow full-width"
++  id="Slideshow-{{ section.id }}"
++  data-autoplay="{{ section.settings.autoplay }}"
++  data-autoplay-speed="{{ section.settings.autoplay_speed }}"
++>
++  <div class="slideshow__slides">
++    {% content_for 'blocks' %}
++  </div>
++
++  {%- if section.blocks.size > 1 -%}
++    <button type="button" class="slideshow__nav slideshow__nav--prev" aria-label="Slide trước">
++      {{ 'icon-arrow-left.svg' | inline_asset_content }}
++    </button>
++    <button type="button" class="slideshow__nav slideshow__nav--next" aria-label="Slide sau">
++      {{ 'icon-arrow-right.svg' | inline_asset_content }}
++    </button>
++
++    <div class="slideshow__dots">
++      {%- for i in (1..section.blocks.size) -%}
++        <button type="button" class="slideshow__dot" aria-label="Đến slide {{ i }}"></button>
++      {%- endfor -%}
++    </div>
++  {%- endif -%}
++</div>
++
++{% javascript %}
++  // Slideshow — điền logic ở đây.
++  // Selector có sẵn:
++  //   .slideshow                 -> section.dataset.autoplay ("true"/"false"), section.dataset.autoplaySpeed (giây)
++  //   .slideshow__slides         -> container chứa các slide, dùng translateX(-100% * index) để trượt
++  //   .slideshow__slide          -> từng slide (querySelectorAll để lấy index + length)
++  //   .slideshow__nav--prev/next -> nút mũi tên
++  //   .slideshow__dot            -> chấm tròn (thứ tự trong DOM khớp với thứ tự slide), toggle class "is-active"
++{% endjavascript %}
++
++{% schema %}
++{
++  "name": "t:general.slideshow",
++  "settings": [
++    {
++      "type": "checkbox",
++      "id": "autoplay",
++      "label": "t:labels.autoplay",
++      "default": true
++    },
++    {
++      "type": "range",
++      "id": "autoplay_speed",
++      "label": "t:labels.autoplay_speed",
++      "min": 3,
++      "max": 10,
++      "step": 1,
++      "unit": "s",
++      "default": 5
++    }
++  ],
++  "blocks": [
++    {
++      "type": "slide"
++    }
++  ],
++  "presets": [
++    {
++      "name": "t:general.slideshow",
++      "blocks": [{ "type": "slide" }]
++    }
++  ]
++}
++{% endschema %}
+```
+
+### 2026-08-18 11:20:38 — Tạo file `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/src/scss/components/_slideshow.scss`
++133 / -0
+
+```diff
+--- before
++++ after
+@@ -0,0 +1,133 @@
++@use '../abstracts/mixins' as mix;
++
++.slideshow {
++  position: relative;
++  overflow: hidden;
++}
++
++.slideshow__slides {
++  display: flex;
++  transition: transform 0.4s ease-in-out;
++}
++
++.slideshow__slide {
++  position: relative;
++  flex: 0 0 100%;
++  min-height: 663px;
++  display: flex;
++  align-items: center;
++  background-color: var(--color-surface-secondary);
++}
++
++.slideshow__image {
++  position: absolute;
++  inset: 0;
++  z-index: -1;
++}
++
++.slideshow__image img {
++  width: 100%;
++  height: 100%;
++  object-fit: cover;
++}
++
++.slideshow__content {
++  display: flex;
++  flex-direction: column;
++  align-items: flex-start;
++  gap: var(--space-5);
++  max-width: 34rem;
++  padding-block: 80px;
++}
++
++.slideshow__heading {
++  font-family: var(--font-heading--family);
++  font-size: var(--fs-hero-xl);
++  line-height: 1.1;
++  color: var(--color-foreground);
++}
++
++.slideshow__text {
++  font-size: var(--fs-body-lg);
++  line-height: 1.4;
++  color: var(--color-text-secondary);
++}
++
++.slideshow__button {
++  padding: 16px 54px;
++  border-radius: 999px;
++  background-color: var(--color-foreground);
++  color: var(--color-background);
++  font-size: var(--fs-body-lg);
++  font-weight: var(--fw-medium);
++  text-decoration: none;
++}
++
++.slideshow__nav {
++  position: absolute;
++  top: 50%;
++  transform: translateY(-50%);
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  width: 44px;
++  height: 44px;
++  border-radius: 999px;
++  border: none;
++  background-color: var(--color-background);
++  color: var(--color-foreground);
++  cursor: pointer;
++  z-index: 1;
++}
++
++.slideshow__nav svg {
++  width: 1.25rem;
++}
++
++.slideshow__nav--prev {
++  left: var(--page-margin);
++}
++
++.slideshow__nav--next {
++  right: var(--page-margin);
++}
++
++.slideshow__dots {
++  position: absolute;
++  bottom: var(--space-5);
++  left: 50%;
++  transform: translateX(-50%);
++  display: flex;
++  gap: var(--space-2);
++  z-index: 1;
++}
++
++.slideshow__dot {
++  width: 8px;
++  height: 8px;
++  border-radius: 999px;
++  border: none;
++  padding: 0;
++  background-color: rgb(255 255 255 / 50%);
++  cursor: pointer;
++}
++
++.slideshow__dot.is-active {
++  background-color: var(--color-background);
++}
++
++@include mix.respond-to-max('md') {
++  .slideshow__content {
++    max-width: 100%;
++    padding-block: 48px;
++  }
++
++  .slideshow__heading {
++    font-size: var(--fs-hero-md);
++  }
++
++  .slideshow__nav {
++    width: 36px;
++    height: 36px;
++  }
++}
+```
+
+### 2026-08-18 11:20:46 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/src/scss/main.scss`
++1 / -0
+
+```diff
+--- before
++++ after
+@@ -2,4 +2,5 @@
+ @use 'components/header';
+ @use 'components/mobile-nav';
+ @use 'components/search-popup';
++@use 'components/slideshow';
+ @use 'components/footer';
+```
+
+### 2026-08-18 11:20:58 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/locales/en.default.schema.json`
++2 / -0
+
+```diff
+--- before
++++ after
+@@ -1,4 +1,6 @@
+     "search": "Search",
++    "slide": "Slide",
++    "slideshow": "Slideshow",
+     "social": "Social media",
+     "secondary": "Secondary",
+     "section": "Section",
+```
+
+### 2026-08-18 11:21:06 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/locales/en.default.schema.json`
++6 / -0
+
+```diff
+--- before
++++ after
+@@ -1,11 +1,17 @@
+   "labels": {
+     "alignment": "Alignment",
++    "autoplay": "Autoplay",
++    "autoplay_speed": "Autoplay speed",
+     "background": "Background",
++    "button_label": "Button label",
++    "button_link": "Button link",
+     "column_heading": "Column heading",
+     "description": "Description",
+     "foreground": "Foreground",
+     "grid_gap": "Grid spacing",
+     "grid_item_width": "Grid item width",
++    "heading": "Heading",
++    "image": "Image",
+     "input_corner_radius": "Input corner radius",
+     "button_corner_radius": "Button corner radius",
+     "layout_direction": "Layout direction",
+```
+
+### 2026-08-18 11:21:15 — Ghi đè file (Write) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/templates/index.json`
++20 / -0
+
+```diff
+--- before
++++ after
+@@ -9,12 +9,32 @@
+  */
+ {
+   "sections": {
++    "slideshow": {
++      "type": "slideshow",
++      "blocks": {
++        "slide-1": {
++          "type": "slide",
++          "settings": {
++            "heading": "Find clothes that matches your style",
++            "text": "Browse through our diverse range of meticulously crafted garments, designed to bring out your individuality and cater to your sense of style.",
++            "button_label": "Shop Now",
++            "button_link": "/collections/all"
++          }
++        }
++      },
++      "block_order": ["slide-1"],
++      "settings": {
++        "autoplay": true,
++        "autoplay_speed": 5
++      }
++    },
+     "main": {
+       "type": "hello-world",
+       "settings": {}
+     }
+   },
+   "order": [
++    "slideshow",
+     "main"
+   ]
+ }
+```
+
+### 2026-08-18 14:23:32 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/src/scss/components/_footer.scss`
++1 / -1
+
+```diff
+--- before
++++ after
+@@ -3,7 +3,7 @@
+   flex-wrap: wrap;
+   align-items: center;
+   justify-content: space-between;
+-  gap: 24px;
++  gap: var(--space-6);
+   background-color: var(--color-foreground);
+   border-radius: var(--radius-lg);
+   padding: 36px 64px;
+```
+
+### 2026-08-18 14:23:38 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/src/scss/components/_footer.scss`
++1 / -1
+
+```diff
+--- before
++++ after
+@@ -1 +1 @@
+-  padding: 12px var(--space-4);+  padding: var(--space-3) var(--space-4);
+```
+
+### 2026-08-18 14:23:45 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/src/scss/components/_footer.scss`
++1 / -1
+
+```diff
+--- before
++++ after
+@@ -1,4 +1,4 @@
+ .footer__payment-icon svg {
+-  height: 14px;
++  height: var(--space-3-5);
+   width: auto;
+ }
+```
+
+### 2026-08-18 14:23:51 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/src/scss/components/_search-popup.scss`
++1 / -1
+
+```diff
+--- before
++++ after
+@@ -1 +1 @@
+-  padding: 10px var(--space-4);+  padding: var(--space-2-5) var(--space-4);
+```
+
+### 2026-08-18 14:23:58 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/src/scss/components/_slideshow.scss`
++1 / -1
+
+```diff
+--- before
++++ after
+@@ -1,2 +1,2 @@
+ .slideshow__button {
+-  padding: 16px 54px;+  padding: var(--space-4) 54px;
+```
+
+### 2026-08-18 14:24:05 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/src/scss/components/_slideshow.scss`
++2 / -2
+
+```diff
+--- before
++++ after
+@@ -1,3 +1,3 @@
+ .slideshow__dot {
+-  width: 8px;
+-  height: 8px;+  width: var(--space-2);
++  height: var(--space-2);
+```
+
+### 2026-08-18 14:44:50 — Tạo file `/Users/dawn/.claude/statusline.sh`
++58 / -0
+
+```diff
+--- before
++++ after
+@@ -0,0 +1,58 @@
++#!/bin/bash
++# Custom Claude Code statusline: model, session cost/tokens, and
++# Pro/Max plan rate-limit usage (5h + 7d), color-coded.
++input=$(cat)
++
++MODEL=$(echo "$input" | jq -r '.model.display_name')
++COST=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
++IN_TOK=$(echo "$input" | jq -r '.context_window.total_input_tokens // 0' | cut -d. -f1)
++OUT_TOK=$(echo "$input" | jq -r '.context_window.total_output_tokens // 0' | cut -d. -f1)
++
++FIVE_H=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')
++FIVE_H_RESET=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty')
++WEEK=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty')
++
++# Format a token count as e.g. "12.4k", or plain if under 1000
++fmt_k() {
++  local n=$1
++  if [ "$n" -ge 1000 ] 2>/dev/null; then
++    awk -v n="$n" 'BEGIN{printf "%.1fk", n/1000}'
++  else
++    echo "$n"
++  fi
++}
++
++COST_FMT=$(printf '$%.2f' "$COST")
++IN_FMT=$(fmt_k "$IN_TOK")
++OUT_FMT=$(fmt_k "$OUT_TOK")
++
++LIMITS=""
++if [ -n "$FIVE_H" ] || [ -n "$WEEK" ]; then
++  # Color dot reflects the higher of the two windows
++  MAXPCT=0
++  [ -n "$FIVE_H" ] && MAXPCT=$(printf '%.0f' "$FIVE_H")
++  if [ -n "$WEEK" ]; then
++    WPCT=$(printf '%.0f' "$WEEK")
++    [ "$WPCT" -gt "$MAXPCT" ] && MAXPCT=$WPCT
++  fi
++
++  if [ "$MAXPCT" -ge 80 ]; then DOT="🔴"
++  elif [ "$MAXPCT" -ge 50 ]; then DOT="🟡"
++  else DOT="🟢"
++  fi
++
++  if [ -n "$FIVE_H" ]; then
++    RESET_TIME=""
++    [ -n "$FIVE_H_RESET" ] && RESET_TIME=" (resets $(date -r "${FIVE_H_RESET%.*}" '+%H:%M' 2>/dev/null))"
++    LIMITS="5h: $(printf '%.0f' "$FIVE_H")%${RESET_TIME}"
++  fi
++  if [ -n "$WEEK" ]; then
++    LIMITS="${LIMITS:+$LIMITS | }7d: $(printf '%.0f' "$WEEK")%"
++  fi
++else
++  # rate_limits absent: not a Pro/Max session yet, or no API response so far
++  DOT="⚪"
++  LIMITS="usage n/a"
++fi
++
++echo -e "${DOT} ${MODEL} | ${COST_FMT} (${IN_FMT} in / ${OUT_FMT} out) | ${LIMITS}"
+```
+
+### 2026-08-18 14:45:13 — Sửa file (Edit) `/Users/dawn/.claude/settings.json`
++5 / -1
+
+```diff
+--- before
++++ after
+@@ -1,5 +1,9 @@
+ {
+   "effortLevel": "high",
+   "theme": "dark",
+-  "switchModelsOnFlag": true
++  "switchModelsOnFlag": true,
++  "statusLine": {
++    "type": "command",
++    "command": "~/.claude/statusline.sh"
++  }
+ }
+```
+
+### 2026-08-18 15:05:06 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/src/scss/components/_slideshow.scss`
++15 / -1
+
+```diff
+--- before
++++ after
+@@ -1,7 +1,12 @@
+ .slideshow__image {
+   position: absolute;
+   inset: 0;
+-  z-index: -1;
++  // KHÔNG dùng z-index âm: .slideshow__slide chỉ có position:relative,
++  // z-index:auto -> không tạo stacking context riêng, nên z-index âm ở đây
++  // sẽ tính theo stacking context của tổ tiên và bị chìm xuống dưới cả
++  // background của .slideshow__slide. 0 là đủ (chỉ cần thoát khỏi luồng
++  // in-flow bình thường của .slideshow__content).
++  z-index: 0;
+ }
+ 
+ .slideshow__image img {
+@@ -11,6 +16,15 @@
+ }
+ 
+ .slideshow__content {
++  position: relative;
++  // Phải > 0 để chắc chắn vẽ trên .slideshow__image (cả 2 giờ đều là
++  // positioned descendant của cùng 1 containing block).
++  z-index: 1;
++  // .container (base/_container.scss) set margin-inline: auto — trên 1 flex
++  // item (.slideshow__slide là display:flex), auto margin sẽ hút hết khoảng
++  // trống 2 bên -> content bị đẩy vào giữa dù không có justify-content:
++  // center nào. Ghi đè về 0 để giữ đúng canh trái.
++  margin-inline: 0;
+   display: flex;
+   flex-direction: column;
+   align-items: flex-start;
+```
+
+### 2026-08-18 15:05:18 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/src/scss/components/_slideshow.scss`
++7 / -2
+
+```diff
+--- before
++++ after
+@@ -4,10 +4,15 @@
+   border-radius: 999px;
+   border: none;
+   padding: 0;
+-  background-color: rgb(255 255 255 / 50%);
++  // Dùng --color-foreground (không phải trắng cố định) + opacity để mờ/rõ —
++  // trắng 50% gần như vô hình trên nền fallback --color-surface-secondary
++  // (sáng) khi slide chưa có ảnh, và hardcode rgb(255 255 255 ..) lại lệch
++  // nguyên tắc "ưu tiên token đã khai báo" nếu merchant đổi foreground color.
++  background-color: var(--color-foreground);
++  opacity: 0.3;
+   cursor: pointer;
+ }
+ 
+ .slideshow__dot.is-active {
+-  background-color: var(--color-background);
++  opacity: 1;
+ }
+```
+
+### 2026-08-18 15:05:33 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/blocks/slide.liquid`
++39 / -10
+
+```diff
+--- before
++++ after
+@@ -1,19 +1,48 @@
++{%- comment -%}
++  content_for 'blocks' không cho forloop, nên dùng section.blocks.first.id để
++  biết mình có phải slide đầu không — cần cho 2 việc:
++  1. LCP: slide đầu là ảnh above-the-fold, không được lazy-load.
++  2. SEO/a11y: chỉ slide đầu được là <h1>, các slide sau xuống <h2> (nhiều
++     <h1> trên 1 trang là sai outline).
++{%- endcomment -%}
++{%- assign is_first_slide = false -%}
++{%- if section.blocks.first.id == block.id -%}
++  {%- assign is_first_slide = true -%}
++{%- endif -%}
++
+ <div class="slideshow__slide" {{ block.shopify_attributes }}>
+   {%- if block.settings.image != blank -%}
+     <div class="slideshow__image">
+-      {{
+-        block.settings.image
+-        | image_url: width: 1920
+-        | image_tag:
+-          loading: 'lazy',
+-          sizes: '100vw',
+-          widths: '768, 1200, 1920, 2560',
+-          alt: block.settings.image.alt
+-      }}
++      {%- if is_first_slide -%}
++        {{
++          block.settings.image
++          | image_url: width: 1920
++          | image_tag:
++            loading: 'eager',
++            fetchpriority: 'high',
++            sizes: '100vw',
++            widths: '768, 1200, 1920, 2560',
++            alt: block.settings.image.alt
++        }}
++      {%- else -%}
++        {{
++          block.settings.image
++          | image_url: width: 1920
++          | image_tag:
++            loading: 'lazy',
++            sizes: '100vw',
++            widths: '768, 1200, 1920, 2560',
++            alt: block.settings.image.alt
++        }}
++      {%- endif -%}
+     </div>
+   {%- endif -%}
+ 
+   <div class="slideshow__content container">
+     {%- if block.settings.heading != blank -%}
+-      <h1 class="slideshow__heading">{{ block.settings.heading }}</h1>
++      {%- if is_first_slide -%}
++        <h1 class="slideshow__heading">{{ block.settings.heading }}</h1>
++      {%- else -%}
++        <h2 class="slideshow__heading">{{ block.settings.heading }}</h2>
++      {%- endif -%}
+     {%- endif -%}
+```
+
+### 2026-08-18 15:06:31 — Ghi đè file (Write) `/Users/dawn/.claude/statusline.sh`
++18 / -27
+
+```diff
+--- before
++++ after
+@@ -1,34 +1,32 @@
+ #!/bin/bash
+-# Custom Claude Code statusline: model, session cost/tokens, and
+-# Pro/Max plan rate-limit usage (5h + 7d), color-coded.
++# Custom Claude Code statusline:
++#   model | context-window bar | session cost | Pro/Max plan usage (5h + 7d)
+ input=$(cat)
+ 
+ MODEL=$(echo "$input" | jq -r '.model.display_name')
+ COST=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
+-IN_TOK=$(echo "$input" | jq -r '.context_window.total_input_tokens // 0' | cut -d. -f1)
+-OUT_TOK=$(echo "$input" | jq -r '.context_window.total_output_tokens // 0' | cut -d. -f1)
++CTX_PCT=$(echo "$input" | jq -r '.context_window.used_percentage // 0' | cut -d. -f1)
+ 
+ FIVE_H=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')
+-FIVE_H_RESET=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty')
+ WEEK=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty')
+ 
+-# Format a token count as e.g. "12.4k", or plain if under 1000
+-fmt_k() {
+-  local n=$1
+-  if [ "$n" -ge 1000 ] 2>/dev/null; then
+-    awk -v n="$n" 'BEGIN{printf "%.1fk", n/1000}'
+-  else
+-    echo "$n"
+-  fi
+-}
++GREEN='\033[32m'; YELLOW='\033[33m'; RED='\033[31m'; DIM='\033[2m'; RESET='\033[0m'
++
++# --- context window bar (10 cells) ---
++if [ "$CTX_PCT" -ge 90 ]; then CTX_COLOR="$RED"
++elif [ "$CTX_PCT" -ge 70 ]; then CTX_COLOR="$YELLOW"
++else CTX_COLOR="$GREEN"; fi
++
++FILLED=$((CTX_PCT / 10)); EMPTY=$((10 - FILLED))
++BAR=""
++[ "$FILLED" -gt 0 ] && printf -v FILL "%${FILLED}s" && BAR="${FILL// /█}"
++[ "$EMPTY" -gt 0 ] && printf -v PAD "%${EMPTY}s" && BAR="${BAR}${PAD// /░}"
+ 
+ COST_FMT=$(printf '$%.2f' "$COST")
+-IN_FMT=$(fmt_k "$IN_TOK")
+-OUT_FMT=$(fmt_k "$OUT_TOK")
+ 
++# --- plan rate limits (Pro/Max only, after first API response) ---
+ LIMITS=""
+ if [ -n "$FIVE_H" ] || [ -n "$WEEK" ]; then
+-  # Color dot reflects the higher of the two windows
+   MAXPCT=0
+   [ -n "$FIVE_H" ] && MAXPCT=$(printf '%.0f' "$FIVE_H")
+   if [ -n "$WEEK" ]; then
+@@ -41,18 +39,11 @@
+   else DOT="🟢"
+   fi
+ 
+-  if [ -n "$FIVE_H" ]; then
+-    RESET_TIME=""
+-    [ -n "$FIVE_H_RESET" ] && RESET_TIME=" (resets $(date -r "${FIVE_H_RESET%.*}" '+%H:%M' 2>/dev/null))"
+-    LIMITS="5h: $(printf '%.0f' "$FIVE_H")%${RESET_TIME}"
+-  fi
+-  if [ -n "$WEEK" ]; then
+-    LIMITS="${LIMITS:+$LIMITS | }7d: $(printf '%.0f' "$WEEK")%"
+-  fi
++  [ -n "$FIVE_H" ] && LIMITS="5h: $(printf '%.0f' "$FIVE_H")%"
++  [ -n "$WEEK" ] && LIMITS="${LIMITS:+$LIMITS | }7d: $(printf '%.0f' "$WEEK")%"
+ else
+-  # rate_limits absent: not a Pro/Max session yet, or no API response so far
+   DOT="⚪"
+   LIMITS="usage n/a"
+ fi
+ 
+-echo -e "${DOT} ${MODEL} | ${COST_FMT} (${IN_FMT} in / ${OUT_FMT} out) | ${LIMITS}"
++echo -e "${DOT} ${MODEL} | ${CTX_COLOR}${BAR}${RESET} ${CTX_PCT}% ctx | ${YELLOW}${COST_FMT}${RESET} ${DIM}|${RESET} ${LIMITS}"
+```
+
+### 2026-08-18 15:36:57 — Tạo file `/Users/dawn/.claude/projects/-Users-dawn-Documents-workspace/memory/figma-api-rate-limit.md`
++12 / -0
+
+```diff
+--- before
++++ after
+@@ -0,0 +1,12 @@
++---
++name: figma-api-rate-limit
++description: Figma MCP for the SHOP.CO clone is on a Starter/Viewer-seat account with a very low API quota (~13h lockout once hit)
++metadata:
++  type: project
++---
++
++The Figma MCP server (`figma-developer-mcp`, fileKey `AXFvzD9Zu9A2xkNwOItGWL` — "E-commerce Website Template (Freebie) (Community)", the SHOP.CO design) runs on a Starter plan with a Viewer/Collaborator seat. The API quota is tiny: on 2026-08-18 roughly 3–4 `get_figma_data` calls exhausted it and returned HTTP 429 with a ~47,000 second (~13 hour) retry window.
++
++**Why:** a 429 here is not a transient backoff to retry through — it locks out Figma reads for the rest of the working day, which blocks design-matching work.
++
++**How to apply:** treat Figma MCP calls as a scarce resource. Before calling, check whether the answer is already in `/Users/dawn/Documents/workspace/design-tokens.css` (full color/typography/spacing/radius token set already extracted from the file) or in `docs/continue-here.md`. When a call is genuinely needed, fetch one specific `nodeId` at low `depth` rather than exploring. Known node IDs: Homepage desktop `20:2` / mobile `35:740`, Category `26:855` / `38:234`, Product Detail `1:2` / `35:1062`, Cart `31:32` / `39:1045`, Filters (mobile only) `38:679`. Cheapest unblock when rate-limited: ask for a screenshot of the frame, or Dev Mode "Copy as code" output. See [[shopify-theme-agent-guides-only]].
+```
+
+### 2026-08-18 15:37:02 — Tạo file `/Users/dawn/.claude/projects/-Users-dawn-Documents-workspace/memory/shopify-theme-agent-guides-only.md`
++12 / -0
+
+```diff
+--- before
++++ after
+@@ -0,0 +1,12 @@
++---
++name: shopify-theme-agent-guides-only
++description: On the ecommerce-theme Shopify build, Claude guides step by step and does not write theme code directly
++metadata:
++  type: feedback
++---
++
++From Bước 2 onward on `shopify-liquid/ecommerce-theme/`, Claude must **not** edit theme files directly. Claude explains what to change, where, and why; the user types the code themselves. Claude then verifies with `shopify theme check` and by re-reading the file. Exceptions: progress-tracking docs (`docs/continue-here.md`) and read-only CLI commands are fine for Claude to do.
++
++**Why:** the project is a learning exercise — the user is working through a Shopify Liquid roadmap day by day, so having Claude write the code defeats the point. This rule is recorded in `shopify-liquid/docs/continue-here.md`.
++
++**How to apply:** when asked to build a section/snippet, deliver step-by-step guidance in the established three passes — static HTML with fake data → swap in dynamic Liquid → add `{% schema %}` one setting at a time, testing in the Theme Editor after each. Offer to run `theme check` after the user reports done. See [[figma-api-rate-limit]].
+```
+
+### 2026-08-18 15:37:06 — Tạo file `/Users/dawn/.claude/projects/-Users-dawn-Documents-workspace/memory/MEMORY.md`
++2 / -0
+
+```diff
+--- before
++++ after
+@@ -0,0 +1,2 @@
++- [Figma API rate limit](figma-api-rate-limit.md) — Starter/Viewer seat, ~13h lockout after a few calls; check design-tokens.css first
++- [Theme work: guide, don't write](shopify-theme-agent-guides-only.md) — on ecommerce-theme the user types the code, Claude only explains and verifies
+```
+
+### 2026-08-18 15:40:25 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/blocks/slide.liquid`
++2 / -1
+
+```diff
+--- before
++++ after
+@@ -3,6 +3,7 @@
+       "id": "button_link",
+       "label": "t:labels.button_link"
+     }
+-  ]
++  ],
++  "presets": [{ "name": "t:general.slide" }]
+ }
+ {% endschema %}
+```
+
+### 2026-08-18 15:40:32 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/blocks/link_list.liquid`
++2 / -1
+
+```diff
+--- before
++++ after
+@@ -3,6 +3,7 @@
+       "id": "menu",
+       "label": "t:labels.menu"
+     }
+-  ]
++  ],
++  "presets": [{ "name": "t:general.column" }]
+ }
+ {% endschema %}
+```
+
+### 2026-08-18 15:42:02 — Tạo file `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/blocks/logo.liquid`
++61 / -0
+
+```diff
+--- before
++++ after
+@@ -0,0 +1,61 @@
++{% doc %}
++  Renders one brand logo inside the logo band. The uploaded image should be a
++  WHITE / transparent version — the band background is black.
++  Used inside sections/logo-list.liquid.
++
++  @example
++  {% content_for 'block', type: 'logo', id: 'logo' %}
++{% enddoc %}
++
++{%- liquid
++  assign logo_image = block.settings.image
++  assign logo_link = block.settings.link
++-%}
++
++<div class="logo-list__item" {{ block.shopify_attributes }}>
++  {%- if logo_link != blank -%}
++    <a href="{{ logo_link }}" class="logo-list__link">
++  {%- endif -%}
++
++  {%- if logo_image != blank -%}
++    {{
++      logo_image
++      | image_url: width: 320
++      | image_tag:
++        loading: 'lazy',
++        widths: '80, 120, 160, 240, 320',
++        sizes: '(min-width: 768px) 160px, 100px',
++        class: 'logo-list__image',
++        alt: logo_image.alt
++    }}
++  {%- else -%}
++    {%- comment -%}
++      Không có ảnh thì vẫn phải vẽ 1 placeholder — nếu render rỗng, block sẽ
++      "tàng hình" trong Theme Editor và merchant không biết mình vừa thêm gì.
++    {%- endcomment -%}
++    {{ 'image' | placeholder_svg_tag: 'logo-list__placeholder' }}
++  {%- endif -%}
++
++  {%- if logo_link != blank -%}
++    </a>
++  {%- endif -%}
++</div>
++
++{% schema %}
++{
++  "name": "t:general.logo",
++  "settings": [
++    {
++      "type": "image_picker",
++      "id": "image",
++      "label": "t:labels.image",
++      "info": "t:info.logo_white"
++    },
++    {
++      "type": "url",
++      "id": "link",
++      "label": "t:labels.link"
++    }
++  ]
++}
++{% endschema %}
+```
+
+### 2026-08-18 15:42:08 — Tạo file `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/sections/logo-list.liquid`
++34 / -0
+
+```diff
+--- before
++++ after
+@@ -0,0 +1,34 @@
++{%- comment -%}
++  Dải logo thương hiệu nằm ngay dưới slideshow (Homepage — Figma SHOP.CO).
++  Nền đen tràn viền (.full-width), nội dung bó về 1240px qua .container.
++{%- endcomment -%}
++
++<div class="logo-list full-width">
++  <div class="logo-list__items container">
++    {% content_for 'blocks' %}
++  </div>
++</div>
++
++{% schema %}
++{
++  "name": "t:general.logo_list",
++  "tag": "section",
++  "blocks": [
++    {
++      "type": "logo"
++    }
++  ],
++  "presets": [
++    {
++      "name": "t:general.logo_list",
++      "blocks": [
++        { "type": "logo" },
++        { "type": "logo" },
++        { "type": "logo" },
++        { "type": "logo" },
++        { "type": "logo" }
++      ]
++    }
++  ]
++}
++{% endschema %}
+```
+
+### 2026-08-18 15:42:17 — Tạo file `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/src/scss/components/_logo-list.scss`
++60 / -0
+
+```diff
+--- before
++++ after
+@@ -0,0 +1,60 @@
++@use '../abstracts/mixins' as mix;
++
++// Dải logo thương hiệu dưới slideshow. Nền đen cố định theo Figma —
++// KHÔNG dùng var(--color-foreground) vì màu đó merchant đổi được trong
++// Theme Editor, còn dải này luôn phải đen để logo trắng đọc được.
++.logo-list {
++  background-color: #000;
++}
++
++.logo-list__items {
++  display: flex;
++  align-items: center;
++  justify-content: space-between;
++  flex-wrap: wrap;
++  gap: var(--space-6);
++  padding-block: var(--space-6);
++}
++
++.logo-list__item {
++  display: flex;
++  align-items: center;
++}
++
++.logo-list__link {
++  display: block;
++  line-height: 0;
++}
++
++// max-height thay vì height: logo mỗi brand có tỷ lệ khác nhau, khoá chiều
++// cao rồi để width tự co (width: auto) mới không bóp méo ảnh.
++.logo-list__image {
++  display: block;
++  max-height: 34px;
++  width: auto;
++  object-fit: contain;
++}
++
++.logo-list__placeholder {
++  width: 120px;
++  height: 34px;
++  fill: #fff;
++  opacity: 0.35;
++}
++
++@include mix.respond-to-max('md') {
++  .logo-list__items {
++    justify-content: center;
++    gap: var(--space-5);
++  }
++
++  .logo-list__image,
++  .logo-list__placeholder {
++    max-height: 24px;
++  }
++
++  .logo-list__placeholder {
++    height: 24px;
++    width: 84px;
++  }
++}
+```
+
+### 2026-08-18 15:42:21 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/src/scss/main.scss`
++1 / -0
+
+```diff
+--- before
++++ after
+@@ -1,2 +1,3 @@
+ @use 'components/slideshow';
++@use 'components/logo-list';
+ @use 'components/footer';
+```
+
+### 2026-08-18 15:42:26 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/locales/en.default.schema.json`
++2 / -0
+
+```diff
+--- before
++++ after
+@@ -1,2 +1,4 @@
+     "layout": "Layout",
++    "logo": "Logo",
++    "logo_list": "Logo list",
+     "main": "Main",
+```
+
+### 2026-08-18 15:42:30 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/locales/en.default.schema.json`
++1 / -0
+
+```diff
+--- before
++++ after
+@@ -1,2 +1,3 @@
+     "layout_direction": "Layout direction",
++    "link": "Link",
+     "menu": "Menu",
+```
+
+### 2026-08-18 15:42:33 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/locales/en.default.schema.json`
++3 / -0
+
+```diff
+--- before
++++ after
+@@ -1 +1,4 @@
++  "info": {
++    "logo_white": "Upload a white or light version — the band background is black."
++  },
+   "options": {
+```
+
+### 2026-08-18 15:42:38 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/templates/index.json`
++13 / -0
+
+```diff
+--- before
++++ after
+@@ -1,3 +1,15 @@
++    "logo-list": {
++      "type": "logo-list",
++      "blocks": {
++        "logo-1": { "type": "logo", "settings": {} },
++        "logo-2": { "type": "logo", "settings": {} },
++        "logo-3": { "type": "logo", "settings": {} },
++        "logo-4": { "type": "logo", "settings": {} },
++        "logo-5": { "type": "logo", "settings": {} }
++      },
++      "block_order": ["logo-1", "logo-2", "logo-3", "logo-4", "logo-5"],
++      "settings": {}
++    },
+     "main": {
+       "type": "hello-world",
+       "settings": {}
+@@ -5,6 +17,7 @@
+   },
+   "order": [
+     "slideshow",
++    "logo-list",
+     "main"
+   ]
+ }
+```
+
+### 2026-08-18 15:48:01 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/docs/shopify-liquid-summary.md`
++33 / -0
+
+```diff
+--- before
++++ after
+@@ -1,3 +1,36 @@
+ `preset.name` = tên hiện trong khay "Add section" (catalog chọn), không phải text hiển thị thật trên trang.
+ 
++##### 4b. `presets` trong file THEME BLOCK — vai trò khác hẳn: quyết định block có hiện trong khay "Add block" hay không
++
++Cùng tên `presets` nhưng đặt trong `blocks/*.liquid` thì ý nghĩa **khác hẳn** so với đặt trong `sections/*.liquid`:
++
++| `presets` nằm ở đâu | Tác dụng |
++| :--- | :--- |
++| `sections/xxx.liquid` | Section hiện trong khay **"Add section"**, kèm cấu hình mặc định |
++| `blocks/xxx.liquid` | Theme block hiện trong khay **"Add block"** — **không có `presets` = không add được** |
++
++⚠️ **Bẫy lớn nhất**: thiếu `presets` ở file block thì **KHÔNG có lỗi nào cả** — theme check pass sạch, block vẫn render đúng, vẫn sửa được settings ở sidebar. Chỉ có đúng 1 triệu chứng: bấm "Add block" thì báo *"No blocks available for this section"*. Rất dễ chẩn đoán nhầm sang lỗi môi trường (CORS/`theme dev`/cache trình duyệt).
++
++Lý do dễ nhầm: nhiều người tưởng khai `"blocks": [{"type": "slide"}]` bên section là đủ. **Không đủ** — 2 thứ đó trả lời 2 câu hỏi khác nhau:
++
++```
++sections/slideshow.liquid  "blocks": [{"type": "slide"}]   → "Section này CHO PHÉP chứa loại block nào?"
++blocks/slide.liquid        "presets": [{"name": "..."}]    → "Block này có được PHÉP tự thêm mới không?"
++```
++
++Thiếu vế 2 → block chỉ tồn tại được nếu đã ghi sẵn trong file JSON data (`templates/index.json`, `sections/*-group.json`), merchant không tự thêm được cái thứ hai.
++
++```json
++// blocks/slide.liquid — schema tối thiểu để add được từ Theme Editor
++{
++  "name": "t:general.slide",
++  "settings": [ /* ... */ ],
++  "presets": [{ "name": "t:general.slide" }]   // ← thiếu dòng này là "No blocks available"
++}
++```
++
++Ví dụ thật trong project: [blocks/slide.liquid](../ecommerce-theme/blocks/slide.liquid) (dùng bởi `sections/slideshow.liquid`) và [blocks/link_list.liquid](../ecommerce-theme/blocks/link_list.liquid) (dùng bởi `sections/footer.liquid`) — cả 2 lúc đầu đều thiếu `presets` nên không add được, đối chiếu với [blocks/text.liquid](../ecommerce-theme/blocks/text.liquid) / [blocks/group.liquid](../ecommerce-theme/blocks/group.liquid) từ skeleton thì thấy rõ 2 file này có `presets` từ đầu.
++
++> 💡 Mẹo debug: nếu "Add block" trống ở **nhiều section khác nhau** cùng lúc → gần như chắc chắn là thiếu `presets` ở các file block, không phải lỗi mạng/dev server. Cách kiểm tra nhanh toàn bộ: `grep -c presets blocks/*.liquid` — file nào ra `0` là file đó không add được.
++
+ #### 5. Block Instance trong file JSON Template — cú pháp đầy đủ & cách hoạt động
+```
+
+### 2026-08-18 15:48:29 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/docs/shopify-liquid-summary.md`
++5 / -4
+
+```diff
+--- before
++++ after
+@@ -1,5 +1,6 @@
+ | 17 | **Section Schema: settings/blocks/presets** | `🧱 Ngày 9 — Sections Cơ Bản & Section Schema` | [Xem Bài](#-ngày-9--sections-cơ-bản--section-schema) |
+-| 18 | **Section Groups & Classic Block (limit/case)** | `🧩 Ngày 10 — Sections Nâng Cao: Blocks & Section Groups` | [Xem Bài](#-ngày-10--sections-nâng-cao-blocks--section-groups) |
+-| 19 | **Global Settings: settings_schema.json, font_picker** | `⚙️ Ngày 11 — Global Settings, Config & Theme Editor` | [Xem Bài](#️-ngày-11--global-settings-config--theme-editor) |
+-| 20 | **Locales: \| t, t:, publish ngôn ngữ** | `🌐 Ngày 12 — Locales, Ôn tập & Best Practices` | [Xem Bài](#-ngày-12--locales-ôn-tập--best-practices) |
+-| 21 | **Bảng Tra Cứu Cheat-Sheet** | `📝 BẢNG TRA CỨU NHANH CÚ PHÁP LIQUID (CHEAT-SHEET)` | [Xem Bài](#-bảng-tra-cứu-nhanh-cú-pháp-liquid-cheat-sheet) |+| 18 | **⚠️ "No blocks available" — presets ở file block** | `4b. presets trong file THEME BLOCK` | [Xem Bài](#4b-presets-trong-file-theme-block--vai-trò-khác-hẳn-quyết-định-block-có-hiện-trong-khay-add-block-hay-không) |
++| 19 | **Section Groups & Classic Block (limit/case)** | `🧩 Ngày 10 — Sections Nâng Cao: Blocks & Section Groups` | [Xem Bài](#-ngày-10--sections-nâng-cao-blocks--section-groups) |
++| 20 | **Global Settings: settings_schema.json, font_picker** | `⚙️ Ngày 11 — Global Settings, Config & Theme Editor` | [Xem Bài](#️-ngày-11--global-settings-config--theme-editor) |
++| 21 | **Locales: \| t, t:, publish ngôn ngữ** | `🌐 Ngày 12 — Locales, Ôn tập & Best Practices` | [Xem Bài](#-ngày-12--locales-ôn-tập--best-practices) |
++| 22 | **Bảng Tra Cứu Cheat-Sheet** | `📝 BẢNG TRA CỨU NHANH CÚ PHÁP LIQUID (CHEAT-SHEET)` | [Xem Bài](#-bảng-tra-cứu-nhanh-cú-pháp-liquid-cheat-sheet) |
+```
+
+### 2026-08-18 15:53:25 — Tạo file `/Users/dawn/Documents/figma-design-assets/DOWNLOAD-PLAN.md`
++87 / -0
+
+```diff
+--- before
++++ after
+@@ -0,0 +1,87 @@
++# 📥 Kế hoạch tải asset từ Figma "SHOP.CO"
++
++> File này là **kế hoạch đã chốt**, sinh ra lúc Figma API đang bị rate-limit (khoá tới khoảng 04:46 sáng 19/08/2026). Khi quay lại, chỉ cần nhắn Claude 1 câu ngắn (VD "tải ảnh figma đi") — Claude đọc file này, gọi `mcp__figma__download_figma_images` theo đúng danh sách bên dưới, KHÔNG cần phân tích lại từ đầu.
++
++**fileKey Figma**: `AXFvzD9Zu9A2xkNwOItGWL`
++**Link gốc**: https://www.figma.com/design/AXFvzD9Zu9A2xkNwOItGWL/E-commerce-Website-Template--Freebie---Community-
++
++**Folder đích**: `/Users/dawn/Documents/figma-design-assets/` (đặt ngoài `workspace/` theo yêu cầu — không dính git của bất kỳ repo nào)
++```
++figma-design-assets/
++├── images/   ← ảnh thật (photo), xuất PNG
++├── icons/    ← icon UI/rating/payment/social/arrow, xuất SVG
++└── logos/    ← logo thương hiệu (brand banner), xuất SVG
++```
++
++---
++
++## 🖼️ images/ — 20 ảnh photo unique (theo `imageRef`, đã loại trùng)
++
++Export bằng PNG (`pngScale: 2`). Tên file đặt tạm theo frame + số thứ tự — **sau khi tải xong, xem lại nội dung ảnh và đổi tên cho đúng ngữ nghĩa** (VD `img-homepage-hero.png`, `img-category-tshirt-01.png`...).
++
++| # | nodeId | Frame gốc | Size | Tên file tạm |
++|---|---|---|---|---|
++| 1 | `35:775` | Homepage | 390×448 | img-homepage-01.png |
++| 2 | `35:817` | Homepage | 198.67×298 | img-homepage-02.png |
++| 3 | `35:893` | Homepage | 198.67×298 | img-homepage-03.png |
++| 4 | `35:824` | Homepage | 171×256 | img-homepage-04.png |
++| 5 | `35:895` | Homepage | 197×294 | img-homepage-05.png |
++| 6 | `35:938` | Homepage | 572×383 | img-homepage-06.png |
++| 7 | `35:942` | Homepage | 709×472 | img-homepage-07.png |
++| 8 | `35:946` | Homepage | 389×311 | img-homepage-08.png |
++| 9 | `35:950` | Homepage | 285×425 | img-homepage-09.png |
++| 10 | `22:417` | Homepage | 296×444 | img-homepage-10.png |
++| 11 | `22:419` | Homepage | 296×444 | img-homepage-11.png |
++| 12 | `22:537` | Homepage | 296×444 | img-homepage-12.png |
++| 13 | `22:539` | Homepage | 252×378 | img-homepage-13.png |
++| 14 | `38:479` | Category Page | 173×260 | img-category-01.png |
++| 15 | `38:557` | Category Page | 172×258 | img-category-02.png |
++| 16 | `38:508` | Category Page | 172×258 | img-category-03.png |
++| 17 | `37:47` | Product Detail Page | 358×290 | img-product-01.png |
++| 18 | `37:49` | Product Detail Page | 112×106 | img-product-02.png |
++| 19 | `37:50` | Product Detail Page | 111×106 | img-product-03.png |
++
++> Lưu ý: các node có `imageRef` (không phải VECTOR/SVG) — khi gọi `download_figma_images`, để trống `imageRef` trong tool call (tool tự tra theo `nodeId` nếu là fill ảnh, theo mô tả tool). Nếu tool yêu cầu `imageRef` cụ thể, dùng đúng giá trị đã ghi log lúc khảo sát (có trong `/tmp/figma_frames.json` lúc phân tích, nếu file đó đã bị dọn thì gọi lại `get_figma_data` để lấy fill data trước khi export).
++
++---
++
++## ⭐ icons/ — icon UI (xuất SVG)
++
++| Icon | nodeId | Frame | Ghi chú |
++|---|---|---|---|
++| Rating star (1 sao) | `35:810` | Homepage | Đại diện 1 ngôi sao — **cần kiểm tra lại lúc export** xem đây là 1 sao lẻ hay cả cụm 5 sao; nếu là node cha chứa `Star 1..5` thì export nguyên cụm làm `icon-rating-5stars.svg`, còn nếu chỉ 1 sao thì `icon-star.svg` (component dùng lặp lại 5 lần bằng CSS/Liquid, không cần xuất riêng 5 file) |
++| Payment — Visa | `35:1053` | Homepage | icon-payment-visa.svg |
++| Payment — Mastercard | `35:1055` | Homepage | icon-payment-mastercard.svg |
++| Payment — Paypal | `35:1057` | Homepage | icon-payment-paypal.svg |
++| Payment — Apple Pay | `35:1059` | Homepage | icon-payment-apple-pay.svg (tên gốc bị lỗi encode ` Pay`, thực chất là Apple Pay) |
++| Payment — G Pay | `35:1061` | Homepage | icon-payment-gpay.svg |
++| Social — Facebook | `35:1019` | Homepage (footer) | icon-social-facebook.svg |
++| Social — Github | `35:1031` | Homepage (footer) | icon-social-github.svg (có thể là icon khác bị đặt nhầm tên gốc, kiểm tra hình dạng thật lúc export) |
++| Social — Instagram | `35:1024` | Homepage (footer) | icon-social-instagram.svg |
++| Social — Twitter/X | `35:1014` | Homepage (footer) | icon-social-twitter.svg |
++| Arrow left (carousel) | `38:647` | Category Page | icon-arrow-left.svg |
++| Arrow right (carousel) | `38:644` | Category Page | icon-arrow-right.svg |
++| Chevron/arrow down | `35:952` | Homepage | icon-chevron-down-bold.svg |
++
++> Đã có sẵn trong `ecommerce-theme/assets/` từ trước, **KHÔNG cần tải lại**: `icon-menu.svg`, `icon-search.svg`, `icon-close.svg`, `icon-chevron-down.svg`, `icon-cart.svg`, `icon-account.svg`.
++
++---
++
++## 🏷️ logos/ — logo thương hiệu banner (xuất SVG)
++
++| Brand | nodeId | Size | Ghi chú |
++|---|---|---|---|
++| Zara | `35:798` | 63.8×26.6 | logo-zara.svg |
++| Gucci | `35:800` | 109.4×25.2 | logo-gucci.svg |
++| Prada | `35:802` | 127×21 | logo-prada.svg |
++
++> ⚠️ Banner brand-logo trong Figma gốc (SHOP.CO template) thường có 5 logo (Versace, Zara, Gucci, Prada, Calvin Klein) nhưng khảo sát chỉ tìm thấy 3 node tên chứa "logo". Lúc thực thi, mở lại `get_figma_data` cho khu vực banner logo (trong frame Homepage, gần node `35:798`-`35:802`) để kiểm tra xem có thêm 2 logo nào đặt tên khác (không chứa chữ "logo") hay không.
++
++---
++
++## ✅ Việc cần làm khi quay lại (sau khi hết rate-limit)
++
++1. Verify hết khoá: gọi thử `mcp__figma__get_figma_data` với `fileKey` + 1 `nodeId` bất kỳ ở trên, nếu không còn báo 429 thì tiếp tục.
++2. Gọi `mcp__figma__download_figma_images` 3 lần (1 lần/category), `fileKey` + `nodes` lấy từ 3 bảng trên, `localPath` tương ứng `images`/`icons`/`logos` (đường dẫn tuyệt đối `/Users/dawn/Documents/figma-design-assets/images` v.v., đã nằm trong image directory của MCP server là `/Users/dawn/Documents/workspace` — **cần xác nhận lại path tương đối hợp lệ**, vì server này quy định lưu tương đối so với `/Users/dawn/Documents/workspace`, còn folder đích lại nằm ngoài — có thể phải kiểm tra lại cấu hình `--image-dir` của server hoặc tải vào 1 thư mục tạm trong workspace rồi `mv` ra ngoài).
++3. Đối chiếu ảnh/icon tải về với hình thật trên Figma, đổi tên file cho đúng ngữ nghĩa (bỏ tên tạm `img-homepage-01.png`...).
++4. Báo cáo lại đầy đủ cho user: tổng số file, dung lượng, đường dẫn.
+```
+
+### 2026-08-18 15:53:49 — Sửa file (Edit) `/Users/dawn/Documents/figma-design-assets/DOWNLOAD-PLAN.md`
++10 / -3
+
+```diff
+--- before
++++ after
+@@ -1,6 +1,13 @@
+ ## ✅ Việc cần làm khi quay lại (sau khi hết rate-limit)
+ 
++> ⚠️ **Giới hạn kỹ thuật đã xác nhận**: tool `mcp__figma__download_figma_images` chỉ được phép ghi file **bên trong `/Users/dawn/Documents/workspace`** (image directory cố định của MCP server figma-developer-mcp) — không ghi thẳng ra `/Users/dawn/Documents/figma-design-assets/` (nằm ngoài workspace) được. Giải quyết bằng 2 bước: tải vào thư mục tạm trong workspace rồi `mv` ra ngoài.
++
+ 1. Verify hết khoá: gọi thử `mcp__figma__get_figma_data` với `fileKey` + 1 `nodeId` bất kỳ ở trên, nếu không còn báo 429 thì tiếp tục.
+-2. Gọi `mcp__figma__download_figma_images` 3 lần (1 lần/category), `fileKey` + `nodes` lấy từ 3 bảng trên, `localPath` tương ứng `images`/`icons`/`logos` (đường dẫn tuyệt đối `/Users/dawn/Documents/figma-design-assets/images` v.v., đã nằm trong image directory của MCP server là `/Users/dawn/Documents/workspace` — **cần xác nhận lại path tương đối hợp lệ**, vì server này quy định lưu tương đối so với `/Users/dawn/Documents/workspace`, còn folder đích lại nằm ngoài — có thể phải kiểm tra lại cấu hình `--image-dir` của server hoặc tải vào 1 thư mục tạm trong workspace rồi `mv` ra ngoài).
+-3. Đối chiếu ảnh/icon tải về với hình thật trên Figma, đổi tên file cho đúng ngữ nghĩa (bỏ tên tạm `img-homepage-01.png`...).
+-4. Báo cáo lại đầy đủ cho user: tổng số file, dung lượng, đường dẫn.+2. Gọi `mcp__figma__download_figma_images` 3 lần (1 lần/category), `fileKey` + `nodes` lấy từ 3 bảng trên, `localPath` là thư mục **tạm trong workspace**:
++   - `.tmp-figma-download/images`
++   - `.tmp-figma-download/icons`
++   - `.tmp-figma-download/logos`
++   (tương ứng `pngScale: 2` cho ảnh PNG, mặc định cho SVG)
++3. Dùng Bash `mv /Users/dawn/Documents/workspace/.tmp-figma-download/* /Users/dawn/Documents/figma-design-assets/` để chuyển ra đúng folder đích, rồi xoá thư mục tạm (`rm -rf .tmp-figma-download`).
++4. Đối chiếu ảnh/icon tải về với hình thật trên Figma, đổi tên file cho đúng ngữ nghĩa (bỏ tên tạm `img-homepage-01.png`...).
++5. Báo cáo lại đầy đủ cho user: tổng số file, dung lượng, đường dẫn.
+```
+
+### 2026-08-18 16:04:39 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/src/scss/components/_slideshow.scss`
++20 / -7
+
+```diff
+--- before
++++ after
+@@ -1,20 +1,30 @@
+ .slideshow__slides {
+   display: flex;
++  width: 100%;
+   transition: transform 0.4s ease-in-out;
+ }
+ 
+ .slideshow__slide {
+   position: relative;
++  // flex-basis 100% + min-width 100%: min-width mặc định của flex item là
++  // `auto` (= min-content), nên nếu thiếu dòng min-width, slide vẫn có thể bị
++  // co lại nhỏ hơn khung khi track chứa nhiều slide.
+   flex: 0 0 100%;
++  min-width: 100%;
+   min-height: 663px;
+   display: flex;
+   align-items: center;
++  overflow: hidden;
+   background-color: var(--color-surface-secondary);
+ }
+ 
++// Ảnh chiếm NỬA PHẢI của slide (theo design), không phải background full-bleed
++// — nếu trải full thì text bên trái sẽ nằm đè lên người trong ảnh.
+ .slideshow__image {
+   position: absolute;
+-  inset: 0;
++  inset-block: 0;
++  inset-inline-end: 0;
++  width: 50%;
+   // KHÔNG dùng z-index âm: .slideshow__slide chỉ có position:relative,
+   // z-index:auto -> không tạo stacking context riêng, nên z-index âm ở đây
+   // sẽ tính theo stacking context của tổ tiên và bị chìm xuống dưới cả
+@@ -27,6 +37,8 @@
+   width: 100%;
+   height: 100%;
+   object-fit: cover;
++  // Ảnh hero là người mẫu -> ưu tiên giữ phần đầu khi khung bị cắt.
++  object-position: top center;
+ }
+ 
+ .slideshow__content {
+@@ -34,16 +46,15 @@
+   // Phải > 0 để chắc chắn vẽ trên .slideshow__image (cả 2 giờ đều là
+   // positioned descendant của cùng 1 containing block).
+   z-index: 1;
+-  // .container (base/_container.scss) set margin-inline: auto — trên 1 flex
+-  // item (.slideshow__slide là display:flex), auto margin sẽ hút hết khoảng
+-  // trống 2 bên -> content bị đẩy vào giữa dù không có justify-content:
+-  // center nào. Ghi đè về 0 để giữ đúng canh trái.
+-  margin-inline: 0;
++  // KHÔNG override max-width ở đây — để nguyên max-width + margin-inline:auto
++  // của .container (base/_container.scss) thì khối content căn giữa trang y
++  // hệt header, tức mép trái chữ thẳng hàng với logo SHOP.CO. Giới hạn bề
++  // ngang chữ đặt ở heading/text bên dưới thay vì ở đây (đặt ở đây sẽ làm
++  // container co lại rồi bị auto-margin hút vào giữa slide).
+   display: flex;
+   flex-direction: column;
+   align-items: flex-start;
+   gap: var(--space-5);
+-  max-width: 34rem;
+   padding-block: 80px;
+ }
+ 
+@@ -52,10 +63,12 @@
+   font-size: var(--fs-hero-xl);
+   line-height: 1.1;
+   color: var(--color-foreground);
++  max-width: 36rem;
+ }
+ 
+ .slideshow__text {
+   font-size: var(--fs-body-lg);
+   line-height: 1.4;
+   color: var(--color-text-secondary);
++  max-width: 34rem;
+ }
+```
+
+### 2026-08-18 16:04:56 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/src/scss/components/_slideshow.scss`
++27 / -0
+
+```diff
+--- before
++++ after
+@@ -1,7 +1,28 @@
+ @include mix.respond-to-max('md') {
++  // Mobile: xếp dọc (chữ trên, ảnh dưới) thay vì chia đôi trái/phải — nửa
++  // màn hình quá hẹp cho heading 40px.
++  .slideshow__slide {
++    flex-direction: column;
++    align-items: stretch;
++    min-height: 0;
++  }
++
++  .slideshow__image {
++    position: static;
++    order: 2;
++    width: 100%;
++    height: 320px;
++  }
++
+   .slideshow__content {
++    order: 1;
+     max-width: 100%;
+     padding-block: 48px;
++  }
++
++  .slideshow__heading,
++  .slideshow__text {
++    max-width: 100%;
+   }
+ 
+   .slideshow__heading {
+@@ -12,4 +33,10 @@
+     width: 36px;
+     height: 36px;
+   }
++
++  // Dots đang absolute ở đáy slideshow — khi ảnh xuống dưới cùng thì chấm sẽ
++  // nằm đè lên ảnh, nên đẩy hẳn vào trong vùng ảnh cho dễ nhìn.
++  .slideshow__dots {
++    bottom: var(--space-3);
++  }
+ }
+```
+
+### 2026-08-18 16:09:04 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/src/scss/components/_slideshow.scss`
++15 / -5
+
+```diff
+--- before
++++ after
+@@ -4,13 +4,23 @@
+   transition: transform 0.4s ease-in-out;
+ }
+ 
++// ⚠️ {% content_for 'blocks' %} khiến Shopify tự bọc MỖI theme block trong 1
++// <div class="shopify-block" id="shopify-block-...">. Nghĩa là flex item thật
++// của track là cái wrapper đó, KHÔNG phải .slideshow__slide bên trong — set
++// flex-basis lên .slideshow__slide sẽ không có tác dụng gì, wrapper vẫn
++// shrink-to-fit theo nội dung.
++// Dùng `> *` thay vì `> .shopify-block` để không phụ thuộc vào tên class nội
++// bộ của Shopify (có thể đổi), đồng thời vẫn đúng nếu sau này bỏ wrapper.
++.slideshow__slides > * {
++  flex: 0 0 100%;
++  // min-width mặc định của flex item là `auto` (= min-content) nên vẫn co được
++  // nhỏ hơn 100% nếu thiếu dòng này.
++  min-width: 100%;
++}
++
+ .slideshow__slide {
+   position: relative;
+-  // flex-basis 100% + min-width 100%: min-width mặc định của flex item là
+-  // `auto` (= min-content), nên nếu thiếu dòng min-width, slide vẫn có thể bị
+-  // co lại nhỏ hơn khung khi track chứa nhiều slide.
+-  flex: 0 0 100%;
+-  min-width: 100%;
++  width: 100%;
+   min-height: 663px;
+   display: flex;
+   align-items: center;
+```
+
+### 2026-08-18 16:39:16 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/blocks/slide.liquid`
++31 / -0
+
+```diff
+--- before
++++ after
+@@ -3,5 +3,36 @@
+         {{ block.settings.button_label }}
+       </a>
+     {%- endif -%}
++
++    {%- comment -%}
++      Hàng số liệu (200+ / 2,000+ / 30,000+). Gom 3 cặp setting thành mảng để
++      render bằng 1 vòng lặp — tránh lặp 3 khối HTML gần giống nhau, và cặp nào
++      bỏ trống thì tự bỏ qua (slide sau có thể không cần số liệu).
++    {%- endcomment -%}
++    {%- assign stat_values = block.settings.stat_1_value
++      | append: '|'
++      | append: block.settings.stat_2_value
++      | append: '|'
++      | append: block.settings.stat_3_value
++      | split: '|'
++    -%}
++    {%- assign stat_labels = block.settings.stat_1_label
++      | append: '|'
++      | append: block.settings.stat_2_label
++      | append: '|'
++      | append: block.settings.stat_3_label
++      | split: '|'
++    -%}
++
++    {%- if stat_values.size > 0 -%}
++      <dl class="slideshow__stats">
++        {%- for value in stat_values -%}
++          <div class="slideshow__stat">
++            <dt class="slideshow__stat-value">{{ value }}</dt>
++            <dd class="slideshow__stat-label">{{ stat_labels[forloop.index0] }}</dd>
++          </div>
++        {%- endfor -%}
++      </dl>
++    {%- endif -%}
+   </div>
+ </div>
+```
+
+### 2026-08-18 16:39:39 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/blocks/slide.liquid`
++22 / -22
+
+```diff
+--- before
++++ after
+@@ -1,30 +1,30 @@
+     {%- comment -%}
+-      Hàng số liệu (200+ / 2,000+ / 30,000+). Gom 3 cặp setting thành mảng để
+-      render bằng 1 vòng lặp — tránh lặp 3 khối HTML gần giống nhau, và cặp nào
+-      bỏ trống thì tự bỏ qua (slide sau có thể không cần số liệu).
++      Hàng số liệu (200+ / 2,000+ / 30,000+). Mỗi cặp value/label để trống thì
++      tự ẩn — slide thứ 2, 3 có thể không cần số liệu. Dấu phân cách dọc giữa
++      các cột do CSS vẽ (border), không phải element riêng.
+     {%- endcomment -%}
+-    {%- assign stat_values = block.settings.stat_1_value
+-      | append: '|'
+-      | append: block.settings.stat_2_value
+-      | append: '|'
+-      | append: block.settings.stat_3_value
+-      | split: '|'
++    {%- if block.settings.stat_1_value != blank
++      or block.settings.stat_2_value != blank
++      or block.settings.stat_3_value != blank
+     -%}
+-    {%- assign stat_labels = block.settings.stat_1_label
+-      | append: '|'
+-      | append: block.settings.stat_2_label
+-      | append: '|'
+-      | append: block.settings.stat_3_label
+-      | split: '|'
+-    -%}
+-
+-    {%- if stat_values.size > 0 -%}
+       <dl class="slideshow__stats">
+-        {%- for value in stat_values -%}
++        {%- if block.settings.stat_1_value != blank -%}
+           <div class="slideshow__stat">
+-            <dt class="slideshow__stat-value">{{ value }}</dt>
+-            <dd class="slideshow__stat-label">{{ stat_labels[forloop.index0] }}</dd>
++            <dt class="slideshow__stat-value">{{ block.settings.stat_1_value }}</dt>
++            <dd class="slideshow__stat-label">{{ block.settings.stat_1_label }}</dd>
+           </div>
+-        {%- endfor -%}
++        {%- endif -%}
++        {%- if block.settings.stat_2_value != blank -%}
++          <div class="slideshow__stat">
++            <dt class="slideshow__stat-value">{{ block.settings.stat_2_value }}</dt>
++            <dd class="slideshow__stat-label">{{ block.settings.stat_2_label }}</dd>
++          </div>
++        {%- endif -%}
++        {%- if block.settings.stat_3_value != blank -%}
++          <div class="slideshow__stat">
++            <dt class="slideshow__stat-value">{{ block.settings.stat_3_value }}</dt>
++            <dd class="slideshow__stat-label">{{ block.settings.stat_3_label }}</dd>
++          </div>
++        {%- endif -%}
+       </dl>
+     {%- endif -%}
+```
+
+### 2026-08-18 16:39:48 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/blocks/slide.liquid`
++40 / -0
+
+```diff
+--- before
++++ after
+@@ -2,6 +2,46 @@
+       "type": "url",
+       "id": "button_link",
+       "label": "t:labels.button_link"
++    },
++    {
++      "type": "header",
++      "content": "t:general.stats"
++    },
++    {
++      "type": "text",
++      "id": "stat_1_value",
++      "label": "t:labels.stat_1_value",
++      "default": "200+"
++    },
++    {
++      "type": "text",
++      "id": "stat_1_label",
++      "label": "t:labels.stat_1_label",
++      "default": "International Brands"
++    },
++    {
++      "type": "text",
++      "id": "stat_2_value",
++      "label": "t:labels.stat_2_value",
++      "default": "2,000+"
++    },
++    {
++      "type": "text",
++      "id": "stat_2_label",
++      "label": "t:labels.stat_2_label",
++      "default": "High-Quality Products"
++    },
++    {
++      "type": "text",
++      "id": "stat_3_value",
++      "label": "t:labels.stat_3_value",
++      "default": "30,000+"
++    },
++    {
++      "type": "text",
++      "id": "stat_3_label",
++      "label": "t:labels.stat_3_label",
++      "default": "Happy Customers"
+     }
+   ],
+   "presets": [{ "name": "t:general.slide" }]
+```
+
+### 2026-08-18 16:40:13 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/src/scss/components/_slideshow.scss`
++31 / -0
+
+```diff
+--- before
++++ after
+@@ -6,4 +6,35 @@
+   font-size: var(--fs-body-lg);
+   font-weight: var(--fw-medium);
+   text-decoration: none;
++}
++
++// Hàng số liệu: 200+ / 2,000+ / 30,000+ (Figma Frame 57 — row, gap 32px)
++.slideshow__stats {
++  display: flex;
++  flex-wrap: wrap;
++  gap: 32px;
++  // Figma: nút Shop Now kết thúc ở y=559, stats bắt đầu y=607 -> cách 48px.
++  // .slideshow__content đã có gap 20px nên chỉ cần bù thêm 28px.
++  margin-top: 28px;
++}
++
++.slideshow__stat + .slideshow__stat {
++  // Figma dùng element LINE riêng làm vạch ngăn; ở đây vẽ bằng border cho gọn
++  // (bớt 2 thẻ rỗng trong DOM). gap 32 + padding 32 = đúng khoảng cách 64px
++  // giữa 2 cột như trong design.
++  padding-inline-start: 32px;
++  border-inline-start: 1px solid rgba(0, 0, 0, 0.1);
++}
++
++.slideshow__stat-value {
++  font-size: var(--fs-hero-md);
++  font-weight: var(--fw-bold);
++  line-height: 1.35;
++  color: var(--color-foreground);
++}
++
++.slideshow__stat-label {
++  margin: 0;
++  font-size: var(--fs-body);
++  color: var(--color-text-secondary);
+ }
+```
+
+### 2026-08-18 16:40:26 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/src/scss/components/_slideshow.scss`
++15 / -0
+
+```diff
+--- before
++++ after
+@@ -1,5 +1,20 @@
+   .slideshow__heading {
+     font-size: var(--fs-hero-md);
++  }
++
++  // Stats: thu nhỏ số + giãn cách để 3 cột vẫn lọt bề ngang mobile; nếu vẫn
++  // tràn thì flex-wrap (khai ở rule gốc) cho xuống dòng.
++  .slideshow__stats {
++    gap: var(--space-4);
++    margin-top: var(--space-6);
++  }
++
++  .slideshow__stat + .slideshow__stat {
++    padding-inline-start: var(--space-4);
++  }
++
++  .slideshow__stat-value {
++    font-size: var(--fs-hero-sm);
+   }
+ 
+   .slideshow__nav {
+```
+
+### 2026-08-18 17:00:05 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/src/scss/components/_slideshow.scss`
++1 / -0
+
+```diff
+--- before
++++ after
+@@ -1,5 +1,6 @@
+ .slideshow__image img {
+   width: 87%;
++  max-width: 100%;
+   height: 100%;
+   object-fit: cover;
+   // Ảnh hero là người mẫu -> ưu tiên giữ phần đầu khi khung bị cắt.
+```
+
+### 2026-08-18 17:02:50 — Ghi đè file (Write) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/templates/index.json`
++8 / -53
+
+```diff
+--- before
++++ after
+@@ -15,18 +15,14 @@
+         "slide-1": {
+           "type": "slide",
+           "settings": {
+-            "image": "shopify://shop_images/b26fea69ccfd8aa5825862cdb9604a4fb4930464.jpg",
+             "heading": "Find clothes that matches your style",
+             "text": "Browse through our diverse range of meticulously crafted garments, designed to bring out your individuality and cater to your sense of style.",
+             "button_label": "Shop Now",
+             "button_link": "/collections/all"
+-          },
+-          "blocks": {}
++          }
+         }
+       },
+-      "block_order": [
+-        "slide-1"
+-      ],
++      "block_order": ["slide-1"],
+       "settings": {
+         "autoplay": true,
+         "autoplay_speed": 5
+@@ -35,54 +31,13 @@
+     "logo-list": {
+       "type": "logo-list",
+       "blocks": {
+-        "logo-1": {
+-          "type": "logo",
+-          "settings": {
+-            "image": "shopify://shop_images/Vector.png",
+-            "link": ""
+-          },
+-          "blocks": {}
+-        },
+-        "logo-2": {
+-          "type": "logo",
+-          "settings": {
+-            "image": "shopify://shop_images/Vector1.png",
+-            "link": ""
+-          },
+-          "blocks": {}
+-        },
+-        "logo-3": {
+-          "type": "logo",
+-          "settings": {
+-            "image": "shopify://shop_images/Vector2.png",
+-            "link": ""
+-          },
+-          "blocks": {}
+-        },
+-        "logo-4": {
+-          "type": "logo",
+-          "settings": {
+-            "image": "shopify://shop_images/Vector3.png",
+-            "link": ""
+-          },
+-          "blocks": {}
+-        },
+-        "logo-5": {
+-          "type": "logo",
+-          "settings": {
+-            "image": "shopify://shop_images/Vector4.png",
+-            "link": ""
+-          },
+-          "blocks": {}
+-        }
++        "logo-1": { "type": "logo", "settings": {} },
++        "logo-2": { "type": "logo", "settings": {} },
++        "logo-3": { "type": "logo", "settings": {} },
++        "logo-4": { "type": "logo", "settings": {} },
++        "logo-5": { "type": "logo", "settings": {} }
+       },
+-      "block_order": [
+-        "logo-1",
+-        "logo-2",
+-        "logo-3",
+-        "logo-4",
+-        "logo-5"
+-      ],
++      "block_order": ["logo-1", "logo-2", "logo-3", "logo-4", "logo-5"],
+       "settings": {}
+     },
+     "main": {
+```
+
+### 2026-08-18 17:07:53 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/locales/en.default.schema.json`
++1 / -1
+
+```diff
+--- before
++++ after
+@@ -1,4 +1,4 @@
+     "collection": "Collection",
++    "collections": "Collections",
+     "collection_card": "Collection card",
+-    "collections": "Collections",
+     "collections_grid": "Collections grid",
+```
+
+### 2026-08-18 17:08:00 — Sửa file (Edit) `/Users/dawn/Documents/workspace/shopify-liquid/ecommerce-theme/locales/en.default.schema.json`
++5 / -5
+
+```diff
+--- before
++++ after
+@@ -1,9 +1,9 @@
+     "search": "Search",
++    "slide": "Slide",
++    "slideshow": "Slideshow",
++    "social": "Social media",
++    "stats": "Stats",
+     "secondary": "Secondary",
+     "section": "Section",
+     "settings": "Settings",
+-    "sidebar": "Sidebar",
+-    "slide": "Slide",
+-    "slideshow": "Slideshow",
+-    "social": "Social media",
+-    "stats": "Stats",+    "sidebar": "Sidebar",
+```

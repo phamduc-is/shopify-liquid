@@ -14,7 +14,7 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  gap: var(--space-6);
   background-color: var(--color-foreground);
   border-radius: var(--radius-lg);
   padding: 36px 64px;
@@ -40,7 +40,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: 12px var(--space-4);
+  padding: var(--space-3) var(--space-4);
   border-radius: 999px;
   background-color: var(--color-background);
 }
@@ -61,7 +61,7 @@
 }
 
 .footer__newsletter-submit {
-  padding: 12px var(--space-4);
+  padding: var(--space-3) var(--space-4);
   border: none;
   border-radius: 999px;
   background-color: var(--color-background);
@@ -213,7 +213,7 @@
 }
 
 .footer__payment-icon svg {
-  height: 14px;
+  height: var(--space-3-5);
   width: auto;
 }
 

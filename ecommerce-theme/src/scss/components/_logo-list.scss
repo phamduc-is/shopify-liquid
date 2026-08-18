@@ -1,0 +1,60 @@
+@use '../abstracts/mixins' as mix;
+
+// Dải logo thương hiệu dưới slideshow. Nền đen cố định theo Figma —
+// KHÔNG dùng var(--color-foreground) vì màu đó merchant đổi được trong
+// Theme Editor, còn dải này luôn phải đen để logo trắng đọc được.
+.logo-list {
+  background-color: #000;
+}
+
+.logo-list__items {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  padding-block: var(--space-6);
+}
+
+.logo-list__item {
+  display: flex;
+  align-items: center;
+}
+
+.logo-list__link {
+  display: block;
+  line-height: 0;
+}
+
+// max-height thay vì height: logo mỗi brand có tỷ lệ khác nhau, khoá chiều
+// cao rồi để width tự co (width: auto) mới không bóp méo ảnh.
+.logo-list__image {
+  display: block;
+  max-height: 34px;
+  width: auto;
+  object-fit: contain;
+}
+
+.logo-list__placeholder {
+  width: 120px;
+  height: 34px;
+  fill: #fff;
+  opacity: 0.35;
+}
+
+@include mix.respond-to-max('md') {
+  .logo-list__items {
+    justify-content: center;
+    gap: var(--space-5);
+  }
+
+  .logo-list__image,
+  .logo-list__placeholder {
+    max-height: 24px;
+  }
+
+  .logo-list__placeholder {
+    height: 24px;
+    width: 84px;
+  }
+}

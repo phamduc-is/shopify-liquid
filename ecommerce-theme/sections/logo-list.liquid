@@ -1,0 +1,34 @@
+{%- comment -%}
+  Dải logo thương hiệu nằm ngay dưới slideshow (Homepage — Figma SHOP.CO).
+  Nền đen tràn viền (.full-width), nội dung bó về 1240px qua .container.
+{%- endcomment -%}
+
+<div class="logo-list full-width">
+  <div class="logo-list__items container">
+    {% content_for 'blocks' %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:general.logo_list",
+  "tag": "section",
+  "blocks": [
+    {
+      "type": "logo"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.logo_list",
+      "blocks": [
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" }
+      ]
+    }
+  ]
+}
+{% endschema %}
