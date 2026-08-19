@@ -7,43 +7,21 @@
 
 ## 🐞 Bug còn mở
 
-### 1. `sections/testimonials.liquid` — nút prev/next chết trong Theme Editor
+### 1. `sections/header.liquid` — nút menu có cấp con là nút chết
 
-Block `{% javascript %}` chỉ chạy `document.querySelectorAll('.testimonials').forEach(...)` **một lần lúc page load**.
+Khi merchant tạo menu có sub-link, `{% if link.links != blank %}` render ra `<button class="header__nav-link header__nav-link--dropdown">` kèm icon chevron xuống — nhưng:
 
-Khi merchant sửa setting trong Theme Editor, Shopify **render lại DOM của section mà không reload trang** → toàn bộ listener vừa gắn bị mất cùng DOM cũ → 2 nút mũi tên không phản hồi cho tới khi F5.
-
-Hướng fix (chưa áp dụng):
-- Tách thân `forEach` hiện tại thành hàm có tên (vd `initSection`) để tái dùng được.
-- Thêm listener:
-  ```js
-  document.addEventListener('shopify:section:load', (event) => {
-    event.target.querySelectorAll('.testimonials').forEach(initSection);
-  });
-  ```
-- `event.target` là `<div class="shopify-section">` vừa render lại → chỉ init trong phạm vi đó, không init lại toàn trang (tránh gắn listener trùng).
-
-**Tham chiếu**: `sections/slideshow.liquid` đã làm đúng pattern này (hàm `initSlideshow` + `shopify:section:load`) — copy cách tổ chức từ đó.
-
----
-
-### 2. `sections/header.liquid` — cùng lỗi, nhưng nặng hơn
-
-Block `{% javascript %}` của header hiện query thẳng từ `document` ở top-level, không bọc hàm, không có `shopify:section:load`. Sau khi section reload trong Theme Editor, các thứ sau **ngừng hoạt động**:
-
-| Thành phần | Hành vi bị mất |
+| Thiếu | Chi tiết |
 |---|---|
-| `.announcement-bar__close` | Không đóng được announcement bar |
-| `.header__menu-toggle` | Hamburger không mở `<dialog class="mobile-nav">` |
-| `.mobile-nav__close` + click backdrop | Không đóng được mobile nav |
-| `.header__icon-button--search` | Không mở được search popup |
-| `.search-popup__close` + click backdrop | Không đóng được search popup |
+| DOM | Không có `{% for %}` nào render `link.links` ra submenu |
+| JS | Không có handler nào bắt `.header__nav-link--dropdown` |
+| CSS | `_header.scss` không có selector `--dropdown` nào |
 
-Nặng hơn testimonials vì merchant chỉnh header rất thường xuyên trong editor (logo, menu, announcement text) → gần như chắc chắn gặp.
+→ User thấy nút có mũi tên, bấm vào **không có gì xảy ra**. Xảy ra ở cả `.header__nav` (desktop) lẫn `.mobile-nav__links`. Đây là bug chức năng, không liên quan Theme Editor.
 
-Hướng fix (chưa áp dụng): gom toàn bộ vào `function initHeader(root)`, query từ `root` thay vì `document`, rồi gọi ở cả page load và `shopify:section:load`.
-
-> ⚠️ Lưu ý riêng cho header: `<dialog class="mobile-nav">` và `<dialog class="search-popup">` có thể nằm **ngoài** phạm vi `.shopify-section` của header (tuỳ nơi render) — kiểm tra DOM thật trước khi đổi sang query-từ-root, kẻo query không ra element.
+Hai hướng, chọn 1 (chưa quyết):
+- **Làm dropdown thật** — render `link.links`; desktop dùng panel thả xuống, mobile dùng `<details>` accordion trong `.mobile-nav`; thêm `aria-expanded`. Là thêm feature, cần cả SCSS mới.
+- **Hạ về link thường** — bỏ nhánh `if`, luôn render `<a href="{{ link.url }}">`, bỏ chevron. Hết nút chết ngay, đổi lại menu cấp con không vào được từ header.
 
 ---
 
@@ -69,9 +47,26 @@ Ngoài ra nên có ngưỡng ~5px trước khi coi là "đang kéo", để click
 
 ---
 
-## ✅ Đã fix trong phiên này (không cần làm lại)
+## ✅ Đã fix — nhóm Theme Editor re-render
 
-Toàn bộ bug slideshow đã báo trước đó đều đã được xử lý — verify lại `src/scss/components/_slideshow.scss` và `blocks/slide.liquid`:
+Theme Editor render lại DOM của section mà **không reload trang**, nên JS chạy 1 lần lúc page load sẽ mất hết listener cùng DOM cũ. Đã xử lý theo pattern của `sections/slideshow.liquid` (IIFE + `init(root)` + `shopify:section:load`).
+
+| Bug cũ | Trạng thái |
+|---|---|
+| `testimonials.liquid` — 2 nút prev/next chết sau khi sửa setting trong editor | ✅ tách `initSection`, thêm `shopify:section:load` |
+| `header.liquid` — đóng announcement bar, hamburger, mobile nav, search popup đều chết sau khi sửa setting | ✅ gom `initHeader(root)`, query từ `root` thay vì `document` |
+| Listener `resize` của testimonials tích luỹ mỗi lần section re-render, closure giữ tham chiếu DOM đã gỡ | ✅ 1 listener `resize` duy nhất ở scope module, query lại `document` mỗi lần thay vì đóng gói tham chiếu |
+| `header.liquid` khai báo 7 `const` ở top-level — các javascript tag của theme bị Shopify gộp chung 1 file nên dùng chung scope, trùng tên là `SyntaxError` chết cả bundle | ✅ bọc IIFE như slideshow |
+
+Ghi chú đã xác minh khi fix:
+- `<dialog class="mobile-nav">` và `<dialog class="search-popup">` **nằm trong** `<header class="header">` → vẫn thuộc `.shopify-section` của header, query từ `root` an toàn. (Cảnh báo cũ trong file này về việc dialog có thể nằm ngoài scope — đã loại trừ.)
+- `.announcement-bar` là **anh em** của `<header>`, không phải con → `root` phải là `.shopify-section` chứ không phải `.header`. Lấy bằng `header.closest('.shopify-section')` vì id section trong `header-group` do Shopify sinh, không hardcode được.
+
+---
+
+## ✅ Đã fix — nhóm slideshow (phiên trước)
+
+Verify lại `src/scss/components/_slideshow.scss` và `blocks/slide.liquid`:
 
 | Bug cũ | Trạng thái |
 |---|---|
