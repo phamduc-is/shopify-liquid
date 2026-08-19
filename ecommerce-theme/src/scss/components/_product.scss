@@ -1,0 +1,405 @@
+// ------------------------------------------------------------
+// Main product section — sections/product.liquid
+// Figma: gallery (thumb dọc 152px + ảnh chính) | info 600px, gap 40px.
+// ------------------------------------------------------------
+
+@use '../abstracts/mixins' as mix;
+
+.product {
+  padding-block: var(--space-6) 72px;
+}
+
+/* ---------- Breadcrumb ---------- */
+
+.product__breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: 36px;
+  font-size: var(--fs-body-lg);
+  color: var(--color-text-secondary);
+}
+
+.product__breadcrumb-link:hover {
+  color: var(--color-foreground);
+}
+
+.product__breadcrumb-current {
+  color: var(--color-foreground);
+}
+
+/* ---------- Layout 2 cột ---------- */
+
+.product__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 590px) minmax(0, 1fr);
+  gap: 40px;
+  align-items: start;
+}
+
+/* ---------- Gallery ---------- */
+
+// Thumb ở cột 1, ảnh chính cột 2 — nhưng DOM để ảnh chính TRƯỚC (nội dung
+// chính, cũng là thứ tự đúng khi rơi xuống 1 cột ở mobile). Grid chỉ đảo
+// lại vị trí hiển thị ở desktop.
+.product__gallery {
+  display: grid;
+  grid-template-columns: 152px minmax(0, 1fr);
+  gap: 14px;
+}
+
+.product__media {
+  grid-column: 2;
+  grid-row: 1;
+  aspect-ratio: 444 / 530;
+  background-color: var(--color-surface-secondary);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+// Tất cả ảnh được render sẵn, chỉ 1 ảnh mang .is-active được hiện —
+// đổi ảnh bằng class nên không phải set lại src/srcset bằng JS.
+.product__media-item {
+  display: none;
+  width: 100%;
+  height: 100%;
+}
+
+.product__media-item.is-active {
+  display: block;
+}
+
+.product__media-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+// Nhiều ảnh -> cột thumb cao hơn ảnh chính, grid row giãn theo và ảnh chính
+// (đã khoá aspect-ratio) neo ở trên. Chấp nhận được, không cần cuộn riêng.
+.product__thumbs {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.product__thumb {
+  padding: 0;
+  aspect-ratio: 152 / 167;
+  background-color: var(--color-surface-secondary);
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.product__thumb.is-active {
+  border-color: var(--color-foreground);
+}
+
+.product__thumb-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------- Info ---------- */
+
+.product__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3-5);
+}
+
+.product__title {
+  font-family: var(--font-heading--family);
+  font-size: var(--fs-hero-md);
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--color-foreground);
+}
+
+.product__price {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.product__price-current,
+.product__price-compare {
+  font-size: var(--fs-hero-sm);
+  font-weight: var(--fw-bold);
+}
+
+.product__price-compare {
+  color: var(--color-text-secondary);
+  text-decoration: line-through;
+}
+
+.product__badge {
+  padding: 6px var(--space-3-5); // 6px không có trong scale --space-*
+  border-radius: var(--style-border-radius-full);
+  background-color: var(--color-sale-badge-background);
+  color: var(--color-sale-badge-text);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-medium);
+  white-space: nowrap;
+}
+
+.product__description {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body-lg);
+}
+
+.product__description > :last-child {
+  margin-bottom: 0;
+}
+
+/* ---------- Form / variant picker ---------- */
+
+.product__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  margin: 0;
+}
+
+// Đường kẻ ngăn giữa các nhóm option — dùng border-top của fieldset thay vì
+// <hr> riêng, khỏi phải in thêm thẻ chỉ để trang trí.
+.product__option {
+  padding: var(--space-6) 0 0;
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.product__option:first-of-type {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.product__option-label {
+  // <legend> mặc định có hành vi riêng trong fieldset — ép display: block để
+  // margin-bottom áp dụng nhất quán giữa các browser.
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin-bottom: var(--space-4);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body-lg);
+}
+
+.product__option-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+// Size (và mọi option không phải màu): pill nền xám, chọn thì đảo màu.
+.product__option-value {
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--style-border-radius-full);
+  background-color: var(--color-surface-secondary);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-body-lg);
+  cursor: pointer;
+  user-select: none;
+}
+
+.product__option-value:hover {
+  color: var(--color-foreground);
+}
+
+// Selector đi từ input (đã .visually-hidden) sang label liền kề —
+// input phải nằm NGAY TRƯỚC label trong DOM để `+` khớp.
+.product__option-input:checked + .product__option-value {
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+}
+
+.product__option-input:focus-visible + .product__option-value {
+  outline: 2px solid var(--color-foreground);
+  outline-offset: 2px;
+}
+
+.product__option-value--unavailable {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+
+// Swatch màu: hình tròn 37px, màu lấy từ --swatch-color (section set inline
+// từ value.swatch.color, fallback về tên màu dạng CSS color keyword).
+.product__option-value--swatch {
+  position: relative;
+  width: 37px;
+  height: 37px;
+  padding: 0;
+  border-radius: 50%;
+  // Nền xám làm đáy, màu thật do ::before phủ lên — xem comment dưới.
+  background-color: var(--color-surface-secondary);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+// Shop chưa cấu hình swatch metafield thì --swatch-color là tên option đã
+// normalize ("darkblue"), có thể KHÔNG phải CSS color hợp lệ. Đặt nó trên
+// ::before chứ không phải trên label: giá trị sai -> background-color của
+// ::before về initial (transparent) và nền xám của label lộ ra, thay vì mất
+// hẳn ô màu. (Fallback trong var() không cứu được, vì biến vẫn được coi là
+// "đã khai báo" — chỉ sai ở bước computed value.)
+.product__option-value--swatch::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-color: var(--swatch-color, transparent);
+}
+
+// Dấu tick trên swatch đang chọn — vẽ bằng ::after (border 2 cạnh + rotate)
+// để không phải nạp thêm file SVG cho 1 dấu check.
+.product__option-input:checked + .product__option-value--swatch::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1; // trên lớp ::before đang tô màu swatch
+  width: 12px;
+  height: 7px;
+  margin: auto;
+  border-left: 2px solid var(--color-background);
+  border-bottom: 2px solid var(--color-background);
+  transform: rotate(-45deg) translateY(-2px);
+}
+
+/* ---------- Quantity + Add to cart ---------- */
+
+.product__buy {
+  display: flex;
+  gap: var(--space-5);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border);
+}
+
+.product__quantity {
+  display: flex;
+  align-items: center;
+  flex: 0 0 170px;
+  padding-inline: var(--space-5);
+  border-radius: var(--style-border-radius-full);
+  background-color: var(--color-surface-secondary);
+}
+
+.product__quantity-button {
+  flex: 0 0 auto;
+  padding: var(--space-3) 0;
+  font-size: var(--fs-subheading);
+  line-height: 1;
+  color: var(--color-foreground);
+}
+
+.product__quantity-input {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: center;
+  font-size: var(--fs-body-lg);
+  font-weight: var(--fw-medium);
+  color: var(--color-foreground);
+  // Ẩn spinner mặc định của input[type=number] — đã có 2 nút −/+ riêng.
+  appearance: textfield;
+}
+
+.product__quantity-input::-webkit-outer-spin-button,
+.product__quantity-input::-webkit-inner-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+.product__add-to-cart {
+  flex: 1 1 auto;
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--style-border-radius-full);
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+  font-size: var(--fs-body-lg);
+  font-weight: var(--fw-medium);
+}
+
+.product__add-to-cart:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.product__add-to-cart:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---------- Responsive ---------- */
+
+@include mix.respond-to-max('lg') {
+  .product__layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-6);
+  }
+}
+
+@include mix.respond-to-max('md') {
+  .product {
+    padding-block: var(--space-4) 40px;
+  }
+
+  .product__breadcrumb {
+    margin-bottom: var(--space-5);
+    font-size: var(--fs-body);
+  }
+
+  // Mobile: ảnh chính trên, dải thumb cuộn ngang bên dưới.
+  .product__gallery {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .product__media {
+    grid-column: 1;
+    grid-row: 1;
+    aspect-ratio: 358 / 290;
+  }
+
+  .product__thumbs {
+    grid-column: 1;
+    grid-row: 2;
+    flex-direction: row;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .product__thumbs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .product__thumb {
+    flex: 0 0 111px;
+    aspect-ratio: 111 / 106;
+  }
+
+  .product__title {
+    font-size: var(--fs-hero-sm);
+  }
+
+  .product__price-current,
+  .product__price-compare {
+    font-size: var(--fs-heading);
+  }
+
+  .product__buy {
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .product__quantity {
+    flex: 0 0 110px;
+    padding-inline: var(--space-4);
+  }
+}

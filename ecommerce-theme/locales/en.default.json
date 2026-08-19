@@ -48,6 +48,19 @@
     "password": "Password",
     "enter": "Enter"
   },
+  "products": {
+    "add_to_cart": "Add to Cart",
+    "sold_out": "Sold out",
+    "unavailable": "Unavailable",
+    "quantity": "Quantity",
+    "decrease_quantity": "Decrease quantity",
+    "increase_quantity": "Increase quantity",
+    "select_colors": "Select Colors",
+    "choose_option": "Choose {{ option }}",
+    "view_image": "View image {{ index }}",
+    "breadcrumb": "Breadcrumb",
+    "breadcrumb_home": "Home"
+  },
   "search": {
     "title": "Search",
     "placeholder": "Search articles, pages, or products",

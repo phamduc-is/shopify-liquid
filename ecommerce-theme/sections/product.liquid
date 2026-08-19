@@ -1,50 +1,457 @@
 {% comment %}
-  This section is used in the product template to render product page with
-  media, content, and add-to-cart form.
+  Main product section — trang chi tiết sản phẩm (clone Figma SHOP.CO).
+
+  Gallery (thumbnail dọc bên trái) + title/rating/giá + variant picker
+  (swatch màu / pill size) + quantity stepper + add to cart.
 
   https://shopify.dev/docs/storefronts/themes/architecture/templates/product
 {% endcomment %}
 
-<div class="product-images">
-  {% for image in product.images %}
-    {% render 'image', class: 'product-image', image: image %}
-  {% endfor %}
+{% liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign active_image = current_variant.featured_image | default: product.featured_image
+  assign product_rating = product.metafields.reviews.rating.value.rating
+  assign form_id = 'ProductForm-' | append: section.id
+
+  assign on_sale = false
+  if current_variant.compare_at_price > current_variant.price
+    assign on_sale = true
+  endif
+
+  assign discount_percent = 0
+  if on_sale
+    assign discount_percent = current_variant.compare_at_price | minus: current_variant.price | times: 100.0 | divided_by: current_variant.compare_at_price | round
+  endif
+%}
+
+<div class="product full-width">
+  <div class="container">
+    {%- if section.settings.show_breadcrumb -%}
+      <nav class="product__breadcrumb" aria-label="{{ 'products.breadcrumb' | t }}">
+        <a class="product__breadcrumb-link" href="{{ routes.root_url }}">{{ 'products.breadcrumb_home' | t }}</a>
+        <span class="product__breadcrumb-separator" aria-hidden="true">/</span>
+        {%- if collection -%}
+          <a class="product__breadcrumb-link" href="{{ collection.url }}">{{ collection.title }}</a>
+          <span class="product__breadcrumb-separator" aria-hidden="true">/</span>
+        {%- endif -%}
+        <span class="product__breadcrumb-current" aria-current="page">{{ product.title }}</span>
+      </nav>
+    {%- endif -%}
+
+    <div class="product__layout">
+      {%- comment -%}
+        Gallery: render TẤT CẢ ảnh vào .product__media rồi chỉ hiện 1 ảnh
+        `.is-active` — đổi ảnh bằng class thay vì set lại `src` để giữ nguyên
+        `srcset`/`sizes` mà `image_tag` đã sinh ra.
+
+        DOM để .product__media trước .product__thumbs (ảnh chính là nội dung
+        chính); vị trí trái/phải do grid trong _product.scss quyết định.
+      {%- endcomment -%}
+      <div class="product__gallery">
+        <div class="product__media">
+          {%- for image in product.images -%}
+            {%- liquid
+              assign image_alt = image.alt | default: product.title | escape
+              assign is_active = false
+              if image.id == active_image.id
+                assign is_active = true
+              endif
+            -%}
+            <div
+              class="product__media-item{% if is_active %} is-active{% endif %}"
+              data-image-id="{{ image.id }}"
+            >
+              {%- if forloop.first -%}
+                {{
+                  image
+                  | image_url: width: 900
+                  | image_tag:
+                    class: 'product__media-image',
+                    widths: '400, 600, 900',
+                    sizes: '(max-width: 767px) 100vw, 40vw',
+                    loading: 'eager',
+                    fetchpriority: 'high',
+                    alt: image_alt
+                }}
+              {%- else -%}
+                {{
+                  image
+                  | image_url: width: 900
+                  | image_tag:
+                    class: 'product__media-image',
+                    widths: '400, 600, 900',
+                    sizes: '(max-width: 767px) 100vw, 40vw',
+                    loading: 'lazy',
+                    alt: image_alt
+                }}
+              {%- endif -%}
+            </div>
+          {%- else -%}
+            <div class="product__media-item is-active product__media-item--placeholder">
+              {{ 'product-1' | placeholder_svg_tag: 'product__media-image' }}
+            </div>
+          {%- endfor -%}
+        </div>
+
+        {%- if product.images.size > 1 -%}
+          <div class="product__thumbs">
+            {%- for image in product.images -%}
+              {%- liquid
+                assign image_alt = image.alt | default: product.title | escape
+                assign is_active = false
+                if image.id == active_image.id
+                  assign is_active = true
+                endif
+              -%}
+              <button
+                type="button"
+                class="product__thumb{% if is_active %} is-active{% endif %}"
+                data-image-id="{{ image.id }}"
+                {% if is_active %}
+                  aria-current="true"
+                {% endif %}
+                aria-label="{{ 'products.view_image' | t: index: forloop.index }}"
+              >
+                {{
+                  image
+                  | image_url: width: 304
+                  | image_tag: class: 'product__thumb-image', widths: '152, 304', sizes: '152px', loading: 'lazy', alt: image_alt
+                }}
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      <div class="product__info">
+        <h1 class="product__title">{{ product.title }}</h1>
+
+        {%- if section.settings.show_rating and product_rating != blank -%}
+          {% render 'rating-stars', rating: product_rating %}
+        {%- endif -%}
+
+        <div class="product__price">
+          <span class="product__price-current">{{ current_variant.price | money }}</span>
+          <span class="product__price-compare" {% unless on_sale %}hidden{% endunless %}>
+            {{- current_variant.compare_at_price | money -}}
+          </span>
+          <span class="product__badge" {% unless on_sale %}hidden{% endunless %}>-{{ discount_percent }}%</span>
+        </div>
+
+        {%- if section.settings.show_description and product.description != blank -%}
+          <div class="product__description">{{ product.description }}</div>
+        {%- endif -%}
+
+        {% form 'product', product, id: form_id, class: 'product__form', novalidate: 'novalidate' %}
+          {%- comment -%}
+            Variant thật submit qua input hidden `id`; các radio bên dưới chỉ là
+            UI, JS đọc lựa chọn rồi map sang variant tương ứng.
+          {%- endcomment -%}
+          <input type="hidden" name="id" value="{{ current_variant.id }}" data-variant-id>
+
+          {%- unless product.has_only_default_variant -%}
+            {%- for option in product.options_with_values -%}
+              {%- liquid
+                assign option_name_downcase = option.name | downcase
+                assign is_color = false
+                if option_name_downcase contains 'color' or option_name_downcase contains 'colour'
+                  assign is_color = true
+                endif
+                assign radio_group = section.id | append: '-option' | append: forloop.index
+              -%}
+              <fieldset class="product__option{% if is_color %} product__option--color{% endif %}">
+                <legend class="product__option-label">
+                  {%- if is_color -%}
+                    {{ 'products.select_colors' | t }}
+                  {%- else -%}
+                    {{ 'products.choose_option' | t: option: option.name }}
+                  {%- endif -%}
+                </legend>
+
+                <div class="product__option-values">
+                  {%- for value in option.values -%}
+                    {%- liquid
+                      assign input_id = radio_group | append: '-' | append: forloop.index
+                      assign swatch_color = value.swatch.color | default: value.name | downcase | replace: ' ', ''
+                    -%}
+                    <input
+                      type="radio"
+                      class="product__option-input visually-hidden"
+                      id="{{ input_id }}"
+                      name="{{ radio_group }}"
+                      value="{{ value.name | escape }}"
+                      data-option-position="{{ option.position }}"
+                      data-option-value="{{ value.name | escape }}"
+                      {% if value.selected %}
+                        checked
+                      {% endif %}
+                    >
+                    <label
+                      class="product__option-value{% if is_color %} product__option-value--swatch{% endif %}{% unless value.available %} product__option-value--unavailable{% endunless %}"
+                      for="{{ input_id }}"
+                      {% if is_color %}
+                        style="--swatch-color: {{ swatch_color }}"
+                        title="{{ value.name | escape }}"
+                      {% endif %}
+                    >
+                      {%- if is_color -%}
+                        <span class="visually-hidden">{{ value.name }}</span>
+                      {%- else -%}
+                        {{ value.name }}
+                      {%- endif -%}
+                    </label>
+                  {%- endfor -%}
+                </div>
+              </fieldset>
+            {%- endfor -%}
+          {%- endunless -%}
+
+          <div class="product__buy">
+            <div class="product__quantity">
+              <button
+                type="button"
+                class="product__quantity-button"
+                data-quantity-change="-1"
+                aria-label="{{ 'products.decrease_quantity' | t }}"
+              >
+                &minus;
+              </button>
+              <input
+                type="number"
+                class="product__quantity-input"
+                name="quantity"
+                value="1"
+                min="1"
+                step="1"
+                inputmode="numeric"
+                aria-label="{{ 'products.quantity' | t }}"
+              >
+              <button
+                type="button"
+                class="product__quantity-button"
+                data-quantity-change="1"
+                aria-label="{{ 'products.increase_quantity' | t }}"
+              >
+                +
+              </button>
+            </div>
+
+            <button
+              type="submit"
+              name="add"
+              class="product__add-to-cart"
+              data-add-text="{{ 'products.add_to_cart' | t | escape }}"
+              data-sold-out-text="{{ 'products.sold_out' | t | escape }}"
+              data-unavailable-text="{{ 'products.unavailable' | t | escape }}"
+              {% unless current_variant.available %}
+                disabled
+              {% endunless %}
+            >
+              <span class="product__add-to-cart-text">
+                {%- if current_variant.available -%}
+                  {{ 'products.add_to_cart' | t }}
+                {%- else -%}
+                  {{ 'products.sold_out' | t }}
+                {%- endif -%}
+              </span>
+            </button>
+          </div>
+
+          {%- if section.settings.show_dynamic_checkout -%}
+            <div class="product__dynamic-checkout">{{ form | payment_button }}</div>
+          {%- endif -%}
+        {% endform %}
+
+        {%- comment -%}
+          Bảng tra variant cho JS: giá đã qua filter `money` sẵn ở phía Liquid,
+          tránh phải tự format tiền trong JS (mỗi shop một `money_format`).
+        {%- endcomment -%}
+        <script type="application/json" data-product-variants>
+          [
+            {%- for variant in product.variants -%}
+              {%- liquid
+                assign v_on_sale = false
+                if variant.compare_at_price > variant.price
+                  assign v_on_sale = true
+                endif
+                assign v_discount = 0
+                if v_on_sale
+                  assign v_discount = variant.compare_at_price | minus: variant.price | times: 100.0 | divided_by: variant.compare_at_price | round
+                endif
+              -%}
+              {
+                "id": {{ variant.id }},
+                "available": {{ variant.available }},
+                "options": {{ variant.options | json }},
+                "price": {{ variant.price | money | json }},
+                "compare_at_price": {{ variant.compare_at_price | money | json }},
+                "on_sale": {{ v_on_sale }},
+                "discount": {{ v_discount }},
+                "image_id": {{ variant.featured_image.id | json }}
+              }{% unless forloop.last %},{% endunless %}
+            {%- endfor -%}
+          ]
+        </script>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="product-info">
-  <h1>{{ product.title }}</h1>
-  <p>{{ product.price | money }}</p>
-  <p>{{ product.description }}</p>
-</div>
+{% javascript %}
+  (function () {
+    function initProduct(root) {
+      const variantInput = root.querySelector('[data-variant-id]');
+      const dataEl = root.querySelector('[data-product-variants]');
+      let variants = [];
 
-<div class="product-form">
-  {% form 'product', product %}
-    {% assign current_variant = product.selected_or_first_available_variant %}
+      try {
+        variants = dataEl ? JSON.parse(dataEl.textContent) : [];
+      } catch (error) {
+        variants = [];
+      }
 
-    <select name="id">
-      {% for variant in product.variants %}
-        <option
-          value="{{ variant.id }}"
-          {% if variant == current_variant %}
-            selected="selected"
-          {% endif %}
-        >
-          {{ variant.title }} - {{ variant.price | money }}
-        </option>
-      {% endfor %}
-    </select>
+      /* ---------- Gallery ---------- */
+      const thumbs = root.querySelectorAll('.product__thumb');
+      const mediaItems = root.querySelectorAll('.product__media-item');
 
-    <input type="text" name="quantity" min="1" value="1">
+      function showImage(imageId) {
+        const target = root.querySelector('.product__media-item[data-image-id="' + imageId + '"]');
+        // Variant không có ảnh riêng (hoặc ảnh không nằm trong product.images) -> giữ ảnh đang hiện.
+        if (!target) return;
 
-    <input type="submit" value="Add to cart">
-    {{ form | payment_button }}
-  {% endform %}
-</div>
+        mediaItems.forEach((item) => item.classList.remove('is-active'));
+        target.classList.add('is-active');
+
+        thumbs.forEach((thumb) => {
+          const isActive = thumb.dataset.imageId === String(imageId);
+          thumb.classList.toggle('is-active', isActive);
+          if (isActive) {
+            thumb.setAttribute('aria-current', 'true');
+          } else {
+            thumb.removeAttribute('aria-current');
+          }
+        });
+      }
+
+      thumbs.forEach((thumb) => {
+        thumb.addEventListener('click', () => showImage(thumb.dataset.imageId));
+      });
+
+      /* ---------- Variant picker ---------- */
+      const optionInputs = root.querySelectorAll('.product__option-input');
+      const priceCurrent = root.querySelector('.product__price-current');
+      const priceCompare = root.querySelector('.product__price-compare');
+      const badge = root.querySelector('.product__badge');
+      const addButton = root.querySelector('.product__add-to-cart');
+      const addButtonText = root.querySelector('.product__add-to-cart-text');
+
+      function selectedOptions() {
+        const values = [];
+        optionInputs.forEach((input) => {
+          if (input.checked) values[Number(input.dataset.optionPosition) - 1] = input.dataset.optionValue;
+        });
+        return values;
+      }
+
+      function findVariant(values) {
+        return variants.find(
+          (variant) =>
+            variant.options.length === values.length && variant.options.every((option, i) => option === values[i])
+        );
+      }
+
+      function updateVariant() {
+        const variant = findVariant(selectedOptions());
+
+        // Tổ hợp option không tồn tại (VD Red + XXL không được tạo variant).
+        if (!variant) {
+          if (addButton && addButtonText) {
+            addButton.disabled = true;
+            addButtonText.textContent = addButton.dataset.unavailableText;
+          }
+          return;
+        }
+
+        if (variantInput) variantInput.value = variant.id;
+        if (priceCurrent) priceCurrent.textContent = variant.price;
+
+        if (priceCompare) {
+          priceCompare.textContent = variant.compare_at_price || '';
+          priceCompare.hidden = !variant.on_sale;
+        }
+
+        if (badge) {
+          badge.textContent = '-' + variant.discount + '%';
+          badge.hidden = !variant.on_sale;
+        }
+
+        if (addButton && addButtonText) {
+          addButton.disabled = !variant.available;
+          addButtonText.textContent = variant.available ? addButton.dataset.addText : addButton.dataset.soldOutText;
+        }
+
+        if (variant.image_id) showImage(variant.image_id);
+
+        // Giữ URL khớp variant đang chọn để copy/refresh không mất lựa chọn.
+        const url = new URL(window.location.href);
+        url.searchParams.set('variant', variant.id);
+        window.history.replaceState({}, '', url);
+      }
+
+      optionInputs.forEach((input) => input.addEventListener('change', updateVariant));
+
+      /* ---------- Quantity stepper ---------- */
+      const quantityInput = root.querySelector('.product__quantity-input');
+
+      root.querySelectorAll('[data-quantity-change]').forEach((button) => {
+        button.addEventListener('click', () => {
+          if (!quantityInput) return;
+          const min = Number(quantityInput.min) || 1;
+          const step = Number(button.dataset.quantityChange);
+          quantityInput.value = Math.max(min, (Number(quantityInput.value) || min) + step);
+        });
+      });
+    }
+
+    document.querySelectorAll('.product').forEach(initProduct);
+
+    // Theme editor render lại DOM của section mà không reload trang.
+    document.addEventListener('shopify:section:load', (event) => {
+      event.target.querySelectorAll('.product').forEach(initProduct);
+    });
+  })();
+{% endjavascript %}
 
 {% schema %}
 {
   "name": "t:general.product",
-  "settings": [],
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumb",
+      "label": "t:labels.show_breadcrumb",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "t:labels.show_rating",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "t:labels.show_description",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dynamic_checkout",
+      "label": "t:labels.show_dynamic_checkout",
+      "info": "t:info.dynamic_checkout",
+      "default": false
+    }
+  ],
   "disabled_on": {
     "groups": ["header", "footer"]
   }

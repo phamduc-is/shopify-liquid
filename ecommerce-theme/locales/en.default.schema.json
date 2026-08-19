@@ -98,10 +98,15 @@
     "rating": "Rating",
     "author": "Author",
     "verified": "Show verified badge",
+    "show_breadcrumb": "Show breadcrumb",
+    "show_rating": "Show rating",
+    "show_description": "Show description",
+    "show_dynamic_checkout": "Show dynamic checkout buttons",
     "quote": "Quote"
   },
   "info": {
-    "logo_white": "Upload a white or light version — the band background is black."
+    "logo_white": "Upload a white or light version — the band background is black.",
+    "dynamic_checkout": "Shop Pay / PayPal buttons — hidden by default because the Figma design only has \"Add to Cart\"."
   },
   "options": {
     "alignment": {
