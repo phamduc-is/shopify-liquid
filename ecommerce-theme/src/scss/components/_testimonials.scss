@@ -1,0 +1,127 @@
+@use '../abstracts/mixins' as mix;
+
+.testimonials {
+  padding-block: 40px 72px;
+  // Mốc lề trái/phải của .container, dùng lại cho padding của track bên dưới
+  // để card đầu tiên thẳng hàng với heading.
+  --testimonials-inset: max(
+    var(--page-margin),
+    calc((100% - 1240px) / 2 + var(--page-margin))
+  );
+}
+
+.testimonials__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+}
+
+.testimonials__heading {
+  font-family: var(--font-heading--family);
+  font-size: var(--fs-hero-lg);
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--color-foreground);
+}
+
+.testimonials__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-shrink: 0;
+}
+
+.testimonials__nav-button {
+  display: flex;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-foreground);
+  cursor: pointer;
+}
+
+.testimonials__nav-button svg {
+  width: var(--space-6);
+}
+
+// Track tràn hết chiều ngang màn hình (card cuối bị cắt ở rìa như design),
+// nhưng padding hai đầu = lề .container để card đầu vẫn thẳng hàng heading.
+.testimonials__track {
+  display: flex;
+  gap: var(--space-5);
+  margin-top: 40px;
+  padding-inline: var(--testimonials-inset);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none; // Firefox
+}
+
+.testimonials__track::-webkit-scrollbar {
+  display: none;
+}
+
+// ⚠️ Nhắm `> *` chứ không phải .testimonial: {% content_for 'blocks' %} bọc mỗi
+// theme block trong <div class="shopify-block">, nên flex item thật là wrapper.
+.testimonials__track > * {
+  flex: 0 0 400px;
+  max-width: 85vw; // mobile: không để card rộng hơn màn hình
+  scroll-snap-align: start;
+}
+
+.testimonial {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  height: 100%;
+  margin: 0;
+  padding: 28px 32px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-lg);
+}
+
+.testimonial__author {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.testimonial__name {
+  font-size: var(--fs-subheading);
+  font-weight: var(--fw-bold);
+  color: var(--color-foreground);
+}
+
+.testimonial__verified {
+  display: flex;
+  color: var(--color-success);
+}
+
+.testimonial__verified svg {
+  width: var(--space-5);
+}
+
+.testimonial__quote {
+  font-size: var(--fs-body-lg);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+@include mix.respond-to-max('md') {
+  .testimonials {
+    padding-block: var(--space-6) 40px;
+  }
+
+  .testimonials__heading {
+    font-size: var(--fs-hero-sm);
+  }
+
+  .testimonials__track {
+    margin-top: var(--space-6);
+  }
+
+  .testimonial {
+    padding: var(--space-6);
+  }
+}

@@ -42,6 +42,8 @@
     "settings": "Settings",
     "sidebar": "Sidebar",
     "text": "Text",
+    "testimonial": "Testimonial",
+    "testimonials": "Testimonials",
     "theme": "Theme",
     "typography": "Typography"
   },
@@ -92,7 +94,11 @@
     "products_to_show": "Products to show",
     "columns": "Columns",
     "show_view_all": "Show \"View all\" button",
-    "view_all_label": "\"View all\" button label"
+    "view_all_label": "\"View all\" button label",
+    "rating": "Rating",
+    "author": "Author",
+    "verified": "Show verified badge",
+    "quote": "Quote"
   },
   "info": {
     "logo_white": "Upload a white or light version — the band background is black."

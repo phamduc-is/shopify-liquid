@@ -40,14 +40,93 @@
       "block_order": ["logo-1", "logo-2", "logo-3", "logo-4", "logo-5"],
       "settings": {}
     },
-    "main": {
-      "type": "hello-world",
-      "settings": {}
+    "new-arrivals": {
+      "type": "featured-collection",
+      "settings": {
+        "heading": "New Arrivals",
+        "collection": "frontpage",
+        "products_to_show": 4,
+        "columns": 4,
+        "show_view_all": true,
+        "view_all_label": "View All"
+      }
+    },
+    "top-selling": {
+      "type": "featured-collection",
+      "settings": {
+        "heading": "Top Selling",
+        "collection": "frontpage",
+        "products_to_show": 4,
+        "columns": 4,
+        "show_view_all": true,
+        "view_all_label": "View All"
+      }
+    },
+    "collections-grid": {
+      "type": "collections-grid",
+      "blocks": {
+        "card-1": { "type": "collection-card", "settings": { "heading": "Casual", "link": "/collections/all" } },
+        "card-2": { "type": "collection-card", "settings": { "heading": "Formal", "link": "/collections/all" } },
+        "card-3": { "type": "collection-card", "settings": { "heading": "Party", "link": "/collections/all" } },
+        "card-4": { "type": "collection-card", "settings": { "heading": "Gym", "link": "/collections/all" } }
+      },
+      "block_order": ["card-1", "card-2", "card-3", "card-4"],
+      "settings": {
+        "heading": "Browse by dress style"
+      }
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "blocks": {
+        "t-1": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "author": "Sarah M.",
+            "verified": true,
+            "quote": "I'm blown away by the quality and style of the clothes I received from Shop.co. From casual wear to elegant dresses, every piece I've bought has exceeded my expectations."
+          }
+        },
+        "t-2": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "author": "Alex K.",
+            "verified": true,
+            "quote": "Finding clothes that align with my personal style used to be a challenge until I discovered Shop.co. The range of options they offer is truly remarkable, catering to a variety of tastes and occasions."
+          }
+        },
+        "t-3": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "author": "James L.",
+            "verified": true,
+            "quote": "As someone who's always on the lookout for unique fashion pieces, I'm thrilled to have stumbled upon Shop.co. The selection of clothes is not only diverse but also on-point with the latest trends."
+          }
+        },
+        "t-4": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "author": "Alex K.",
+            "verified": true,
+            "quote": "Finding clothes that align with my personal style used to be a challenge until I discovered Shop.co. The range of options they offer is truly remarkable, catering to a variety of tastes and occasions."
+          }
+        }
+      },
+      "block_order": ["t-1", "t-2", "t-3", "t-4"],
+      "settings": {
+        "heading": "Our happy customers"
+      }
     }
   },
   "order": [
     "slideshow",
     "logo-list",
-    "main"
+    "new-arrivals",
+    "top-selling",
+    "collections-grid",
+    "testimonials"
   ]
 }

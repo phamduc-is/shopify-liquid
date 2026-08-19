@@ -1,0 +1,128 @@
+<div class="testimonials full-width">
+  <div class="container">
+    <div class="testimonials__header">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="testimonials__heading">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+
+      {%- if section.blocks.size > 1 -%}
+        <div class="testimonials__nav">
+          <button type="button" class="testimonials__nav-button" data-direction="prev" aria-label="{{ 'sections.testimonials.previous' | t }}">
+            {{ 'icon-arrow-left.svg' | inline_asset_content }}
+          </button>
+          <button type="button" class="testimonials__nav-button" data-direction="next" aria-label="{{ 'sections.testimonials.next' | t }}">
+            {{ 'icon-arrow-right.svg' | inline_asset_content }}
+          </button>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- comment -%}
+    Track nằm NGOÀI .container để card có thể tràn ra sát mép màn hình khi
+    cuộn (đúng như design: card thứ 4 bị cắt ở rìa phải), nhưng vẫn thụt lề
+    đầu/cuối bằng padding để card đầu thẳng hàng với heading.
+  {%- endcomment -%}
+  <div class="testimonials__track">
+    {% content_for 'blocks' %}
+  </div>
+</div>
+
+{% javascript %}
+  // Testimonials — nút prev/next.
+  //
+  // Track đã dùng CSS scroll-snap nên vuốt/cuộn ngang chạy được sẵn không cần
+  // JS; phần dưới chỉ để 2 nút mũi tên hoạt động.
+
+  // querySelectorAll: 1 trang có thể có nhiều instance của section này
+  document.querySelectorAll('.testimonials').forEach((section) => {
+    const track = section.querySelector('.testimonials__track');
+    const navButtons = section.querySelectorAll('.testimonials__nav-button');
+
+    if (!track || navButtons.length === 0) return;
+
+    // Bước cuộn = bề rộng 1 card + gap, đọc lại mỗi lần click vì cả hai đều đổi theo breakpoint
+    const getScrollStep = () => {
+      const card = track.firstElementChild;
+
+      if (!card) return track.clientWidth;
+
+      const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+
+      return card.getBoundingClientRect().width + gap;
+    };
+
+    // Tắt nút khi track đã chạm hai đầu; trừ 1px cho sai số sub-pixel
+    const updateNavButtons = () => {
+      const maxScroll = track.scrollWidth - track.clientWidth;
+
+      navButtons.forEach((button) => {
+        button.disabled =
+          button.dataset.direction === 'prev'
+            ? track.scrollLeft <= 1
+            : track.scrollLeft >= maxScroll - 1;
+      });
+    };
+
+    navButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const direction = button.dataset.direction === 'prev' ? -1 : 1;
+
+        track.scrollBy({ left: direction * getScrollStep(), behavior: 'smooth' });
+      });
+    });
+
+    track.addEventListener('scroll', updateNavButtons, { passive: true });
+    window.addEventListener('resize', updateNavButtons);
+
+    updateNavButtons();
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "t:general.testimonials",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Our happy customers"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.testimonials",
+      "blocks": [
+        { "type": "testimonial", "settings": { "author": "Sarah M." } },
+        {
+          "type": "testimonial",
+          "settings": {
+            "author": "Alex K.",
+            "quote": "Finding clothes that align with my personal style used to be a challenge until I discovered Shop.co. The range of options they offer is truly remarkable, catering to a variety of tastes and occasions."
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "author": "James L.",
+            "quote": "As someone who's always on the lookout for unique fashion pieces, I'm thrilled to have stumbled upon Shop.co. The selection of clothes is not only diverse but also on-point with the latest trends."
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "author": "Alex K.",
+            "quote": "Finding clothes that align with my personal style used to be a challenge until I discovered Shop.co. The range of options they offer is truly remarkable, catering to a variety of tastes and occasions."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

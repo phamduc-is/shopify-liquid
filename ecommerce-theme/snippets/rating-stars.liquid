@@ -1,7 +1,13 @@
 {% doc %}
   Render a star rating
 
-  @param rating - {number} - Rating Value from 0 to 5
+  @param {number} rating - Rating Value from 0 to 5
+  @param {boolean} [show_value] - Hiện thêm chữ "4.5/5" bên cạnh dãy sao.
+    Mặc định true; truyền `show_value: false` khi chỉ cần sao (VD testimonial).
+
+  @example
+  {% render 'rating-stars', rating: 4.5 %}
+  {% render 'rating-stars', rating: 5, show_value: false %}
 {% enddoc %}
 
 {%- assign fill_percent = rating | divided_by: 5.0 | times: 100 -%}
@@ -14,5 +20,7 @@
 <div class="rating-stars">
     <div class="rating-stars__track">{{ star_icons }}</div>
       <div class="rating-stars__fill" style="width: {{ fill_percent }}%;">{{ star_icons }}</div>
-    <div class="rating-stars_value"> {{ rating }}/5 </div>
+    {%- if show_value != false -%}
+      <div class="rating-stars_value"> {{ rating }}/5 </div>
+    {%- endif -%}
 </div>

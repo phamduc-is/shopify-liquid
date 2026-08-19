@@ -1,0 +1,60 @@
+{% doc %}
+  Renders one customer testimonial card: star rating, author name with an
+  optional "verified" badge, and the quote itself.
+
+  @example
+  {% content_for 'block', type: 'testimonial', id: 'testimonial' %}
+{% enddoc %}
+
+<blockquote class="testimonial" {{ block.shopify_attributes }}>
+  {% render 'rating-stars', rating: block.settings.rating, show_value: false %}
+
+  <div class="testimonial__author">
+    <span class="testimonial__name">{{ block.settings.author }}</span>
+    {%- if block.settings.verified -%}
+      <span class="testimonial__verified" title="{{ 'sections.testimonials.verified' | t }}">
+        {{ 'icon-verified.svg' | inline_asset_content }}
+      </span>
+    {%- endif -%}
+  </div>
+
+  {%- if block.settings.quote != blank -%}
+    <p class="testimonial__quote">{{ block.settings.quote }}</p>
+  {%- endif -%}
+</blockquote>
+
+{% schema %}
+{
+  "name": "t:general.testimonial",
+  "settings": [
+    {
+      "type": "range",
+      "id": "rating",
+      "label": "t:labels.rating",
+      "min": 1,
+      "max": 5,
+      "step": 0.5,
+      "default": 5
+    },
+    {
+      "type": "text",
+      "id": "author",
+      "label": "t:labels.author",
+      "default": "Sarah M."
+    },
+    {
+      "type": "checkbox",
+      "id": "verified",
+      "label": "t:labels.verified",
+      "default": true
+    },
+    {
+      "type": "textarea",
+      "id": "quote",
+      "label": "t:labels.quote",
+      "default": "I'm blown away by the quality and style of the clothes I received from Shop.co. From casual wear to elegant dresses, every piece I've bought has exceeded my expectations."
+    }
+  ],
+  "presets": [{ "name": "t:general.testimonial" }]
+}
+{% endschema %}

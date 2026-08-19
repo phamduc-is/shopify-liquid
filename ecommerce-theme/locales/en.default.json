@@ -58,6 +58,11 @@
   "sections": {
     "featured_collection": {
       "empty": "Select a collection in the theme editor to show products here."
+    },
+    "testimonials": {
+      "verified": "Verified buyer",
+      "previous": "Previous testimonials",
+      "next": "Next testimonials"
     }
   }
 }
