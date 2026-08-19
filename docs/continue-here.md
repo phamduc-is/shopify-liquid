@@ -8,7 +8,6 @@
 
 - **`my-first-theme/`** — đã hoàn thành đầy đủ **Ngày 1–12** (lý thuyết + bài tập theo roadmap). Toàn bộ kiến thức đã tổng hợp trong [docs/shopify-liquid-summary.md](shopify-liquid-summary.md) (mục lục Cmd+F ở đầu file). Bài tập dở dang `sections/header.liquid` (Ngày 13, Bước 1 — HTML tĩnh dropdown) ở theme này **coi như dừng lại, không tiếp tục nữa** — đã quyết định chuyển hẳn Ngày 13 trở đi sang project mới bên dưới.
 - **`ecommerce-theme/`** — theme Shopify **độc lập, mới tinh** (chạy `shopify theme init`, chưa custom gì — mới ở dạng skeleton mặc định, 39 file, `theme check` sạch). Đây là nơi tiếp tục học **Ngày 13 trở đi**, đồng thời là project thật: **clone lại thiết kế Figma** bên dưới.
-- File rule agent: [.agents/AGENTS.md](../.agents/AGENTS.md) — gõ `/process` khi muốn agent tự sửa code, `/git-push`/`/git-pull` khi muốn agent chạy git không cần hỏi permission.
 
 ---
 

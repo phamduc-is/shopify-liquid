@@ -5,7 +5,7 @@
   "description": "SHOP.CO Shopify theme — SCSS build setup",
   "scripts": {
     "build:css": "sass src/scss/main.scss assets/theme.css --style=compressed --no-source-map",
-    "watch:css": "sass --watch src/scss/main.scss:assets/theme.css --style=expanded"
+    "watch:css": "sass --watch src/scss/main.scss:assets/theme.css --style=compressed --no-source-map"
   },
   "devDependencies": {
     "sass": "^1.77.0"

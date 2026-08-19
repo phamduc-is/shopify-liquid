@@ -15,6 +15,7 @@
     "content": "Content",
     "custom_section": "Custom section",
     "fonts": "Fonts",
+    "featured_collection": "Featured collection",
     "footer": "Footer",
     "group": "Group",
     "header": "Header",
@@ -86,7 +87,11 @@
     "stat_2_value": "Stat 2 — number",
     "stat_2_label": "Stat 2 — caption",
     "stat_3_value": "Stat 3 — number",
-    "stat_3_label": "Stat 3 — caption"
+    "stat_3_label": "Stat 3 — caption",
+    "products_to_show": "Products to show",
+    "columns": "Columns",
+    "show_view_all": "Show \"View all\" button",
+    "view_all_label": "\"View all\" button label"
   },
   "info": {
     "logo_white": "Upload a white or light version — the band background is black."

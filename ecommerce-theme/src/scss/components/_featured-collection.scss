@@ -1,0 +1,70 @@
+@use '../abstracts/mixins' as mix;
+
+.featured-collection {
+  padding-block: 72px;
+}
+
+.featured-collection__heading {
+  font-family: var(--font-heading--family);
+  font-size: var(--fs-hero-lg);
+  line-height: 1.2;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--color-foreground);
+}
+
+.featured-collection__grid {
+  display: grid;
+  // --columns do section đặt inline theo setting; 1fr đều nhau, gap 20px
+  // đúng khoảng cách giữa 2 card trong design (card 295px, cách nhau 315px).
+  grid-template-columns: repeat(var(--columns, 4), minmax(0, 1fr));
+  gap: var(--space-5);
+  margin-top: 55px;
+  list-style: none;
+}
+
+.featured-collection__view-all {
+  display: block;
+  width: fit-content;
+  margin: 36px auto 0;
+  padding: var(--space-4) 54px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: var(--style-border-radius-full);
+  color: var(--color-foreground);
+  font-size: var(--fs-body-lg);
+  font-weight: var(--fw-medium);
+  text-decoration: none;
+}
+
+.featured-collection__view-all:hover {
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+}
+
+.featured-collection__empty {
+  margin-top: var(--space-5);
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+@include mix.respond-to-max('lg') {
+  .featured-collection__grid {
+    // Tablet: tối đa 2 cột dù setting chọn 4-5, tránh card bị bóp quá hẹp.
+    grid-template-columns: repeat(min(var(--columns, 4), 2), minmax(0, 1fr));
+  }
+}
+
+@include mix.respond-to-max('md') {
+  .featured-collection {
+    padding-block: 40px;
+  }
+
+  .featured-collection__heading {
+    font-size: var(--fs-hero-sm);
+  }
+
+  .featured-collection__grid {
+    margin-top: var(--space-6);
+    gap: var(--space-4);
+  }
+}

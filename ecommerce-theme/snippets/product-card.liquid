@@ -1,15 +1,25 @@
 {% doc %}
   Renders a product card — image, title, rating, price (+ sale badge if on sale).
 
-   @param product {product} - Sản phẩm cần hiển thị
-   
-  TODO (Liquid động): thay data giả bên dưới bằng biến thật (product object,
-  {% render 'product-card', ... %} với param từ vòng lặp {% for %}).
+  @param {product} product - Sản phẩm cần hiển thị
+  @param {number} [rating] - Điểm đánh giá 0..5. Bỏ trống thì tự đọc metafield
+    `reviews.rating` (chuẩn của app Shopify Product Reviews); không có luôn thì
+    ẩn phần sao.
+
+  @example
+  {% render 'product-card', product: product %}
+  {% render 'product-card', product: product, rating: 4.5 %}
 {% enddoc %}
 
-{%- assign product_card_title = product.title -%}
+{% liquid
+  assign card_rating = rating
+  if card_rating == blank and product.metafields.reviews.rating != blank
+    assign card_rating = product.metafields.reviews.rating.value.rating
+  endif
+%}
+
 <div class="product-card">
-  <div class="product-card__media">
+  <a href="{{ product.url }}" class="product-card__media">
     {% render 'image',
       class: 'product-card__image',
       image: product.featured_image,
@@ -17,12 +27,16 @@
       height: 600,
       crop: 'center'
     %}
-  </div>
+  </a>
 
   <div class="product-card__info">
-    <h3 class="product-card__title">{{ product_card_title }}</h3>
+    <h3 class="product-card__title">
+      <a href="{{ product.url }}" class="product-card__link">{{ product.title }}</a>
+    </h3>
 
-    {% render 'rating-stars', rating: 3.5 %}
+    {% if card_rating != blank %}
+      {% render 'rating-stars', rating: card_rating %}
+    {% endif %}
 
     <div class="product-card__price">
       {% if product.compare_at_price and product.compare_at_price > product.price %}
@@ -35,7 +49,7 @@
 
         <span class="product-card__price-current">{{ product.price | money }}</span>
         <span class="product-card__price-compare">{{ product.compare_at_price | money }}</span>
-        <span class="product-card__badge">{{ discount_percent }}%</span>
+        <span class="product-card__badge">-{{ discount_percent }}%</span>
       {% else %}
         <span class="product-card__price-current">{{ product.price | money }}</span>
       {% endif %}

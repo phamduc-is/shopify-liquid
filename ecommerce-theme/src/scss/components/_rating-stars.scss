@@ -1,24 +1,29 @@
 .rating-stars {
-    position: relative; // làm điểm neo cho 2 lớp con absolute
+    position: relative; // làm điểm neo cho lớp __fill absolute
     display: inline-flex;
     align-items: center;
     gap: 4px;
 }
 
-.rating-stars__track,
-.rating-stars__fill {
-    position: absolute; // 2 lớp chồng đúng vị trí (0,0)
-    top: 0;
-    left: 0;
-    white-space: nowrap; // ★★★★★ không bị xuống dòng
-    overflow: hidden; // fill bị "cắt" theo width % → lộ ra bao nhiêu sao vàng
-}
-
+// __track nằm TRONG luồng (không absolute) để nó tự tạo kích thước cho
+// container — nếu cả 2 lớp cùng absolute thì .rating-stars cao/rộng bằng 0
+// và dãy sao sẽ đè lên chữ "4.5/5" bên cạnh.
 .rating-stars__track {
+    white-space: nowrap; // ★★★★★ không bị xuống dòng
     color: var(--color-border);
 }
 
-// xám nhạt, không phải màu sao rỗng nữa
+// __fill chồng đúng lên __track, bị cắt theo width % → lộ ra bao nhiêu sao vàng
 .rating-stars__fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    white-space: nowrap;
+    overflow: hidden;
     color: var(--color-rating-star);
+}
+
+.rating-stars_value {
+    font-size: var(--fs-label);
+    color: var(--color-foreground);
 }

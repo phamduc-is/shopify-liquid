@@ -1,0 +1,89 @@
+<div class="featured-collection full-width">
+  <div class="container">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="featured-collection__heading">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+
+    {%- assign collection = collections[section.settings.collection] -%}
+
+    {%- if collection.products.size > 0 -%}
+      <ul
+        class="featured-collection__grid"
+        style="--columns: {{ section.settings.columns }}"
+      >
+        {%- for product in collection.products limit: section.settings.products_to_show -%}
+          <li>{% render 'product-card', product: product %}</li>
+        {%- endfor -%}
+      </ul>
+
+      {%- if section.settings.show_view_all -%}
+        <a href="{{ collection.url }}" class="featured-collection__view-all">
+          {{ section.settings.view_all_label }}
+        </a>
+      {%- endif -%}
+    {%- else -%}
+      {%- comment -%}
+        Chưa chọn collection (hoặc collection rỗng): chỉ hiện nhắc nhở trong
+        Theme Editor để section không "biến mất" lúc đang dựng trang; ngoài
+        storefront thật thì không in gì cả.
+      {%- endcomment -%}
+      {%- if request.design_mode -%}
+        <p class="featured-collection__empty">{{ 'sections.featured_collection.empty' | t }}</p>
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:general.featured_collection",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "New Arrivals"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:general.collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "t:labels.products_to_show",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "t:labels.columns",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "t:labels.show_view_all",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "t:labels.view_all_label",
+      "default": "View All"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.featured_collection"
+    }
+  ]
+}
+{% endschema %}
