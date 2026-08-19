@@ -25,6 +25,33 @@ Hai hướng, chọn 1 (chưa quyết):
 
 ---
 
+### 2. Git identity — Mac mini chưa set, 28 commit cũ chưa attribute
+
+MacBook Air **đã xong** (xem mục đã fix bên dưới). Hai việc còn lại:
+
+**a. Mac mini chưa set.** `~/.gitconfig` nằm trong home của từng máy, không đồng bộ qua GitHub account — phải chạy lại y hệt trên Mac mini:
+
+```bash
+git config --global user.name  "Dawn"
+git config --global user.email "298667006+phamduc-is@users.noreply.github.com"
+git config --global user.useConfigOnly true
+git var GIT_AUTHOR_IDENT   # verify: phải in ra đúng email noreply ở trên
+```
+
+Chưa chạy thì commit từ Mac mini vẫn ra `dawn@Dawns-Mac-mini.local` như cũ.
+
+**b. 28 commit cũ vẫn mang author sai** — chỉ commit *từ đây trở đi* mới đúng:
+
+| Author string cũ | Số commit | Nguồn gốc |
+|---|---|---|
+| `Dawn <dawn@Dawns-Mac-mini.local>` | 18 | hostname Mac mini |
+| `Dawn <dawn@Macmini.bbrouter>` | 5 | cùng Mac mini, hostname do router cấp qua DHCP |
+| `Dawn <dawn@Dawns-MacBook-Air.local>` | 5 | hostname MacBook Air |
+
+Muốn 28 commit này cũng được attribute vào account thì phải rewrite history (`git filter-repo --mailmap`) rồi force-push — **toàn bộ SHA sẽ đổi**. Repo public nhưng một mình làm nên rủi ro thấp; vẫn chưa quyết, chưa làm.
+
+---
+
 ## 💡 Enhancement đang cân nhắc (không phải bug)
 
 ### Kéo ngang bằng chuột cho `.testimonials__track`
@@ -61,6 +88,22 @@ Theme Editor render lại DOM của section mà **không reload trang**, nên JS
 Ghi chú đã xác minh khi fix:
 - `<dialog class="mobile-nav">` và `<dialog class="search-popup">` **nằm trong** `<header class="header">` → vẫn thuộc `.shopify-section` của header, query từ `root` an toàn. (Cảnh báo cũ trong file này về việc dialog có thể nằm ngoài scope — đã loại trừ.)
 - `.announcement-bar` là **anh em** của `<header>`, không phải con → `root` phải là `.shopify-section` chứ không phải `.header`. Lấy bằng `header.closest('.shopify-section')` vì id section trong `header-group` do Shopify sinh, không hardcode được.
+
+---
+
+## ✅ Đã fix — git identity trên MacBook Air
+
+`user.name` / `user.email` trước đây **chưa set ở cả local lẫn global**, git tự suy ra `$(whoami)@$(hostname)` → mỗi máy (và mỗi lần router đổi hostname) đẻ ra một identity khác nhau. Email `.local` không tồn tại trên GitHub nên commit không link được vào account: không avatar, không tính contribution graph.
+
+Lưu ý: **đăng nhập GitHub và commit author là hai lớp tách rời**. Token/SSH chỉ trả lời "có quyền push không"; author name/email được đóng băng vào commit object lúc `git commit` và GitHub **không ghi đè** nó — chỉ tra ngược email xem thuộc account nào. Nên login cùng account trên 2 máy không hề đồng bộ identity.
+
+Đã set global trên MacBook Air:
+
+| Key | Giá trị | Lý do |
+|---|---|---|
+| `user.name` | `Dawn` | |
+| `user.email` | `298667006+phamduc-is@users.noreply.github.com` | Repo public → dùng noreply thay email thật, vì email trong commit là **public vĩnh viễn**, ai clone cũng đọc được bằng `git log`. Dạng `<ID>+<username>@users.noreply.github.com` vẫn link đúng vào account. |
+| `user.useConfigOnly` | `true` | Chặn git tự đoán từ hostname. Git sẽ **báo lỗi và từ chối commit** thay vì âm thầm bịa email rác — net an toàn cho máy mới / container / CI sau này. Mặc định của git là `false`. |
 
 ---
 
