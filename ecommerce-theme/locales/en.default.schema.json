@@ -1,54 +1,32 @@
 {
   "general": {
-    "404": "Not found",
-    "article": "Article",
-    "block": "Block",
-    "blog": "Blog",
     "brand": "Brand",
-    "cart": "Cart",
     "collection": "Collection",
-    "collections": "Collections",
     "collection_card": "Collection card",
     "collection_list": "Collection list",
-    "collections_grid": "Collections grid",
     "colors": "Colors",
     "column": "Column",
-    "content": "Content",
-    "custom_section": "Custom section",
     "fonts": "Fonts",
     "featured_collection": "Featured collection",
     "footer": "Footer",
-    "group": "Group",
     "header": "Header",
     "heading": "Heading",
     "layout": "Layout",
     "logo": "Logo",
     "logo_list": "Logo list",
-    "main": "Main",
     "newsletter": "Newsletter",
-    "page": "Page",
-    "password": "Password",
     "payment": "Payment",
     "primary": "Primary",
     "product": "Product",
-    "row": "Row",
-    "search": "Search",
     "slide": "Slide",
     "slideshow": "Slideshow",
     "social": "Social media",
     "stats": "Stats",
-    "secondary": "Secondary",
-    "section": "Section",
-    "settings": "Settings",
-    "sidebar": "Sidebar",
-    "text": "Text",
     "testimonial": "Testimonial",
     "testimonials": "Testimonials",
-    "theme": "Theme",
     "typography": "Typography"
   },
   "labels": {
-    "alignment": "Alignment",
     "autoplay": "Autoplay",
     "autoplay_speed": "Autoplay speed",
     "background": "Background",
@@ -57,18 +35,13 @@
     "column_heading": "Column heading",
     "description": "Description",
     "foreground": "Foreground",
-    "grid_gap": "Grid spacing",
-    "grid_item_width": "Grid item width",
     "heading": "Heading",
     "image": "Image",
     "input_corner_radius": "Input corner radius",
     "button_corner_radius": "Button corner radius",
-    "layout_direction": "Layout direction",
     "link": "Link",
     "menu": "Menu",
-    "customer_account_menu": "Customer account menu",
     "newsletter_heading": "Heading",
-    "padding": "Padding",
     "page_margin": "Page margin",
     "page_width": "Page width",
     "show_payment_icons": "Show payment icons",
@@ -76,7 +49,6 @@
     "social_facebook_link": "Facebook",
     "social_instagram_link": "Instagram",
     "social_github_link": "GitHub",
-    "text_style": "Text style",
     "text": "Text",
     "text_secondary": "Secondary text",
     "border": "Border",
@@ -109,27 +81,9 @@
     "dynamic_checkout": "Shop Pay / PayPal buttons — hidden by default because the Figma design only has \"Add to Cart\"."
   },
   "options": {
-    "alignment": {
-      "left": "Left",
-      "center": "Center",
-      "right": "Right"
-    },
-    "direction": {
-      "horizontal": "Horizontal",
-      "vertical": "Vertical"
-    },
     "page_width": {
       "narrow": "Narrow",
       "wide": "Wide"
-    },
-    "size": {
-      "large": "Large",
-      "small": "Small"
-    },
-    "text_style": {
-      "title": "Title",
-      "subtitle": "Subtitle",
-      "normal": "Normal text"
     }
   }
 }
