@@ -33,27 +33,19 @@
   //
   // Track đã dùng CSS scroll-snap nên vuốt/cuộn ngang chạy được sẵn không cần
   // JS; phần dưới chỉ để 2 nút mũi tên hoạt động.
+  //
+  // Bọc IIFE vì Shopify gộp mọi javascript tag của theme vào chung 1 file: biến
+  // khai báo ở top-level sẽ dùng chung scope với mọi section khác.
+  (function () {
+    // Nhận section thay vì đóng gói sẵn track/navButtons, để dùng lại được từ
+    // listener resize dùng chung ở dưới.
+    const updateNavButtons = (section) => {
+      const track = section.querySelector('.testimonials__track');
+      const navButtons = section.querySelectorAll('.testimonials__nav-button');
 
-  // querySelectorAll: 1 trang có thể có nhiều instance của section này
-  document.querySelectorAll('.testimonials').forEach((section) => {
-    const track = section.querySelector('.testimonials__track');
-    const navButtons = section.querySelectorAll('.testimonials__nav-button');
+      if (!track) return;
 
-    if (!track || navButtons.length === 0) return;
-
-    // Bước cuộn = bề rộng 1 card + gap, đọc lại mỗi lần click vì cả hai đều đổi theo breakpoint
-    const getScrollStep = () => {
-      const card = track.firstElementChild;
-
-      if (!card) return track.clientWidth;
-
-      const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
-
-      return card.getBoundingClientRect().width + gap;
-    };
-
-    // Tắt nút khi track đã chạm hai đầu; trừ 1px cho sai số sub-pixel
-    const updateNavButtons = () => {
+      // Tắt nút khi track đã chạm hai đầu; trừ 1px cho sai số sub-pixel
       const maxScroll = track.scrollWidth - track.clientWidth;
 
       navButtons.forEach((button) => {
@@ -64,19 +56,53 @@
       });
     };
 
-    navButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        const direction = button.dataset.direction === 'prev' ? -1 : 1;
+    const initSection = (section) => {
+      const track = section.querySelector('.testimonials__track');
+      const navButtons = section.querySelectorAll('.testimonials__nav-button');
 
-        track.scrollBy({ left: direction * getScrollStep(), behavior: 'smooth' });
+      if (!track || navButtons.length === 0) return;
+
+      // Bước cuộn = bề rộng 1 card + gap, đọc lại mỗi lần click vì cả hai đều đổi theo breakpoint
+      const getScrollStep = () => {
+        const card = track.firstElementChild;
+
+        if (!card) return track.clientWidth;
+
+        const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+
+        return card.getBoundingClientRect().width + gap;
+      };
+
+      navButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          const direction = button.dataset.direction === 'prev' ? -1 : 1;
+
+          track.scrollBy({ left: direction * getScrollStep(), behavior: 'smooth' });
+        });
       });
+
+      track.addEventListener('scroll', () => updateNavButtons(section), { passive: true });
+
+      updateNavButtons(section);
+    };
+
+    // querySelectorAll: 1 trang có thể có nhiều instance của section này
+    document.querySelectorAll('.testimonials').forEach(initSection);
+
+    // Đúng 1 listener resize cho cả trang, đăng ký 1 lần và query lại DOM mỗi
+    // lần chạy. Nếu gắn resize bên trong initSection thì mỗi lượt Theme Editor
+    // render lại section sẽ cộng thêm 1 listener trỏ vào DOM đã bị gỡ.
+    window.addEventListener('resize', () => {
+      document.querySelectorAll('.testimonials').forEach(updateNavButtons);
     });
 
-    track.addEventListener('scroll', updateNavButtons, { passive: true });
-    window.addEventListener('resize', updateNavButtons);
-
-    updateNavButtons();
-  });
+    // Theme editor thay lại DOM của section mà không reload trang. event.target
+    // là <div class="shopify-section"> vừa render lại nên chỉ init trong phạm
+    // vi đó, tránh gắn listener trùng cho các section khác.
+    document.addEventListener('shopify:section:load', (event) => {
+      event.target.querySelectorAll('.testimonials').forEach(initSection);
+    });
+  })();
 {% endjavascript %}
 
 {% schema %}

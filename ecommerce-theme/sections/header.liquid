@@ -100,49 +100,60 @@
 </header>
 
 {% javascript %}
-  const announcementCloseButton = document.querySelector('.announcement-bar__close');
+  // Header — announcement bar, mobile nav, search popup.
+  //
+  // Bọc IIFE vì Shopify gộp mọi javascript tag của theme vào chung 1 file: biến
+  // khai báo ở top-level sẽ dùng chung scope với mọi section khác, trùng tên là
+  // SyntaxError và chết cả bundle.
+  (function () {
+    // Mobile nav và search popup mở/đóng y hệt nhau nên dùng chung 1 hàm.
+    const initDialog = (openButton, dialog, closeButton) => {
+      if (!dialog) return;
 
-  announcementCloseButton?.addEventListener('click', () => {
-    document.querySelector('.announcement-bar')?.remove();
-  });
+      openButton?.addEventListener('click', () => dialog.showModal());
+      closeButton?.addEventListener('click', () => dialog.close());
 
-  // hamburger btn
-  const menuToggleButton = document.querySelector('.header__menu-toggle');
-  const mobileNav = document.querySelector('.mobile-nav');
-  const mobileNavCloseButton = document.querySelector('.mobile-nav__close');
+      // Click trúng chính <dialog> tức là click vào vùng backdrop, không phải nội dung.
+      dialog.addEventListener('click', (event) => {
+        if (event.target === dialog) dialog.close();
+      });
+    };
 
-  menuToggleButton?.addEventListener('click', () => {
-    mobileNav?.showModal();
-  });
+    // root là <div class="shopify-section"> của header chứ không phải .header,
+    // vì .announcement-bar là anh em của <header> chứ không nằm trong nó.
+    const initHeader = (root) => {
+      const announcementBar = root.querySelector('.announcement-bar');
 
-  mobileNavCloseButton?.addEventListener('click', () => {
-    mobileNav?.close();
-  });
+      root.querySelector('.announcement-bar__close')?.addEventListener('click', () => {
+        announcementBar?.remove();
+      });
 
-  mobileNav?.addEventListener('click', (event) => {
-    if (event.target === mobileNav) {
-      mobileNav.close();
-    }
-  });
+      initDialog(
+        root.querySelector('.header__menu-toggle'),
+        root.querySelector('.mobile-nav'),
+        root.querySelector('.mobile-nav__close')
+      );
 
-  // search popup
-  const searchToggleButton = document.querySelector('.header__icon-button--search');
-  const searchPopup = document.querySelector('.search-popup');
-  const searchPopupCloseButton = document.querySelector('.search-popup__close');
+      initDialog(
+        root.querySelector('.header__icon-button--search'),
+        root.querySelector('.search-popup'),
+        root.querySelector('.search-popup__close')
+      );
+    };
 
-  searchToggleButton?.addEventListener('click', () => {
-    searchPopup?.showModal();
-  });
+    // Đi ngược từ .header lên section wrapper: id của section trong header-group
+    // do Shopify sinh ra nên không hardcode được.
+    const initFromHeader = (header) => {
+      initHeader(header.closest('.shopify-section') ?? document);
+    };
 
-  searchPopupCloseButton?.addEventListener('click', () => {
-    searchPopup?.close();
-  });
+    document.querySelectorAll('.header').forEach(initFromHeader);
 
-  searchPopup?.addEventListener('click', (event) => {
-    if (event.target === searchPopup) {
-      searchPopup.close();
-    }
-  });
+    // Theme editor thay lại DOM của section mà không reload trang.
+    document.addEventListener('shopify:section:load', (event) => {
+      event.target.querySelectorAll('.header').forEach(initFromHeader);
+    });
+  })();
 {% endjavascript %}
 
 {% schema %}
