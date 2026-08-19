@@ -1,0 +1,54 @@
+{% doc %}
+  Renders one card in the collections grid: a full-bleed image with a title
+  overlaid on the top-left corner, linking to a collection or any URL.
+
+  @example
+  {% content_for 'block', type: 'collection-card', id: 'collection-card' %}
+{% enddoc %}
+
+<a
+  href="{{ block.settings.link | default: '#' }}"
+  class="collections-grid__card"
+  {{ block.shopify_attributes }}
+>
+  {%- if block.settings.image != blank -%}
+    {{
+      block.settings.image
+      | image_url: width: 1400
+      | image_tag:
+        class: 'collections-grid__image',
+        loading: 'lazy',
+        widths: '400, 700, 1000, 1400',
+        alt: block.settings.image.alt
+    }}
+  {%- endif -%}
+
+  {%- if block.settings.heading != blank -%}
+    <span class="collections-grid__card-title">{{ block.settings.heading }}</span>
+  {%- endif -%}
+</a>
+
+{% schema %}
+{
+  "name": "t:general.collection_card",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:labels.image"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Casual"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "t:labels.link"
+    }
+  ],
+  "presets": [{ "name": "t:general.collection_card" }]
+}
+{% endschema %}

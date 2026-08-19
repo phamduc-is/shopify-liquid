@@ -1,0 +1,106 @@
+@use '../abstracts/mixins' as mix;
+
+.collections-grid {
+  padding-block: 40px;
+}
+
+.collections-grid__panel {
+  padding: 70px 64px 76px;
+  border-radius: 40px; // design dùng 40px cho khung ngoài; card bên trong mới là --radius-lg (20px)
+  background-color: var(--color-surface-secondary);
+}
+
+.collections-grid__heading {
+  font-family: var(--font-heading--family);
+  font-size: var(--fs-hero-lg);
+  line-height: 1.2;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--color-foreground);
+}
+
+// Lưới 8 cột: card hẹp span 3, card rộng span 5.
+// Tỉ lệ này khớp gần như tuyệt đối với design (407px / 684px, gap 20px):
+//   cột = (1111 - 7*20) / 8 = 121.4px
+//   span 3 -> 3*121.4 + 2*20 = 404px  (design 407)
+//   span 5 -> 5*121.4 + 4*20 = 687px  (design 684)
+.collections-grid__items {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: var(--space-5);
+  margin-top: 64px;
+}
+
+// ⚠️ Nhắm `> *` chứ KHÔNG phải `.collections-grid__card`: {% content_for 'blocks' %}
+// khiến Shopify bọc mỗi theme block trong <div class="shopify-block">, nên grid
+// item thật là wrapper đó — đặt grid-column lên thẻ <a> bên trong sẽ vô tác dụng.
+// Chu kỳ 4: hẹp - rộng - rộng - hẹp (so le giữa 2 hàng như design).
+.collections-grid__items > *:nth-child(4n + 1),
+.collections-grid__items > *:nth-child(4n) {
+  grid-column: span 3;
+}
+
+.collections-grid__items > *:nth-child(4n + 2),
+.collections-grid__items > *:nth-child(4n + 3) {
+  grid-column: span 5;
+}
+
+.collections-grid__card {
+  position: relative;
+  display: block;
+  height: 289px;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-background);
+  text-decoration: none;
+}
+
+.collections-grid__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  // Ảnh trong design là người mẫu lệch phải, chừa khoảng trống trái cho chữ.
+  object-position: right center;
+}
+
+.collections-grid__card-title {
+  position: relative; // nổi trên ảnh absolute
+  display: block;
+  padding: var(--space-6) var(--space-6-5);
+  font-size: var(--fs-hero-sm);
+  font-weight: var(--fw-bold);
+  color: var(--color-foreground);
+}
+
+@include mix.respond-to-max('lg') {
+  .collections-grid__panel {
+    padding: 40px var(--space-6) 48px;
+  }
+
+  // Tablet trở xuống: bỏ so le, mỗi card chiếm nguyên hàng cho dễ nhìn.
+  .collections-grid__items > * {
+    grid-column: span 8 !important;
+  }
+}
+
+@include mix.respond-to-max('md') {
+  .collections-grid__heading {
+    font-size: var(--fs-hero-sm);
+  }
+
+  .collections-grid__items {
+    margin-top: var(--space-6);
+    gap: var(--space-4);
+  }
+
+  .collections-grid__card {
+    height: 190px;
+  }
+
+  .collections-grid__card-title {
+    padding: var(--space-4);
+    font-size: var(--fs-heading);
+  }
+}

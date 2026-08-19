@@ -1,0 +1,43 @@
+<div class="collections-grid full-width">
+  <div class="container">
+    <div class="collections-grid__panel">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="collections-grid__heading">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+
+      <div class="collections-grid__items">
+        {% content_for 'blocks' %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:general.collection_list",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Browse by dress style"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection-card"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.collection_list",
+      "blocks": [
+        { "type": "collection-card", "settings": { "heading": "Casual" } },
+        { "type": "collection-card", "settings": { "heading": "Formal" } },
+        { "type": "collection-card", "settings": { "heading": "Party" } },
+        { "type": "collection-card", "settings": { "heading": "Gym" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
