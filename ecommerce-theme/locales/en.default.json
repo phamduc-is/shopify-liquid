@@ -26,6 +26,44 @@
       "verified": "Verified buyer",
       "previous": "Previous testimonials",
       "next": "Next testimonials"
+    },
+    "product_tabs": {
+      "tablist_label": "Product information",
+      "tab_details": "Product Details",
+      "tab_reviews": "Rating & Reviews",
+      "tab_faqs": "FAQs",
+      "all_reviews": "All Reviews",
+      "filter_label": "Filter by rating",
+      "filter_all": "All ratings",
+      "filter_stars": "{{ count }} stars",
+      "sort_label": "Sort reviews",
+      "sort_latest": "Latest",
+      "sort_oldest": "Oldest",
+      "sort_highest": "Highest rated",
+      "sort_lowest": "Lowest rated",
+      "write_review": "Write a Review",
+      "load_more": "Load More Reviews",
+      "posted_on": "Posted on {{ date }}",
+      "verified": "Verified buyer",
+      "empty_details": "Add a \"custom.product_details\" rich text metafield to this product to fill this tab.",
+      "empty_reviews": "Link review entries to this product through the \"custom.reviews\" metafield to show them here.",
+      "empty_faqs": "Add FAQ blocks in the theme editor to fill this tab."
+    },
+    "collection": {
+      "filters": "Filters",
+      "close_filters": "Close filters",
+      "apply_filter": "Apply Filter",
+      "clear_all": "Clear all",
+      "price_from": "Minimum price",
+      "price_to": "Maximum price",
+      "sort_by": "Sort by:",
+      "showing": "Showing {{ first }}-{{ last }} of {{ total }} Products",
+      "pagination": "Pagination",
+      "previous": "Previous",
+      "next": "Next",
+      "no_products": "This collection has no products yet.",
+      "no_results": "No products match the selected filters.",
+      "no_filters": "Set up storefront filters in the Search & Discovery app to show them here."
     }
   }
 }

@@ -1,0 +1,50 @@
+@use '../abstracts/mixins' as mix;
+
+// Cấu trúc grid gần giống .featured-collection__grid — giữ riêng thay vì
+// @extend để hai section đổi độc lập được (related nằm cuối trang product,
+// khoảng cách trên/dưới khác với section trên home).
+.related-products {
+  // Custom element mặc định là display:inline -> padding-block không có tác dụng.
+  display: block;
+  padding-block: 72px;
+}
+
+.related-products__heading {
+  font-family: var(--font-heading--family);
+  font-size: var(--fs-hero-lg);
+  line-height: 1.2;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--color-foreground);
+}
+
+.related-products__grid {
+  display: grid;
+  // --columns do section đặt inline theo setting.
+  grid-template-columns: repeat(var(--columns, 4), minmax(0, 1fr));
+  gap: var(--space-5);
+  margin-top: 55px;
+  list-style: none;
+}
+
+@include mix.respond-to-max('lg') {
+  .related-products__grid {
+    // Tablet: tối đa 2 cột dù setting chọn 4-5, tránh card bị bóp quá hẹp.
+    grid-template-columns: repeat(min(var(--columns, 4), 2), minmax(0, 1fr));
+  }
+}
+
+@include mix.respond-to-max('md') {
+  .related-products {
+    padding-block: 40px;
+  }
+
+  .related-products__heading {
+    font-size: var(--fs-hero-sm);
+  }
+
+  .related-products__grid {
+    margin-top: var(--space-6);
+    gap: var(--space-4);
+  }
+}

@@ -12,9 +12,51 @@
     "main": {
       "type": "product",
       "settings": {}
+    },
+    "product-tabs": {
+      "type": "product-tabs",
+      "settings": {
+        "default_tab": "reviews",
+        "reviews_per_page": 6,
+        "show_write_review": true
+      },
+      "blocks": {
+        "faq-1": {
+          "type": "faq",
+          "settings": {
+            "question": "What sizes are available?",
+            "answer": "<p>This item runs true to size. Check the size chart for exact measurements.</p>"
+          }
+        },
+        "faq-2": {
+          "type": "faq",
+          "settings": {
+            "question": "How do I care for this item?",
+            "answer": "<p>Machine wash cold with like colours. Do not bleach. Tumble dry low.</p>"
+          }
+        },
+        "faq-3": {
+          "type": "faq",
+          "settings": {
+            "question": "What is the return policy?",
+            "answer": "<p>Returns are accepted within 30 days of delivery, unworn and with tags attached.</p>"
+          }
+        }
+      },
+      "block_order": ["faq-1", "faq-2", "faq-3"]
+    },
+    "related-products": {
+      "type": "related-products",
+      "settings": {
+        "heading": "You might also like",
+        "products_to_show": 4,
+        "columns": 4
+      }
     }
   },
   "order": [
-    "main"
+    "main",
+    "product-tabs",
+    "related-products"
   ]
 }

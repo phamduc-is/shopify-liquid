@@ -18,13 +18,16 @@
     "payment": "Payment",
     "primary": "Primary",
     "product": "Product",
+    "related_products": "Related products",
     "slide": "Slide",
     "slideshow": "Slideshow",
     "social": "Social media",
     "stats": "Stats",
     "testimonial": "Testimonial",
     "testimonials": "Testimonials",
-    "typography": "Typography"
+    "typography": "Typography",
+    "product_tabs": "Product tabs",
+    "faq": "FAQ"
   },
   "labels": {
     "autoplay": "Autoplay",
@@ -74,16 +77,35 @@
     "show_rating": "Show rating",
     "show_description": "Show description",
     "show_dynamic_checkout": "Show dynamic checkout buttons",
-    "quote": "Quote"
+    "quote": "Quote",
+    "recommendation_intent": "Recommendation source",
+    "default_tab": "Tab open by default",
+    "reviews_per_page": "Reviews per batch",
+    "show_write_review": "Show \"Write a Review\" button",
+    "write_review_url": "\"Write a Review\" link",
+    "question": "Question",
+    "answer": "Answer",
+    "products_per_page": "Products per page"
   },
   "info": {
     "logo_white": "Upload a white or light version — the band background is black.",
-    "dynamic_checkout": "Shop Pay / PayPal buttons — hidden by default because the Figma design only has \"Add to Cart\"."
+    "dynamic_checkout": "Shop Pay / PayPal buttons — hidden by default because the Figma design only has \"Add to Cart\".",
+    "recommendation_intent": "Complementary reads the list merchants set in the Search & Discovery app; Related uses Shopify’s automatic algorithm.",
+    "write_review_url": "Shopify has no built-in review form. Point this at a review app page or a contact page."
   },
   "options": {
     "page_width": {
       "narrow": "Narrow",
       "wide": "Wide"
+    },
+    "intent": {
+      "related": "Related (automatic)",
+      "complementary": "Complementary (Search & Discovery)"
+    },
+    "default_tab": {
+      "details": "Product Details",
+      "reviews": "Rating & Reviews",
+      "faqs": "FAQs"
     }
   }
 }

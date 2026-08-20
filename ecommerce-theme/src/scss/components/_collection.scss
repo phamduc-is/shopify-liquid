@@ -1,0 +1,494 @@
+@use '../abstracts/mixins' as mix;
+
+.collection {
+  // Custom element mặc định là display:inline.
+  display: block;
+  padding-block: var(--space-5) 72px;
+}
+
+.collection__breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-body-lg);
+  color: var(--color-text-secondary);
+}
+
+.collection__breadcrumb-current {
+  color: var(--color-foreground);
+}
+
+.collection__layout {
+  display: grid;
+  grid-template-columns: 295px minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+  margin-top: var(--space-6);
+}
+
+// ---------- Sidebar ----------
+
+// Sidebar là <dialog> ở mọi breakpoint. Desktop: ghi đè toàn bộ default của
+// <dialog> để nó hiện như 1 cột tĩnh. Author style thắng UA stylesheet nên
+// `display: block` vô hiệu hoá được `dialog:not([open]) { display: none }`.
+.collection__sidebar {
+  display: block;
+  position: static;
+  inset: auto;
+  width: auto;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: var(--space-5);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.collection__sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.collection__sidebar-title {
+  font-size: var(--fs-subheading);
+  font-weight: var(--fw-bold);
+}
+
+.collection__sidebar-close {
+  display: none; // Chỉ cần ở mobile
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+
+  svg {
+    width: var(--space-6);
+  }
+}
+
+// ---------- Chip filter đang active ----------
+
+.collection__active {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding-block: var(--space-4);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.collection__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border-radius: 999px;
+  background-color: var(--color-surface-secondary);
+  font-size: var(--fs-body);
+  color: var(--color-foreground);
+  text-decoration: none;
+
+  svg {
+    width: var(--space-3-5);
+  }
+}
+
+.collection__clear {
+  font-size: var(--fs-body);
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+}
+
+// ---------- Từng nhóm filter ----------
+
+.collection__filter {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.collection__filter-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block: var(--space-5);
+  font-size: var(--fs-body-lg);
+  font-weight: var(--fw-bold);
+  cursor: pointer;
+  // Bỏ tam giác mặc định của <summary>.
+  list-style: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  svg {
+    width: var(--space-5);
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+  }
+}
+
+.collection__filter[open] .collection__filter-summary svg {
+  transform: rotate(180deg);
+}
+
+.collection__filter-body {
+  padding-bottom: var(--space-5);
+}
+
+.collection__values {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  list-style: none;
+}
+
+.collection__value {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-body-lg);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+
+  &.is-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.collection__value-count {
+  margin-left: auto;
+  font-size: var(--fs-body);
+  color: var(--color-border);
+}
+
+.collection__checkbox {
+  width: var(--space-5);
+  height: var(--space-5);
+  flex-shrink: 0;
+  accent-color: var(--color-foreground);
+  cursor: inherit;
+}
+
+// ---------- Swatch màu ----------
+
+.collection__values--swatch {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
+  gap: var(--space-3);
+}
+
+.collection__values--swatch .collection__value {
+  position: relative;
+}
+
+// Ẩn checkbox nhưng vẫn giữ trong luồng để :checked style được ô swatch.
+.collection__values--swatch .collection__checkbox {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.collection__swatch {
+  width: 37px;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  // Nền mặc định: hiện khi tên màu không phải CSS color hợp lệ, lúc đó
+  // browser bỏ luôn khai báo inline style.
+  background-color: var(--color-surface-secondary);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+.collection__checkbox:checked + .collection__swatch {
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2), 0 0 0 2px var(--color-foreground);
+}
+
+// ---------- Filter giá ----------
+
+.collection__price {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.collection__price-field {
+  flex: 1;
+  min-width: 0;
+
+  input {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--style-border-radius-inputs);
+    font-size: var(--fs-body-lg);
+    color: var(--color-foreground);
+  }
+}
+
+.collection__price-separator {
+  color: var(--color-text-secondary);
+}
+
+.collection__apply {
+  width: 100%;
+  margin-top: var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  border-radius: 999px;
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+  font-size: var(--fs-body-lg);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+}
+
+// ---------- Cột phải ----------
+
+.collection__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.collection__title {
+  font-family: var(--font-heading--family);
+  font-size: var(--fs-hero-sm);
+  text-transform: capitalize;
+  color: var(--color-foreground);
+}
+
+.collection__toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.collection__count {
+  font-size: var(--fs-body-lg);
+  color: var(--color-text-secondary);
+}
+
+.collection__sort {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--fs-body-lg);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+
+  svg {
+    width: var(--space-5);
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+}
+
+.collection__sort-select {
+  border: none;
+  background: none;
+  font-size: var(--fs-body-lg);
+  font-weight: var(--fw-medium);
+  color: var(--color-foreground);
+  cursor: pointer;
+  // Bỏ mũi tên mặc định — đã có icon-chevron-down riêng.
+  appearance: none;
+}
+
+// Nút mở filter: desktop không cần vì sidebar luôn hiện.
+.collection__filters-toggle {
+  display: none;
+  align-items: center;
+  gap: var(--space-2);
+  height: 40px;
+  padding-inline: var(--space-4);
+  border: none;
+  border-radius: 999px;
+  background-color: var(--color-surface-secondary);
+  font-size: var(--fs-body);
+  color: var(--color-foreground);
+  cursor: pointer;
+
+  svg {
+    width: var(--space-5);
+  }
+}
+
+.collection__grid {
+  display: grid;
+  grid-template-columns: repeat(var(--columns, 3), minmax(0, 1fr));
+  gap: var(--space-5);
+  margin-top: var(--space-5);
+  list-style: none;
+}
+
+.collection__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding-block: 72px;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+// ---------- Pagination ----------
+
+.collection__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.collection__pages {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-inline: auto;
+  list-style: none;
+}
+
+.collection__page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-width: 40px;
+  height: 40px;
+  padding-inline: var(--space-2);
+  border-radius: var(--style-border-radius-buttons);
+  font-size: var(--fs-body-lg);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
+.collection__page.is-current {
+  background-color: var(--color-surface-secondary);
+  color: var(--color-foreground);
+}
+
+.collection__page--nav {
+  padding-inline: var(--space-4);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: var(--color-foreground);
+
+  svg {
+    width: var(--space-5);
+  }
+}
+
+.collection__page--gap {
+  cursor: default;
+}
+
+// ---------- Responsive ----------
+
+@include mix.respond-to-max('lg') {
+  .collection__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .collection__grid {
+    // Tablet: tối đa 2 cột dù setting chọn 3-4.
+    grid-template-columns: repeat(min(var(--columns, 3), 2), minmax(0, 1fr));
+  }
+
+  .collection__filters-toggle {
+    display: flex;
+  }
+
+  .collection__sidebar-close {
+    display: flex;
+  }
+
+  // Mobile: trả <dialog> về đúng hành vi modal — trượt lên từ dưới, có backdrop.
+  .collection__sidebar {
+    display: none;
+    position: fixed;
+    inset: auto 0 0 0;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    border: none;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    transform: translateY(100%);
+    transition:
+      transform 0.3s ease-out,
+      overlay 0.3s ease-out allow-discrete,
+      display 0.3s ease-out allow-discrete;
+  }
+
+  .collection__sidebar[open] {
+    display: block;
+    transform: translateY(0);
+  }
+
+  @starting-style {
+    .collection__sidebar[open] {
+      transform: translateY(100%);
+    }
+  }
+
+  .collection__sidebar::backdrop {
+    background-color: rgba(0, 0, 0, 0.4);
+    transition:
+      background-color 0.3s ease-out,
+      overlay 0.3s ease-out allow-discrete,
+      display 0.3s ease-out allow-discrete;
+  }
+
+  .collection__sidebar[open]::backdrop {
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+
+  @starting-style {
+    .collection__sidebar[open]::backdrop {
+      background-color: rgba(0, 0, 0, 0);
+    }
+  }
+}
+
+@include mix.respond-to-max('md') {
+  .collection {
+    padding-bottom: 40px;
+  }
+
+  .collection__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .collection__toolbar {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .collection__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+
+  .collection__pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .collection__page--nav span {
+    display: none;
+  }
+}

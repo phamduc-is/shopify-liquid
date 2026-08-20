@@ -1,0 +1,387 @@
+{% comment %}
+  Collection (category page) — sidebar filter + product grid + pagination.
+
+  Kiến trúc: 1 section, filter submit bằng form GET (không AJAX).
+  Server nhận query param -> trả về `collection.products` ĐÃ lọc sẵn, nên grid
+  phải đọc `collection.products` (không phải `collections['handle']` như
+  featured-collection, nếu không filter sẽ không có tác dụng gì).
+
+  Lợi ích của form GET so với AJAX: URL luôn phản ánh đúng trạng thái filter ->
+  back/forward, refresh, share link, và SEO đều hoạt động mà không cần code gì.
+
+  ⚠️ `collection.filters` chỉ trả về filter mà MERCHANT đã cấu hình (app Search
+  & Discovery). Chưa cấu hình -> sidebar rỗng, không phải bug. Filter dựa được
+  trên: Availability, Category, Price, Product tags, Product type, Vendor,
+  Variant options, Metafields.
+
+  https://shopify.dev/docs/storefronts/themes/navigation-search/filtering/storefront-filtering
+{% endcomment %}
+
+{%- paginate collection.products by section.settings.products_per_page -%}
+  {%- liquid
+    assign has_active_filters = false
+    for filter in collection.filters
+      if filter.active_values.size > 0
+        assign has_active_filters = true
+        break
+      endif
+      if filter.type == 'price_range'
+        if filter.min_value.value != null or filter.max_value.value != null
+          assign has_active_filters = true
+          break
+        endif
+      endif
+    endfor
+
+    assign first_item = paginate.current_offset | plus: 1
+    assign last_item = paginate.current_offset | plus: collection.products.size
+  -%}
+
+  <collection-filters class="collection full-width">
+    <div class="container">
+      {%- if section.settings.show_breadcrumb -%}
+        <nav class="collection__breadcrumb" aria-label="{{ 'products.breadcrumb' | t }}">
+          <a class="collection__breadcrumb-link" href="{{ routes.root_url }}">
+            {{- 'products.breadcrumb_home' | t -}}
+          </a>
+          <span class="collection__breadcrumb-separator" aria-hidden="true">/</span>
+          <span class="collection__breadcrumb-current" aria-current="page">{{ collection.title }}</span>
+        </nav>
+      {%- endif -%}
+
+      {%- comment -%}
+        1 form duy nhất bọc CẢ sidebar và ô sort: bấm "Apply Filter" hay đổi
+        sort đều gửi kèm toàn bộ state, không mất filter đang chọn.
+      {%- endcomment -%}
+      <form method="get" action="{{ collection.url }}" class="collection__layout">
+        {%- comment -%}
+          Sidebar là <dialog> ở MỌI breakpoint, chỉ khác cách style:
+          - Mobile: showModal() -> panel trượt lên, có sẵn backdrop + Esc.
+          - Desktop: CSS ghi đè `display: block; position: static` nên nó hiện
+            như 1 cột bình thường (author style thắng UA stylesheet).
+          Nhờ vậy markup filter chỉ tồn tại 1 bản — Dawn phải viết 2 bản
+          (desktop + mobile) nên snippet facets của họ dài tới 946 dòng.
+        {%- endcomment -%}
+        <dialog class="collection__sidebar" id="CollectionFilters-{{ section.id }}">
+          <div class="collection__sidebar-header">
+            <h2 class="collection__sidebar-title">{{ 'sections.collection.filters' | t }}</h2>
+            <button
+              type="button"
+              class="collection__sidebar-close"
+              data-filters-close
+              aria-label="{{ 'sections.collection.close_filters' | t }}"
+            >
+              {{ 'icon-close.svg' | inline_asset_content }}
+            </button>
+          </div>
+
+          {%- if collection.filters.size > 0 -%}
+            {%- if has_active_filters -%}
+              <div class="collection__active">
+                {%- for filter in collection.filters -%}
+                  {%- for value in filter.active_values -%}
+                    <a class="collection__chip" href="{{ value.url_to_remove }}">
+                      {{ value.label }}
+                      {{ 'icon-close.svg' | inline_asset_content }}
+                    </a>
+                  {%- endfor -%}
+
+                  {%- if filter.type == 'price_range' -%}
+                    {%- if filter.min_value.value != null or filter.max_value.value != null -%}
+                      <a class="collection__chip" href="{{ filter.url_to_remove }}">
+                        {{ filter.min_value.value | default: 0 | money }}
+                        –
+                        {{ filter.max_value.value | default: filter.range_max | money }}
+                        {{ 'icon-close.svg' | inline_asset_content }}
+                      </a>
+                    {%- endif -%}
+                  {%- endif -%}
+                {%- endfor -%}
+
+                <a class="collection__clear" href="{{ collection.url }}">
+                  {{- 'sections.collection.clear_all' | t -}}
+                </a>
+              </div>
+            {%- endif -%}
+
+            {%- for filter in collection.filters -%}
+              <details class="collection__filter" open>
+                <summary class="collection__filter-summary">
+                  {{ filter.label }}
+                  {{ 'icon-chevron-down.svg' | inline_asset_content }}
+                </summary>
+
+                <div class="collection__filter-body">
+                  {%- case filter.type -%}
+                    {%- when 'list', 'boolean' -%}
+                      {%- liquid
+                        # `presentation` do merchant đặt trong Search & Discovery
+                        # (text/swatch/image). Nhiều store để mặc định nên thêm
+                        # điều kiện theo tên filter để vẫn ra swatch đúng design.
+                        assign presentation = filter.presentation | default: 'text'
+                        assign filter_label = filter.label | downcase
+                        assign show_swatch = false
+                        if presentation == 'swatch'
+                          assign show_swatch = true
+                        elsif filter_label contains 'color' or filter_label contains 'colour'
+                          assign show_swatch = true
+                        endif
+                      -%}
+
+                      <ul class="collection__values{% if show_swatch %} collection__values--swatch{% endif %}">
+                        {%- for value in filter.values -%}
+                          {%- liquid
+                            assign is_disabled = false
+                            if value.count == 0 and value.active == false
+                              assign is_disabled = true
+                            endif
+                          -%}
+                          <li>
+                            <label class="collection__value{% if is_disabled %} is-disabled{% endif %}">
+                              <input
+                                type="checkbox"
+                                class="collection__checkbox"
+                                name="{{ value.param_name }}"
+                                value="{{ value.value }}"
+                                {% if value.active %}checked{% endif %}
+                                {% if is_disabled %}disabled{% endif %}
+                              >
+
+                              {%- if show_swatch -%}
+                                {%- comment -%}
+                                  Tên màu dùng thẳng làm CSS color. Tên không hợp
+                                  lệ ("Off White") -> browser bỏ khai báo inline,
+                                  class giữ nền xám mặc định nên ô vẫn nhìn thấy.
+                                {%- endcomment -%}
+                                <span
+                                  class="collection__swatch"
+                                  style="background-color: {{ value.label | downcase | replace: ' ', '' }}"
+                                ></span>
+                                <span class="visually-hidden">{{ value.label }}</span>
+                              {%- else -%}
+                                <span class="collection__value-label">{{ value.label }}</span>
+                                <span class="collection__value-count">{{ value.count }}</span>
+                              {%- endif -%}
+                            </label>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+
+                    {%- when 'price_range' -%}
+                      <div class="collection__price">
+                        <label class="collection__price-field">
+                          <span class="visually-hidden">{{ 'sections.collection.price_from' | t }}</span>
+                          <input
+                            type="number"
+                            name="{{ filter.min_value.param_name }}"
+                            {% if filter.min_value.value %}
+                              value="{{ filter.min_value.value | money_without_currency }}"
+                            {% endif %}
+                            min="0"
+                            max="{{ filter.range_max | money_without_currency }}"
+                            inputmode="decimal"
+                            placeholder="0"
+                          >
+                        </label>
+                        <span class="collection__price-separator" aria-hidden="true">–</span>
+                        <label class="collection__price-field">
+                          <span class="visually-hidden">{{ 'sections.collection.price_to' | t }}</span>
+                          <input
+                            type="number"
+                            name="{{ filter.max_value.param_name }}"
+                            {% if filter.max_value.value %}
+                              value="{{ filter.max_value.value | money_without_currency }}"
+                            {% endif %}
+                            min="0"
+                            max="{{ filter.range_max | money_without_currency }}"
+                            inputmode="decimal"
+                            placeholder="{{ filter.range_max | money_without_currency }}"
+                          >
+                        </label>
+                      </div>
+                  {%- endcase -%}
+                </div>
+              </details>
+            {%- endfor -%}
+
+            <button type="submit" class="collection__apply">
+              {{ 'sections.collection.apply_filter' | t }}
+            </button>
+          {%- elsif request.design_mode -%}
+            <p class="collection__empty">{{ 'sections.collection.no_filters' | t }}</p>
+          {%- endif -%}
+        </dialog>
+
+        <div class="collection__main">
+          <div class="collection__header">
+            <h1 class="collection__title">{{ collection.title }}</h1>
+
+            <div class="collection__toolbar">
+              {%- if paginate.items > 0 -%}
+                <p class="collection__count">
+                  {{- 'sections.collection.showing' | t: first: first_item, last: last_item, total: paginate.items -}}
+                </p>
+              {%- endif -%}
+
+              <label class="collection__sort">
+                <span class="collection__sort-label">{{ 'sections.collection.sort_by' | t }}</span>
+                {%- assign sort_by = collection.sort_by | default: collection.default_sort_by -%}
+                <select name="sort_by" class="collection__sort-select" data-sort-select>
+                  {%- for option in collection.sort_options -%}
+                    <option value="{{ option.value }}" {% if option.value == sort_by %}selected{% endif %}>
+                      {{ option.name }}
+                    </option>
+                  {%- endfor -%}
+                </select>
+                {{ 'icon-chevron-down.svg' | inline_asset_content }}
+              </label>
+
+              {%- comment -%}
+                Nút mở dialog filter — chỉ hiện ở mobile (CSS), vì desktop
+                sidebar luôn mở sẵn.
+              {%- endcomment -%}
+              <button
+                type="button"
+                class="collection__filters-toggle"
+                data-filters-open
+                aria-controls="CollectionFilters-{{ section.id }}"
+              >
+                {{ 'icon-filter.svg' | inline_asset_content }}
+                {{ 'sections.collection.filters' | t }}
+              </button>
+            </div>
+          </div>
+
+          {%- if collection.products.size > 0 -%}
+            <ul class="collection__grid" style="--columns: {{ section.settings.columns }}">
+              {%- for product in collection.products -%}
+                <li>{% render 'product-card', product: product %}</li>
+              {%- endfor -%}
+            </ul>
+
+            {%- if paginate.pages > 1 -%}
+              <nav class="collection__pagination" aria-label="{{ 'sections.collection.pagination' | t }}">
+                {%- if paginate.previous.is_link -%}
+                  <a class="collection__page collection__page--nav" href="{{ paginate.previous.url }}" rel="prev">
+                    {{ 'icon-arrow-left.svg' | inline_asset_content }}
+                    <span>{{ 'sections.collection.previous' | t }}</span>
+                  </a>
+                {%- endif -%}
+
+                <ol class="collection__pages">
+                  {%- for part in paginate.parts -%}
+                    <li>
+                      {%- if part.is_link -%}
+                        <a class="collection__page" href="{{ part.url }}">{{ part.title }}</a>
+                      {%- else -%}
+                        {%- assign part_number = part.title | plus: 0 -%}
+                        {%- if part_number == paginate.current_page -%}
+                          <span class="collection__page is-current" aria-current="page">{{ part.title }}</span>
+                        {%- else -%}
+                          <span class="collection__page collection__page--gap">{{ part.title }}</span>
+                        {%- endif -%}
+                      {%- endif -%}
+                    </li>
+                  {%- endfor -%}
+                </ol>
+
+                {%- if paginate.next.is_link -%}
+                  <a class="collection__page collection__page--nav" href="{{ paginate.next.url }}" rel="next">
+                    <span>{{ 'sections.collection.next' | t }}</span>
+                    {{ 'icon-arrow-right.svg' | inline_asset_content }}
+                  </a>
+                {%- endif -%}
+              </nav>
+            {%- endif -%}
+          {%- else -%}
+            {%- comment -%}
+              Phân biệt 2 trạng thái rỗng: filter lọc hết vs collection không có
+              sản phẩm nào — hành động tiếp theo của khách khác nhau hoàn toàn.
+            {%- endcomment -%}
+            <div class="collection__empty">
+              {%- if has_active_filters -%}
+                <p>{{ 'sections.collection.no_results' | t }}</p>
+                <a class="collection__clear" href="{{ collection.url }}">
+                  {{- 'sections.collection.clear_all' | t -}}
+                </a>
+              {%- else -%}
+                <p>{{ 'sections.collection.no_products' | t }}</p>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        </div>
+      </form>
+    </div>
+  </collection-filters>
+{%- endpaginate -%}
+
+{% javascript %}
+  (function () {
+    class CollectionFilters extends HTMLElement {
+      connectedCallback() {
+        this.dialog = this.querySelector('dialog');
+        this.form = this.querySelector('form');
+
+        // Đổi sort -> submit ngay, không phải bấm "Apply Filter".
+        // Không có JS thì nút "Apply Filter" vẫn gửi kèm giá trị sort.
+        this.querySelector('[data-sort-select]')?.addEventListener('change', () => {
+          this.form?.requestSubmit();
+        });
+
+        if (!this.dialog) return;
+
+        this.querySelector('[data-filters-open]')?.addEventListener('click', () => {
+          this.dialog.showModal();
+        });
+
+        this.querySelector('[data-filters-close]')?.addEventListener('click', () => {
+          this.dialog.close();
+        });
+
+        // Click vào backdrop: target là chính <dialog> chứ không phải con của nó.
+        this.dialog.addEventListener('click', (event) => {
+          if (event.target === this.dialog) this.dialog.close();
+        });
+      }
+    }
+
+    if (!customElements.get('collection-filters')) {
+      customElements.define('collection-filters', CollectionFilters);
+    }
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "t:general.collection",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumb",
+      "label": "t:labels.show_breadcrumb",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "t:labels.products_per_page",
+      "min": 6,
+      "max": 36,
+      "step": 3,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "t:labels.columns",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    }
+  ],
+  "enabled_on": {
+    "templates": ["collection"]
+  }
+}
+{% endschema %}

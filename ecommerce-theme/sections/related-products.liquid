@@ -1,0 +1,158 @@
+{% comment %}
+  Related products — "You might also like" dưới main product.
+
+  Object `recommendations` CHỈ có dữ liệu khi section được request qua Product
+  Recommendations API. Render thẳng từ product.json thì `performed == false`,
+  nên lần render đầu section cố tình để trống và custom element bên dưới fetch
+  lại chính section này rồi thay nội dung vào.
+
+  https://shopify.dev/docs/storefronts/themes/product-merchandising/recommendations
+{% endcomment %}
+
+{%- comment -%}
+  Trong {% liquid %} mỗi dòng là 1 tag riêng, không xuống dòng giữa chuỗi filter
+  được — nên nối URL qua nhiều lệnh assign thay vì một chuỗi filter dài.
+
+  `intent=complementary` đọc đúng danh sách merchant set trong app Search &
+  Discovery; `related` là thuật toán tự động của Shopify.
+{%- endcomment -%}
+{%- liquid
+  assign recommendations_url = routes.product_recommendations_url | append: '?section_id=' | append: section.id
+  assign recommendations_url = recommendations_url | append: '&product_id=' | append: product.id
+  assign recommendations_url = recommendations_url | append: '&limit=' | append: section.settings.products_to_show
+  assign recommendations_url = recommendations_url | append: '&intent=' | append: section.settings.intent
+-%}
+
+{%- comment -%}
+  Custom element thay vì <div>: connectedCallback tự chạy mỗi lần node được
+  chèn vào DOM, nên Theme Editor render lại section là tự init — không cần
+  listener 'shopify:section:load'.
+{%- endcomment -%}
+<related-products class="related-products full-width" data-recommendations-url="{{ recommendations_url }}">
+  <div class="container">
+    {%- if recommendations.performed and recommendations.products_count > 0 -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="related-products__heading">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+
+      <ul class="related-products__grid" style="--columns: {{ section.settings.columns }}">
+        {%- for recommended_product in recommendations.products -%}
+          <li>{% render 'product-card', product: recommended_product %}</li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+</related-products>
+
+{% javascript %}
+  (function () {
+    class RelatedProducts extends HTMLElement {
+      connectedCallback() {
+        // Đã có grid sẵn => đây là HTML trả về từ chính API, không fetch lại nữa.
+        if (!this.dataset.recommendationsUrl || this.querySelector('.related-products__grid')) return;
+
+        // Section nằm cuối trang product: chỉ fetch khi user scroll gần tới,
+        // để request này không cạnh tranh băng thông với ảnh sản phẩm chính.
+        this.observer?.unobserve(this);
+        this.observer = new IntersectionObserver(
+          (entries, observer) => {
+            if (!entries[0].isIntersecting) return;
+
+            observer.unobserve(this);
+            this.loadRecommendations();
+          },
+          { rootMargin: '0px 0px 400px 0px' }
+        );
+        this.observer.observe(this);
+      }
+
+      disconnectedCallback() {
+        this.observer?.unobserve(this);
+      }
+
+      async loadRecommendations() {
+        try {
+          const response = await fetch(this.dataset.recommendationsUrl);
+
+          if (!response.ok) return;
+
+          const html = await response.text();
+          // DOMParser tạo document riêng, custom element trong đó KHÔNG được
+          // upgrade -> connectedCallback không chạy -> không fetch đệ quy.
+          const fresh = new DOMParser().parseFromString(html, 'text/html').querySelector('related-products');
+
+          // Không có sản phẩm gợi ý (store mới, hoặc chưa set trong Search &
+          // Discovery) -> giữ section rỗng.
+          if (!fresh || !fresh.querySelector('.related-products__grid')) return;
+
+          // innerHTML chứ không outerHTML: outerHTML sẽ xoá luôn data-attribute
+          // và shopify_attributes của section, làm hỏng Theme Editor.
+          this.innerHTML = fresh.innerHTML;
+        } catch (error) {
+          console.error('[related-products]', error);
+        }
+      }
+    }
+
+    if (!customElements.get('related-products')) {
+      customElements.define('related-products', RelatedProducts);
+    }
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "t:general.related_products",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "You might also like"
+    },
+    {
+      "type": "select",
+      "id": "intent",
+      "label": "t:labels.recommendation_intent",
+      "info": "t:info.recommendation_intent",
+      "options": [
+        {
+          "value": "related",
+          "label": "t:options.intent.related"
+        },
+        {
+          "value": "complementary",
+          "label": "t:options.intent.complementary"
+        }
+      ],
+      "default": "related"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "t:labels.products_to_show",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "t:labels.columns",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.related_products"
+    }
+  ],
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  }
+}
+{% endschema %}

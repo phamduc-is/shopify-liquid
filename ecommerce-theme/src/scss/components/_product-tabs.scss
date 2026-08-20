@@ -1,0 +1,342 @@
+@use '../abstracts/mixins' as mix;
+
+.product-tabs {
+  // Custom element mặc định là display:inline -> padding không có tác dụng.
+  display: block;
+  padding-block: 0 72px;
+}
+
+// ---------- Tab bar ----------
+
+.product-tabs__list {
+  display: flex;
+  gap: var(--space-6);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.product-tabs__list::-webkit-scrollbar {
+  display: none;
+}
+
+.product-tabs__tab {
+  flex-shrink: 0;
+  padding: var(--space-5) var(--space-2);
+  border: none;
+  background: none;
+  font-size: var(--fs-body-lg);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+  // Gạch chân dùng box-shadow thay border-bottom: không cộng thêm chiều cao
+  // nên tab active và tab thường không bị lệch 1px.
+  box-shadow: inset 0 -1px 0 transparent;
+  transition: color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-tabs__tab[aria-selected='true'] {
+  font-weight: var(--fw-medium);
+  color: var(--color-foreground);
+  box-shadow: inset 0 -2px 0 var(--color-foreground);
+}
+
+.product-tabs__panel {
+  padding-top: var(--space-6);
+}
+
+.product-tabs__panel:focus-visible {
+  outline: 2px solid var(--color-foreground);
+  outline-offset: 4px;
+}
+
+.product-tabs__empty {
+  padding-block: var(--space-6);
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+// ---------- Tab 1: Product Details ----------
+
+.product-tabs__richtext {
+  max-width: 46rem;
+  font-size: var(--fs-body-lg);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+
+  > * + * {
+    margin-top: var(--space-4);
+  }
+
+  h2,
+  h3,
+  h4 {
+    color: var(--color-foreground);
+  }
+
+  ul,
+  ol {
+    padding-left: var(--space-5);
+    list-style: revert;
+  }
+}
+
+// ---------- Tab 2: Rating & Reviews ----------
+
+.product-tabs__reviews-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.product-tabs__reviews-title {
+  font-size: var(--fs-heading);
+  font-weight: var(--fw-bold);
+  color: var(--color-foreground);
+}
+
+.product-tabs__reviews-count {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-regular);
+  color: var(--color-text-secondary);
+
+  // Dấu ngoặc đặt ở CSS thay vì trong Liquid: JS chỉ ghi số vào textContent
+  // (khi filter) nên không phải ghép lại chuỗi "(N)" trong JS.
+  &::before {
+    content: '(';
+  }
+
+  &::after {
+    content: ')';
+  }
+}
+
+.product-tabs__reviews-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.product-tabs__control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 48px;
+  padding-inline: var(--space-5);
+  border-radius: 999px;
+  background-color: var(--color-surface-secondary);
+  color: var(--color-foreground);
+  cursor: pointer;
+
+  svg {
+    width: var(--space-5);
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+}
+
+// Ô filter chỉ hiện icon: <select> phủ trong suốt lên toàn bộ nút để vẫn
+// bấm được, nhưng không chiếm chỗ đẩy icon lệch đi.
+.product-tabs__control--icon {
+  padding-inline: var(--space-4);
+
+  .product-tabs__select {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    opacity: 0;
+  }
+}
+
+.product-tabs__select {
+  border: none;
+  background: none;
+  font-size: var(--fs-body-lg);
+  font-weight: var(--fw-medium);
+  color: inherit;
+  cursor: pointer;
+  // Bỏ mũi tên mặc định của trình duyệt — đã có icon-chevron-down riêng.
+  appearance: none;
+}
+
+.product-tabs__write-review {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  padding-inline: var(--space-6);
+  border-radius: 999px;
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+  font-size: var(--fs-body-lg);
+  font-weight: var(--fw-medium);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.product-tabs__reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+  margin-top: var(--space-5);
+  list-style: none;
+}
+
+// Cần rule riêng: [hidden] chỉ đặt display:none ở mức mặc định, sẽ bị grid
+// item / display khác trong stylesheet ghi đè.
+.product-tabs__review[hidden] {
+  display: none;
+}
+
+.product-tabs__review {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 28px 32px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-lg);
+}
+
+.product-tabs__review-author {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.product-tabs__review-name {
+  font-size: var(--fs-subheading);
+  font-weight: var(--fw-bold);
+  color: var(--color-foreground);
+}
+
+.product-tabs__review-verified {
+  display: flex;
+  color: var(--color-success);
+
+  svg {
+    width: var(--space-5);
+  }
+}
+
+.product-tabs__review-body {
+  font-size: var(--fs-body-lg);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.product-tabs__review-date {
+  margin-top: auto;
+  font-size: var(--fs-body-lg);
+  font-weight: var(--fw-medium);
+  color: var(--color-text-secondary);
+}
+
+.product-tabs__load-more {
+  display: block;
+  margin: 36px auto 0;
+  padding: var(--space-4) 44px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 999px;
+  background: none;
+  font-size: var(--fs-body-lg);
+  font-weight: var(--fw-medium);
+  color: var(--color-foreground);
+  cursor: pointer;
+}
+
+// ---------- Tab 3: FAQs ----------
+
+.product-tabs__faqs {
+  max-width: 46rem;
+  list-style: none;
+}
+
+.product-tabs__faq {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.product-tabs__faq-question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block: var(--space-5);
+  font-size: var(--fs-body-lg);
+  font-weight: var(--fw-medium);
+  color: var(--color-foreground);
+  cursor: pointer;
+  // Bỏ tam giác mặc định của <summary> ở mọi trình duyệt.
+  list-style: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  svg {
+    width: var(--space-5);
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+  }
+}
+
+.product-tabs__faq[open] .product-tabs__faq-question svg {
+  transform: rotate(180deg);
+}
+
+.product-tabs__faq-answer {
+  padding-bottom: var(--space-5);
+  font-size: var(--fs-body-lg);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+// ---------- Responsive ----------
+
+@include mix.respond-to-max('lg') {
+  .product-tabs__reviews-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@include mix.respond-to-max('md') {
+  .product-tabs {
+    padding-bottom: 40px;
+  }
+
+  .product-tabs__list {
+    gap: var(--space-4);
+  }
+
+  .product-tabs__tab {
+    padding-block: var(--space-4);
+    font-size: var(--fs-body);
+  }
+
+  .product-tabs__reviews-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .product-tabs__reviews-controls {
+    width: 100%;
+    // Hàng control tràn ngang trên mobile thì cho cuộn thay vì xuống dòng lộn xộn.
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .product-tabs__reviews-controls::-webkit-scrollbar {
+    display: none;
+  }
+
+  .product-tabs__control,
+  .product-tabs__write-review {
+    height: 40px;
+    font-size: var(--fs-body);
+  }
+
+  .product-tabs__review {
+    padding: var(--space-6);
+  }
+}

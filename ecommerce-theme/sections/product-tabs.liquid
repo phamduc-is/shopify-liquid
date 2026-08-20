@@ -1,0 +1,466 @@
+{% comment %}
+  Product tabs — "Product Details / Rating & Reviews / FAQs" dưới main product.
+
+  Nguồn dữ liệu của từng tab, và VÌ SAO mỗi tab dùng cơ chế khác nhau:
+
+  1. Product Details -> metafield `custom.product_details` (rich text).
+     Không dùng lại `product.description` vì cột product info bên trên đã render
+     mô tả ngắn đó rồi, in lại lần nữa là trùng nội dung.
+
+  2. Rating & Reviews -> metafield `custom.reviews`
+     (type list.metaobject_reference, trỏ tới metaobject `product_review`).
+     KHÔNG dùng theme block: block/settings thuộc templates/product.json nên
+     mọi sản phẩm sẽ dùng chung 1 danh sách review — vô nghĩa. Review phải gắn
+     vào chính product, nên data buộc phải nằm ở metafield của product.
+     Kèm block `@app` để review app (Judge.me, Loox...) cắm widget vào sau.
+
+  3. FAQs -> theme block `faq`. Ở đây block LÀ đúng, vì FAQ thường giống nhau
+     cho mọi sản phẩm.
+
+  Setup phía Admin (theme không tạo được metaobject definition):
+    Content > Metaobjects > Add definition, type handle `product_review`, fields:
+      author      | Single line text
+      rating      | Integer (1-5)
+      body        | Multi-line text
+      review_date | Date
+      verified    | True or false
+    Rồi: Settings > Custom data > Products > Add definition
+      namespace.key `custom.reviews`, type List of metaobjects -> Product review
+      namespace.key `custom.product_details`, type Rich text
+{% endcomment %}
+
+{%- liquid
+  assign details = product.metafields.custom.product_details
+  assign reviews = product.metafields.custom.reviews.value
+  assign faq_blocks = section.blocks | where: 'type', 'faq'
+  assign app_blocks = section.blocks | where: 'type', '@app'
+
+  assign details_id = 'ProductTabsDetails-' | append: section.id
+  assign reviews_id = 'ProductTabsReviews-' | append: section.id
+  assign faqs_id = 'ProductTabsFaqs-' | append: section.id
+-%}
+
+<product-tabs class="product-tabs full-width" data-reviews-per-page="{{ section.settings.reviews_per_page }}">
+  <div class="container">
+    <div class="product-tabs__list" role="tablist" aria-label="{{ 'sections.product_tabs.tablist_label' | t }}">
+      {%- comment -%}
+        aria-selected + tabIndex + panel[hidden] render sẵn từ setting default_tab
+        để không bị nháy đổi tab lúc JS chưa chạy.
+      {%- endcomment -%}
+      {%- assign tabs = 'details,reviews,faqs' | split: ',' -%}
+      {%- for tab in tabs -%}
+        {%- liquid
+          assign is_active = false
+          if section.settings.default_tab == tab
+            assign is_active = true
+          endif
+
+          case tab
+            when 'details'
+              assign panel_id = details_id
+            when 'reviews'
+              assign panel_id = reviews_id
+            else
+              assign panel_id = faqs_id
+          endcase
+
+          assign label_key = 'sections.product_tabs.tab_' | append: tab
+        -%}
+        <button
+          type="button"
+          role="tab"
+          id="{{ panel_id }}-tab"
+          class="product-tabs__tab"
+          aria-controls="{{ panel_id }}"
+          aria-selected="{% if is_active %}true{% else %}false{% endif %}"
+          tabindex="{% if is_active %}0{% else %}-1{% endif %}"
+        >
+          {{ label_key | t }}
+        </button>
+      {%- endfor -%}
+    </div>
+
+    {%- comment -%} ---------- Tab 1: Product Details ---------- {%- endcomment -%}
+    <div
+      id="{{ details_id }}"
+      class="product-tabs__panel product-tabs__panel--details"
+      role="tabpanel"
+      aria-labelledby="{{ details_id }}-tab"
+      tabindex="0"
+      {% unless section.settings.default_tab == 'details' %}hidden{% endunless %}
+    >
+      {%- if details != blank -%}
+        <div class="product-tabs__richtext">{{ details }}</div>
+      {%- elsif request.design_mode -%}
+        <p class="product-tabs__empty">{{ 'sections.product_tabs.empty_details' | t }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} ---------- Tab 2: Rating & Reviews ---------- {%- endcomment -%}
+    <div
+      id="{{ reviews_id }}"
+      class="product-tabs__panel product-tabs__panel--reviews"
+      role="tabpanel"
+      aria-labelledby="{{ reviews_id }}-tab"
+      tabindex="0"
+      {% unless section.settings.default_tab == 'reviews' %}hidden{% endunless %}
+    >
+      <div class="product-tabs__reviews-header">
+        <h3 class="product-tabs__reviews-title">
+          {{ 'sections.product_tabs.all_reviews' | t }}
+          <span class="product-tabs__reviews-count" data-reviews-count>{{ reviews.size }}</span>
+        </h3>
+
+        <div class="product-tabs__reviews-controls">
+          <label class="product-tabs__control product-tabs__control--icon">
+            <span class="visually-hidden">{{ 'sections.product_tabs.filter_label' | t }}</span>
+            {{ 'icon-filter.svg' | inline_asset_content }}
+            <select class="product-tabs__select" data-reviews-filter>
+              <option value="">{{ 'sections.product_tabs.filter_all' | t }}</option>
+              {%- for i in (1..5) reversed -%}
+                <option value="{{ i }}">{{ 'sections.product_tabs.filter_stars' | t: count: i }}</option>
+              {%- endfor -%}
+            </select>
+          </label>
+
+          <label class="product-tabs__control">
+            <span class="visually-hidden">{{ 'sections.product_tabs.sort_label' | t }}</span>
+            <select class="product-tabs__select" data-reviews-sort>
+              <option value="latest">{{ 'sections.product_tabs.sort_latest' | t }}</option>
+              <option value="oldest">{{ 'sections.product_tabs.sort_oldest' | t }}</option>
+              <option value="highest">{{ 'sections.product_tabs.sort_highest' | t }}</option>
+              <option value="lowest">{{ 'sections.product_tabs.sort_lowest' | t }}</option>
+            </select>
+            {{ 'icon-chevron-down.svg' | inline_asset_content }}
+          </label>
+
+          {%- if section.settings.show_write_review -%}
+            <a
+              class="product-tabs__write-review"
+              href="{{ section.settings.write_review_url | default: '#' }}"
+            >
+              {{ 'sections.product_tabs.write_review' | t }}
+            </a>
+          {%- endif -%}
+        </div>
+      </div>
+
+      {%- if reviews.size > 0 -%}
+        <ul class="product-tabs__reviews-grid" data-reviews-list>
+          {%- for review in reviews -%}
+            {%- comment -%}
+              data-rating / data-date để JS sort + filter đọc trực tiếp qua
+              dataset, không phải parse lại text trong DOM.
+            {%- endcomment -%}
+            {%- assign review_date = review.review_date | date: '%B %d, %Y' -%}
+            <li
+              class="product-tabs__review"
+              data-rating="{{ review.rating | round }}"
+              data-date="{{ review.review_date | date: '%Y-%m-%d' }}"
+            >
+              {% render 'rating-stars', rating: review.rating, show_value: false %}
+
+              <div class="product-tabs__review-author">
+                <span class="product-tabs__review-name">{{ review.author }}</span>
+                {%- if review.verified -%}
+                  <span
+                    class="product-tabs__review-verified"
+                    title="{{ 'sections.product_tabs.verified' | t }}"
+                  >
+                    {{ 'icon-verified.svg' | inline_asset_content }}
+                  </span>
+                {%- endif -%}
+              </div>
+
+              {%- if review.body != blank -%}
+                <p class="product-tabs__review-body">{{ review.body }}</p>
+              {%- endif -%}
+
+              {%- if review.review_date != blank -%}
+                <p class="product-tabs__review-date">
+                  {{- 'sections.product_tabs.posted_on' | t: date: review_date -}}
+                </p>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+
+        <button type="button" class="product-tabs__load-more" data-reviews-load-more hidden>
+          {{ 'sections.product_tabs.load_more' | t }}
+        </button>
+      {%- elsif request.design_mode -%}
+        <p class="product-tabs__empty">{{ 'sections.product_tabs.empty_reviews' | t }}</p>
+      {%- endif -%}
+
+      {%- comment -%}
+        Slot cho review app cắm widget vào — nằm sau grid để không đẩy nội dung
+        của theme xuống dưới.
+      {%- endcomment -%}
+      {%- for block in app_blocks -%}
+        {% render block %}
+      {%- endfor -%}
+    </div>
+
+    {%- comment -%} ---------- Tab 3: FAQs ---------- {%- endcomment -%}
+    <div
+      id="{{ faqs_id }}"
+      class="product-tabs__panel product-tabs__panel--faqs"
+      role="tabpanel"
+      aria-labelledby="{{ faqs_id }}-tab"
+      tabindex="0"
+      {% unless section.settings.default_tab == 'faqs' %}hidden{% endunless %}
+    >
+      {%- if faq_blocks.size > 0 -%}
+        <ul class="product-tabs__faqs">
+          {%- for block in faq_blocks -%}
+            <li>
+              {%- comment -%}
+                <details> native: có sẵn đóng/mở, keyboard, và không cần JS.
+              {%- endcomment -%}
+              <details class="product-tabs__faq" {{ block.shopify_attributes }}>
+                <summary class="product-tabs__faq-question">
+                  {{ block.settings.question }}
+                  {{ 'icon-chevron-down.svg' | inline_asset_content }}
+                </summary>
+                {%- if block.settings.answer != blank -%}
+                  <div class="product-tabs__faq-answer">{{ block.settings.answer }}</div>
+                {%- endif -%}
+              </details>
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- elsif request.design_mode -%}
+        <p class="product-tabs__empty">{{ 'sections.product_tabs.empty_faqs' | t }}</p>
+      {%- endif -%}
+    </div>
+  </div>
+</product-tabs>
+
+{% javascript %}
+  (function () {
+    class ProductTabs extends HTMLElement {
+      // connectedCallback tự chạy mỗi lần node vào DOM -> Theme Editor render
+      // lại section là tự init, không cần listener 'shopify:section:load'.
+      connectedCallback() {
+        this.tabs = Array.from(this.querySelectorAll('[role="tab"]'));
+        this.panels = Array.from(this.querySelectorAll('[role="tabpanel"]'));
+
+        if (this.tabs.length === 0) return;
+
+        this.tabs.forEach((tab) => {
+          tab.addEventListener('click', () => this.selectTab(tab));
+        });
+
+        this.onKeydown = this.onKeydown.bind(this);
+        this.addEventListener('keydown', this.onKeydown);
+
+        this.initReviews();
+      }
+
+      selectTab(tab) {
+        const index = this.tabs.indexOf(tab);
+
+        if (index === -1) return;
+
+        // Ghép tab <-> panel theo INDEX, không querySelector theo id: section.id
+        // có thể chứa ký tự làm hỏng CSS selector.
+        this.tabs.forEach((item, i) => {
+          item.setAttribute('aria-selected', i === index ? 'true' : 'false');
+          item.tabIndex = i === index ? 0 : -1;
+        });
+
+        this.panels.forEach((panel, i) => {
+          panel.hidden = i !== index;
+        });
+      }
+
+      onKeydown(event) {
+        const index = this.tabs.indexOf(document.activeElement);
+
+        if (index === -1) return;
+
+        let next;
+
+        switch (event.key) {
+          case 'ArrowRight':
+            next = (index + 1) % this.tabs.length;
+            break;
+          case 'ArrowLeft':
+            next = (index - 1 + this.tabs.length) % this.tabs.length;
+            break;
+          case 'Home':
+            next = 0;
+            break;
+          case 'End':
+            next = this.tabs.length - 1;
+            break;
+          default:
+            return;
+        }
+
+        event.preventDefault();
+        this.selectTab(this.tabs[next]);
+        this.tabs[next].focus();
+      }
+
+      initReviews() {
+        this.reviewList = this.querySelector('[data-reviews-list]');
+
+        if (!this.reviewList) return;
+
+        this.reviews = Array.from(this.reviewList.children);
+        this.filterSelect = this.querySelector('[data-reviews-filter]');
+        this.sortSelect = this.querySelector('[data-reviews-sort]');
+        this.loadMoreButton = this.querySelector('[data-reviews-load-more]');
+        this.countElement = this.querySelector('[data-reviews-count]');
+        this.step = Number(this.dataset.reviewsPerPage) || 6;
+        this.shown = this.step;
+
+        this.filterSelect?.addEventListener('change', () => {
+          // Đổi filter -> quay lại batch đầu, không giữ số đã "load more" cũ.
+          this.shown = this.step;
+          this.renderReviews();
+        });
+
+        this.sortSelect?.addEventListener('change', () => this.renderReviews());
+
+        this.loadMoreButton?.addEventListener('click', () => {
+          this.shown += this.step;
+          this.renderReviews();
+        });
+
+        this.renderReviews();
+      }
+
+      renderReviews() {
+        const rating = this.filterSelect?.value || '';
+        const sort = this.sortSelect?.value || 'latest';
+
+        const visible = rating
+          ? this.reviews.filter((review) => review.dataset.rating === rating)
+          : Array.from(this.reviews);
+
+        // data-date là 'YYYY-MM-DD' nên so sánh chuỗi cũng ra đúng thứ tự.
+        visible.sort((a, b) => {
+          switch (sort) {
+            case 'oldest':
+              return a.dataset.date.localeCompare(b.dataset.date);
+            case 'highest':
+              return Number(b.dataset.rating) - Number(a.dataset.rating);
+            case 'lowest':
+              return Number(a.dataset.rating) - Number(b.dataset.rating);
+            default:
+              return b.dataset.date.localeCompare(a.dataset.date);
+          }
+        });
+
+        const hidden = this.reviews.filter((review) => !visible.includes(review));
+
+        // append() di chuyển node đang có sẵn -> vừa sắp xếp lại thứ tự DOM
+        // vừa không tạo element mới.
+        visible.forEach((review, i) => {
+          review.hidden = i >= this.shown;
+          this.reviewList.append(review);
+        });
+
+        hidden.forEach((review) => {
+          review.hidden = true;
+          this.reviewList.append(review);
+        });
+
+        if (this.loadMoreButton) {
+          this.loadMoreButton.hidden = visible.length <= this.shown;
+        }
+
+        if (this.countElement) {
+          this.countElement.textContent = visible.length;
+        }
+      }
+    }
+
+    if (!customElements.get('product-tabs')) {
+      customElements.define('product-tabs', ProductTabs);
+    }
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "t:general.product_tabs",
+  "settings": [
+    {
+      "type": "select",
+      "id": "default_tab",
+      "label": "t:labels.default_tab",
+      "options": [
+        {
+          "value": "details",
+          "label": "t:options.default_tab.details"
+        },
+        {
+          "value": "reviews",
+          "label": "t:options.default_tab.reviews"
+        },
+        {
+          "value": "faqs",
+          "label": "t:options.default_tab.faqs"
+        }
+      ],
+      "default": "reviews"
+    },
+    {
+      "type": "range",
+      "id": "reviews_per_page",
+      "label": "t:labels.reviews_per_page",
+      "min": 2,
+      "max": 12,
+      "step": 2,
+      "default": 6
+    },
+    {
+      "type": "checkbox",
+      "id": "show_write_review",
+      "label": "t:labels.show_write_review",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "write_review_url",
+      "label": "t:labels.write_review_url",
+      "info": "t:info.write_review_url"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "t:general.faq",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "t:labels.question",
+          "default": "What sizes are available?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "t:labels.answer",
+          "default": "<p>This item runs true to size. Check the size chart for exact measurements.</p>"
+        }
+      ]
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.product_tabs",
+      "blocks": [{ "type": "faq" }, { "type": "faq" }, { "type": "faq" }]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["product"]
+  }
+}
+{% endschema %}
