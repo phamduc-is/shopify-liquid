@@ -1,123 +1,168 @@
-# 📍 Continue Here — Bug & việc còn treo (chờ review)
+# 📍 Continue Here — Trạng thái lúc dừng (chờ review)
 
-> Ghi lại lúc dừng phiên làm việc. Agent **không tự sửa** những mục dưới đây — chờ review thủ công.
-> Nội dung cũ của file (link Figma, bảng tiến độ roadmap) lấy lại bằng: `git show b1e7d13:docs/continue-here.md`
+> Ghi lại lúc dừng phiên làm việc, để pull về máy khác là tiếp được ngay.
+> Nội dung cũ của file lấy lại bằng: `git show 0a98732:docs/continue-here.md`
 
 ---
 
-## 🐞 Bug còn mở
+## ⏸️ Việc đang TẠM DỪNG: section `product-tabs`
 
-### 1. `sections/header.liquid` — nút menu có cấp con là nút chết
+Đã build xong code, `theme check` sạch (31 files, 0 offenses), nhưng **chưa test trên browser** và **chưa quyết định giữ hay bỏ**. Không tiếp tục cho tới khi review.
 
-Khi merchant tạo menu có sub-link, `{% if link.links != blank %}` render ra `<button class="header__nav-link header__nav-link--dropdown">` kèm icon chevron xuống — nhưng:
+### File đã tạo/sửa cho section này
 
-| Thiếu | Chi tiết |
+| File | Trạng thái |
 |---|---|
-| DOM | Không có `{% for %}` nào render `link.links` ra submenu |
-| JS | Không có handler nào bắt `.header__nav-link--dropdown` |
-| CSS | `_header.scss` không có selector `--dropdown` nào |
+| `sections/product-tabs.liquid` | mới, 466 dòng — markup 3 tab + custom element + schema |
+| `src/scss/components/_product-tabs.scss` | mới, 342 dòng |
+| `assets/icon-filter.svg` | mới (theme chưa có icon filter) |
+| `src/scss/main.scss` | thêm `@use 'components/product-tabs'` |
+| `locales/en.default.json` | thêm 21 string `sections.product_tabs.*` |
+| `locales/en.default.schema.json` | thêm `general.product_tabs`, `general.faq`, 6 label, `options.default_tab.*`, `info.write_review_url` |
+| `templates/product.json` | chèn vào order: `main → product-tabs → related-products` + 3 FAQ block mặc định |
 
-→ User thấy nút có mũi tên, bấm vào **không có gì xảy ra**. Xảy ra ở cả `.header__nav` (desktop) lẫn `.mobile-nav__links`. Đây là bug chức năng, không liên quan Theme Editor.
+> ⚠️ Section **đang active trong `templates/product.json`** nên vẫn render trên trang product. Muốn ẩn tạm thì xoá `"product-tabs"` khỏi mảng `order` (giữ nguyên khối `sections`), hoặc xoá section trong Theme Editor.
 
-Hai hướng, chọn 1 (chưa quyết):
-- **Làm dropdown thật** — render `link.links`; desktop dùng panel thả xuống, mobile dùng `<details>` accordion trong `.mobile-nav`; thêm `aria-expanded`. Là thêm feature, cần cả SCSS mới.
-- **Hạ về link thường** — bỏ nhánh `if`, luôn render `<a href="{{ link.url }}">`, bỏ chevron. Hết nút chết ngay, đổi lại menu cấp con không vào được từ header.
+### 3 tab, 3 cơ chế data — có chủ đích
 
----
+| Tab | Nguồn data | Lý do chọn |
+|---|---|---|
+| Product Details | metafield `custom.product_details` (rich text) | Không dùng lại `product.description` vì cột product info bên trên đã render mô tả ngắn đó → tránh trùng nội dung |
+| Rating & Reviews | metafield `custom.reviews` (`list.metaobject_reference` → metaobject `product_review`) + block `@app` | Cần per-product. Theme block/settings thuộc `templates/product.json` nên mọi sản phẩm sẽ dùng chung 1 danh sách review → sai bản chất |
+| FAQs | Theme block `faq`, dùng `<details>` native | Ở đây block **là đúng** — FAQ thường giống nhau cho mọi sản phẩm |
 
-### 2. Git identity — Mac mini chưa set, 28 commit cũ chưa attribute
+Dùng **classic section blocks** (`{% for block in section.blocks %}` + `where: 'type', ...`) chứ không phải `{% content_for 'blocks' %}` như các section khác — vì cần lọc theo type để đặt FAQ block vào tab 3 và app block vào tab 2.
 
-MacBook Air **đã xong** (xem mục đã fix bên dưới). Hai việc còn lại:
+### Filter / sort / load more
 
-**a. Mac mini chưa set.** `~/.gitconfig` nằm trong home của từng máy, không đồng bộ qua GitHub account — phải chạy lại y hệt trên Mac mini:
+Mỗi review card mang data để JS đọc trực tiếp qua `dataset`, không parse text DOM:
 
-```bash
-git config --global user.name  "Dawn"
-git config --global user.email "298667006+phamduc-is@users.noreply.github.com"
-git config --global user.useConfigOnly true
-git var GIT_AUTHOR_IDENT   # verify: phải in ra đúng email noreply ở trên
+```liquid
+<li class="product-tabs__review" data-rating="5" data-date="2023-08-14">
 ```
 
-Chưa chạy thì commit từ Mac mini vẫn ra `dawn@Dawns-Mac-mini.local` như cũ.
+| Control | Cơ chế |
+|---|---|
+| Filter | `data-rating` — All ratings / 5★→1★, khớp chính xác |
+| Sort | `data-date` (`YYYY-MM-DD` nên so sánh chuỗi ra đúng thứ tự) cho Latest/Oldest; `data-rating` cho Highest/Lowest rated |
+| Load More | Reveal theo batch, default 6/lần (setting `reviews_per_page`) |
+| Count "(N)" | JS ghi số vào `textContent`; dấu ngoặc để ở CSS `::before`/`::after` nên JS không phải ghép chuỗi |
 
-**b. 28 commit cũ vẫn mang author sai** — chỉ commit *từ đây trở đi* mới đúng:
+Đổi filter → reset về batch đầu, không giữ số đã "load more" cũ.
 
-| Author string cũ | Số commit | Nguồn gốc |
-|---|---|---|
-| `Dawn <dawn@Dawns-Mac-mini.local>` | 18 | hostname Mac mini |
-| `Dawn <dawn@Macmini.bbrouter>` | 5 | cùng Mac mini, hostname do router cấp qua DHCP |
-| `Dawn <dawn@Dawns-MacBook-Air.local>` | 5 | hostname MacBook Air |
+Nút "Write a Review" render đủ theo design nhưng chỉ là link tới URL merchant tự set (setting `write_review_url`) — Shopify **không có form review native**.
 
-Muốn 28 commit này cũng được attribute vào account thì phải rewrite history (`git filter-repo --mailmap`) rồi force-push — **toàn bộ SHA sẽ đổi**. Repo public nhưng một mình làm nên rủi ro thấp; vẫn chưa quyết, chưa làm.
+### 🔧 Cần setup trong Admin để test tab Reviews
+
+Theme **không tạo được** metaobject definition, phải làm tay 1 lần:
+
+**1.** Content → Metaobjects → Add definition, type handle **`product_review`**:
+
+| Field key | Type |
+|---|---|
+| `author` | Single line text |
+| `rating` | Integer (1–5) |
+| `body` | Multi-line text |
+| `review_date` | Date |
+| `verified` | True or false |
+
+**2.** Settings → Custom data → Products → Add definition:
+- `custom.reviews` — type **List of metaobjects** → Product review
+- `custom.product_details` — type **Rich text**
+
+**3.** Tạo vài metaobject entry rồi gán vào product qua metafield `custom.reviews`.
+
+Spec này cũng nằm trong khối `{% comment %}` đầu file `sections/product-tabs.liquid`.
+
+### ❓ Chưa verify
+
+- Tab bar trên browser thật: đổi tab, keyboard nav (`←` `→` `Home` `End`), `aria-selected`.
+- Accordion FAQ trên mobile.
+- Reviews grid + filter/sort/load more (cần data metaobject mới test được).
+- Section render đúng vị trí giữa product info và "You might also like".
 
 ---
 
-## 💡 Enhancement đang cân nhắc (không phải bug)
+## ✅ Section `related-products` — đã chốt phương án
 
-### Kéo ngang bằng chuột cho `.testimonials__track`
+Đã đi qua 2 lần rewrite, **kết luận: giữ pattern Recommendations API** (giống Dawn). Ghi lại để không lặp lại tranh luận:
 
-Carousel hiện chạy bằng CSS `scroll-snap` — native, không cần JS. Trên desktop user cuộn được bằng:
+| Phương án | Kết luận |
+|---|---|
+| Setting `product_list` cho merchant chọn | ❌ **Sai bản chất** — settings thuộc template nên mọi product hiện chung 1 danh sách |
+| `product.collections.first.products` | ❌ Chỉ là "cùng collection", không phản ánh hành vi mua |
+| Recommendations API 2 lượt render | ✅ **Đang dùng** — đường duy nhất đọc được data từ Search & Discovery |
 
-- Shift + con lăn chuột ✅
-- Trackpad 2 ngón vuốt ngang ✅
-- 2 nút prev/next ✅
-- Kéo scrollbar ❌ (đã tắt bằng `scrollbar-width: none`)
-- **Click-kéo (grab) bằng chuột ❌ — browser không hỗ trợ native, cần JS**
+Code hiện tại đã kế thừa 3 điểm từ Dawn:
+1. **Custom element** `<related-products>` thay `querySelectorAll` + `shopify:section:load` — `connectedCallback` tự chạy khi node vào DOM.
+2. **IntersectionObserver** `rootMargin: '0px 0px 400px 0px'` — chỉ fetch khi scroll gần tới.
+3. **Setting `intent`** — `related` (thuật toán Shopify) / `complementary` (list merchant set trong Search & Discovery). Cùng 1 endpoint, chỉ khác 1 param.
 
-Nếu làm, dùng Pointer Events (`pointerdown`/`pointermove`/`pointerup` + `setPointerCapture`) và bỏ qua `e.pointerType === 'touch'` (touch đã có native scroll).
+Đã thêm `presets` (trước đó thiếu nên không thêm được qua "Add section").
 
-**Hai điểm bắt buộc phải xử lý, nếu không carousel sẽ giật/trễ:**
+> ⚠️ Section trống trên dev store là **ĐÚNG**, không phải bug: docs Shopify ghi rõ không tính đơn hàng import từ platform khác, và loại trừ sản phẩm hết hàng / giá 0 / gift card / đang trong cart. Dev store chưa có đơn hàng thật → mất tiêu chí mạnh nhất.
+
+Bắt buộc có `display: block` trong SCSS cho cả `.related-products` và `.product-tabs` — custom element mặc định là `display: inline`.
+
+---
+
+## 📦 Trạng thái repo — 11 file CHƯA COMMIT
+
+```
+ M docs/shopify-practical-techniques.md
+ M ecommerce-theme/assets/theme.css
+ M ecommerce-theme/locales/en.default.json
+ M ecommerce-theme/locales/en.default.schema.json
+ M ecommerce-theme/src/scss/main.scss
+ M ecommerce-theme/templates/product.json
+?? ecommerce-theme/assets/icon-filter.svg
+?? ecommerce-theme/sections/product-tabs.liquid
+?? ecommerce-theme/sections/related-products.liquid
+?? ecommerce-theme/src/scss/components/_product-tabs.scss
+?? ecommerce-theme/src/scss/components/_related-products.scss
+```
+
+Commit cuối đã push: `0a98732` (docs: continue-here bug notes).
+
+---
+
+## 📚 Docs đã bổ sung
+
+`docs/shopify-practical-techniques.md` — thêm **Kỹ thuật 8: Section Rendering API — Section Phụ Thuộc Data Nội Bộ Của Shopify** (~137 dòng, đã update mục lục).
+
+Nội dung chính: cơ chế 2 lượt render, vì sao `section_id` là param quan trọng nhất (HTML vs JSON → markup 1 bản vs 2 bản), 3 tiêu chí của thuật toán `related` (purchase history / product description / related collections — **không** dùng tag, product_type, hay title), và mental model phân loại section theo nguồn data (Presentation / Store data / Platform-computed).
+
+---
+
+## ✅ Đã fix, KHÔNG cần làm lại
+
+| Việc | Trạng thái |
+|---|---|
+| 8 bug slideshow (`z-index: -1`, `.slideshow__slide` không phải flex item thật, dots vô hình, ảnh dọc bị crop, nhiều `<h1>`, `loading: lazy` trên hero…) | ✅ đã xử lý hết |
+| `testimonials.liquid` thiếu `shopify:section:load` | ✅ đã thêm listener |
+| `header.liquid` thiếu `shopify:section:load` | ✅ đã thêm listener |
+| `related-products.liquid` upload fail — xuống dòng giữa chuỗi filter trong `{% liquid %}` | ✅ đã tách thành nhiều lệnh `assign` |
+| `templates/product.json` bị reject vì section file chưa có trên remote | ✅ đã `touch` để sync lại |
+
+---
+
+## 💡 Enhancement chưa làm (không phải bug)
+
+**Kéo ngang bằng chuột cho `.testimonials__track`** — carousel chạy bằng CSS `scroll-snap` nên desktop đã có Shift+wheel, trackpad 2 ngón, và 2 nút prev/next. Riêng **click-kéo (grab)** thì browser không hỗ trợ native, cần JS Pointer Events.
+
+Nếu làm, 2 điểm bắt buộc xử lý kẻo carousel giật/trễ:
 1. Tạm set `scroll-snap-type: none` trong lúc kéo — snap `mandatory` sẽ liên tục kéo `scrollLeft` về điểm snap trong khi JS đang set thủ công. Bật lại ở `pointerup` để browser tự snap vào card gần nhất.
-2. Tạm set `scroll-behavior: auto` trong lúc kéo — `_testimonials.scss` đang bật `smooth` (cho nút prev/next), mỗi lần set `scrollLeft` sẽ khởi động 1 animation → chuột đi trước, track chạy theo sau.
+2. Tạm set `scroll-behavior: auto` — `_testimonials.scss` đang bật `smooth` cho nút prev/next, mỗi lần set `scrollLeft` sẽ khởi động 1 animation → chuột đi trước, track chạy theo sau.
 
-Ngoài ra nên có ngưỡng ~5px trước khi coi là "đang kéo", để click vào link trong card không bị hiểu sai thành drag.
+Thêm ngưỡng ~5px trước khi coi là "đang kéo", để click vào link trong card không bị hiểu sai thành drag.
 
 ---
 
-## ✅ Đã fix — nhóm Theme Editor re-render
+## 🗺️ Còn lại theo design SHOP.CO
 
-Theme Editor render lại DOM của section mà **không reload trang**, nên JS chạy 1 lần lúc page load sẽ mất hết listener cùng DOM cũ. Đã xử lý theo pattern của `sections/slideshow.liquid` (IIFE + `init(root)` + `shopify:section:load`).
-
-| Bug cũ | Trạng thái |
+| Trang | Trạng thái |
 |---|---|
-| `testimonials.liquid` — 2 nút prev/next chết sau khi sửa setting trong editor | ✅ tách `initSection`, thêm `shopify:section:load` |
-| `header.liquid` — đóng announcement bar, hamburger, mobile nav, search popup đều chết sau khi sửa setting | ✅ gom `initHeader(root)`, query từ `root` thay vì `document` |
-| Listener `resize` của testimonials tích luỹ mỗi lần section re-render, closure giữ tham chiếu DOM đã gỡ | ✅ 1 listener `resize` duy nhất ở scope module, query lại `document` mỗi lần thay vì đóng gói tham chiếu |
-| `header.liquid` khai báo 7 `const` ở top-level — các javascript tag của theme bị Shopify gộp chung 1 file nên dùng chung scope, trùng tên là `SyntaxError` chết cả bundle | ✅ bọc IIFE như slideshow |
-
-Ghi chú đã xác minh khi fix:
-- `<dialog class="mobile-nav">` và `<dialog class="search-popup">` **nằm trong** `<header class="header">` → vẫn thuộc `.shopify-section` của header, query từ `root` an toàn. (Cảnh báo cũ trong file này về việc dialog có thể nằm ngoài scope — đã loại trừ.)
-- `.announcement-bar` là **anh em** của `<header>`, không phải con → `root` phải là `.shopify-section` chứ không phải `.header`. Lấy bằng `header.closest('.shopify-section')` vì id section trong `header-group` do Shopify sinh, không hardcode được.
-
----
-
-## ✅ Đã fix — git identity trên MacBook Air
-
-`user.name` / `user.email` trước đây **chưa set ở cả local lẫn global**, git tự suy ra `$(whoami)@$(hostname)` → mỗi máy (và mỗi lần router đổi hostname) đẻ ra một identity khác nhau. Email `.local` không tồn tại trên GitHub nên commit không link được vào account: không avatar, không tính contribution graph.
-
-Lưu ý: **đăng nhập GitHub và commit author là hai lớp tách rời**. Token/SSH chỉ trả lời "có quyền push không"; author name/email được đóng băng vào commit object lúc `git commit` và GitHub **không ghi đè** nó — chỉ tra ngược email xem thuộc account nào. Nên login cùng account trên 2 máy không hề đồng bộ identity.
-
-Đã set global trên MacBook Air:
-
-| Key | Giá trị | Lý do |
-|---|---|---|
-| `user.name` | `Dawn` | |
-| `user.email` | `298667006+phamduc-is@users.noreply.github.com` | Repo public → dùng noreply thay email thật, vì email trong commit là **public vĩnh viễn**, ai clone cũng đọc được bằng `git log`. Dạng `<ID>+<username>@users.noreply.github.com` vẫn link đúng vào account. |
-| `user.useConfigOnly` | `true` | Chặn git tự đoán từ hostname. Git sẽ **báo lỗi và từ chối commit** thay vì âm thầm bịa email rác — net an toàn cho máy mới / container / CI sau này. Mặc định của git là `false`. |
-
----
-
-## ✅ Đã fix — nhóm slideshow (phiên trước)
-
-Verify lại `src/scss/components/_slideshow.scss` và `blocks/slide.liquid`:
-
-| Bug cũ | Trạng thái |
-|---|---|
-| `.slideshow__image { z-index: -1 }` làm ảnh bị `background-color` của slide che | ✅ đổi sang `z-index: 0`, có comment giải thích stacking context |
-| Ảnh đè lên chữ sau khi bỏ z-index âm | ✅ `.slideshow__content` có `position: relative; z-index: 1` |
-| `.slideshow__slide { flex: 0 0 100% }` vô hiệu vì `content_for 'blocks'` bọc block trong `<div class="shopify-block">` → slide chỉ rộng 544px | ✅ đổi selector sang `.slideshow__slides > *` + `min-width: 100%` |
-| `.slideshow__content` bị `margin-inline: auto` của `.container` căn giữa | ✅ giữ `.container` nguyên vẹn, chuyển giới hạn bề ngang xuống heading/text |
-| Dots vô hình (`rgb(255 255 255 / 50%)` trên nền sáng) | ✅ dùng `--color-foreground` + `opacity` 0.3 / 1 |
-| Ảnh dọc bị crop mạnh khi trải full-bleed | ✅ ảnh chiếm nửa phải (`width: 50%`) + `object-position: top center` |
-| Nhiều `<h1>` khi có nhiều slide | ✅ slide đầu `<h1>`, các slide sau `<h2>` |
-| `loading: 'lazy'` trên hero above-the-fold | ✅ slide đầu `eager` + `fetchpriority: high`, slide sau `lazy` |
+| **Homepage** | ✅ xong (header, hero slideshow, logo list, featured collection ×2, collections grid, testimonials, newsletter + footer) |
+| **Product Detail** | ⏸️ main product + related-products xong; `product-tabs` đang tạm dừng chờ review |
+| **Category Page** | ❌ chưa làm — sidebar filters (dropdown Casual, price slider, colors, size, dress style), product grid + pagination |
+| **Cart** | ❌ chưa làm — list item (ảnh + size/color + quantity), Order Summary (subtotal/discount/delivery/total), promo code input |

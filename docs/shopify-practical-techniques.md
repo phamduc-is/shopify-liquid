@@ -13,6 +13,7 @@ Tài liệu này lưu trữ các kỹ thuật lập trình Liquid, tối ưu hi�
 5. [Kỹ thuật 5: Fallback Mock Data Khi Cửa Hàng Chưa Có Sản Phẩm](#5-kỹ-thuật-5-fallback-mock-data-khi-cửa-hàng-chưa-có-sản-phẩm)
 6. [Kỹ thuật 6: `Handle` — Định Danh URL Của Resource & Cách Test Nhanh 1 Trang](#6-kỹ-thuật-6-handle--định-danh-url-của-resource--cách-test-nhanh-1-trang)
 7. [Kỹ thuật 7: `<shopify-account>` — Custom Element Có Sẵn Cho Khu Vực Tài Khoản](#7-kỹ-thuật-7-shopify-account--custom-element-có-sẵn-cho-khu-vực-tài-khoản)
+8. [Kỹ thuật 8: Section Rendering API — Section Phụ Thuộc Data Nội Bộ Của Shopify](#8-kỹ-thuật-8-section-rendering-api--section-phụ-thuộc-data-nội-bộ-của-shopify)
 
 ---
 
@@ -266,3 +267,143 @@ Dùng **Custom Element** (Web Component) `<shopify-account>` — Shopify tự cu
 
 #### ⚠️ Lưu ý khi dùng:
 `<shopify-account>` chỉ hoạt động đúng khi được đặt bên trong 1 trang có nạp đầy đủ `content_for_header` (tức mọi trang dùng `layout/theme.liquid` bình thường) — không tự viết logic phân biệt đăng nhập/chưa đăng nhập bằng `{% if customer %}` thủ công nữa, để component tự xử lý.
+
+---
+
+## 8. Kỹ thuật 8: Section Rendering API — Section Phụ Thuộc Data Nội Bộ Của Shopify
+
+### 🚨 Vấn đề thực tế (Problem):
+Section "You might also like" (related products) cần danh sách **thay đổi theo từng sản phẩm** đang xem. Ba cách làm quen tay đều sai:
+
+| Cách làm | Vì sao sai |
+|---|---|
+| Hardcode danh sách trong section settings | Settings thuộc **template**, không thuộc product → cả 500 sản phẩm hiện đúng 4 cái giống nhau |
+| Lấy `product.collections.first.products` | Chỉ là "cùng collection", không phản ánh hành vi mua hàng |
+| Đọc `product.related_products` trong Liquid | **Không tồn tại** — Liquid không có field nào chứa data này |
+
+Data gợi ý nằm trong **recommendation index nội bộ của Shopify**, không gắn trên product object. Ở lượt render thường, object `recommendations` luôn rỗng (`performed? == false`).
+
+### 💡 Giải pháp (Solution):
+**Section Rendering API** — render section **2 lượt**:
+1. **Lượt 1** (server, từ `product.json`): `recommendations.performed == false` → section cố tình in ra vỏ rỗng, kèm URL trong `data-*`.
+2. **Lượt 2** (browser, JS fetch): gọi endpoint `/{locale}/recommendations/products` với param `section_id` → Shopify **render lại chính section đó**, lần này `performed == true`, rồi JS thay nội dung vào.
+
+Điểm mấu chốt là param **`section_id`**: có nó thì Shopify trả về **HTML đã render sẵn** từ chính file `.liquid` của mình; không có nó thì trả **JSON** — và mình sẽ phải viết lại toàn bộ markup product card bằng JavaScript (markup tồn tại 2 bản, sửa design phải sửa 2 chỗ).
+
+### 💻 Ví dụ Code Thực Tế:
+
+```liquid
+{%- comment -%}
+  Liquid không có toán tử `+=`, nên nối chuỗi bằng `assign x = x | append: ...`.
+  Trong {% liquid %} mỗi dòng là 1 tag riêng — không xuống dòng giữa chuỗi filter.
+{%- endcomment -%}
+{%- liquid
+  assign recommendations_url = routes.product_recommendations_url | append: '?section_id=' | append: section.id
+  assign recommendations_url = recommendations_url | append: '&product_id=' | append: product.id
+  assign recommendations_url = recommendations_url | append: '&limit=' | append: section.settings.products_to_show
+  assign recommendations_url = recommendations_url | append: '&intent=' | append: section.settings.intent
+-%}
+
+<related-products class="related-products" data-recommendations-url="{{ recommendations_url }}">
+  {%- if recommendations.performed and recommendations.products_count > 0 -%}
+    <h2>{{ section.settings.heading }}</h2>
+    <ul class="related-products__grid">
+      {%- for recommended_product in recommendations.products -%}
+        <li>{% render 'product-card', product: recommended_product %}</li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+</related-products>
+```
+
+```js
+class RelatedProducts extends HTMLElement {
+  // connectedCallback tự chạy mỗi lần node vào DOM -> Theme Editor render lại
+  // section là tự init, KHÔNG cần listener 'shopify:section:load'.
+  connectedCallback() {
+    if (!this.dataset.recommendationsUrl || this.querySelector('.related-products__grid')) return;
+
+    // Section nằm cuối trang: chỉ fetch khi user scroll gần tới.
+    this.observer = new IntersectionObserver(
+      (entries, observer) => {
+        if (!entries[0].isIntersecting) return;
+        observer.unobserve(this);
+        this.loadRecommendations();
+      },
+      { rootMargin: '0px 0px 400px 0px' }
+    );
+    this.observer.observe(this);
+  }
+
+  disconnectedCallback() {
+    this.observer?.unobserve(this);
+  }
+
+  async loadRecommendations() {
+    const response = await fetch(this.dataset.recommendationsUrl);
+    if (!response.ok) return;
+
+    // DOMParser tạo document riêng -> custom element trong đó KHÔNG được
+    // upgrade -> connectedCallback không chạy -> không fetch đệ quy.
+    const html = await response.text();
+    const fresh = new DOMParser().parseFromString(html, 'text/html').querySelector('related-products');
+    if (!fresh || !fresh.querySelector('.related-products__grid')) return;
+
+    // innerHTML chứ không outerHTML: outerHTML xoá luôn data-attribute và
+    // shopify_attributes của section, làm hỏng Theme Editor.
+    this.innerHTML = fresh.innerHTML;
+  }
+}
+
+if (!customElements.get('related-products')) {
+  customElements.define('related-products', RelatedProducts);
+}
+```
+
+#### 🔍 Bóc tách 4 param trong URL:
+
+| Param | Trả lời câu hỏi | Thiếu nó thì sao |
+|---|---|---|
+| `section_id` | Render **section nào**? | Shopify trả **JSON** thay vì HTML |
+| `product_id` | Gợi ý cho **sản phẩm nào**? | Endpoint là URL độc lập, không biết đang ở trang product nào → không trả gì |
+| `limit` | Lấy **bao nhiêu** sản phẩm? | Mặc định 5, không khớp setting (tối đa 10) |
+| `intent` | **Loại** gợi ý nào? | Mặc định `related` |
+
+#### 🔍 Cơ chế `intent` — 2 nguồn, 1 endpoint:
+
+| | `intent=related` | `intent=complementary` |
+|---|---|---|
+| Ai quyết định danh sách | Thuật toán Shopify | Merchant nhập tay trong app **Search & Discovery** |
+| Tính lại theo thời gian | ✅ đơn hàng mới → kết quả đổi | ❌ cố định đến khi merchant sửa |
+| Cần cài app | ❌ | ✅ |
+| Code theme cần đổi | Không gì cả — chỉ đổi 1 setting | |
+
+> Search & Discovery **không phải** server riêng để "trỏ vào" — nó chỉ là UI cho merchant nhập liệu; data được Shopify lưu rồi phục vụ lại qua **cùng endpoint đó**.
+
+#### 🔍 Thuật toán `related` dựa trên gì (theo docs Shopify):
+
+| Tiêu chí | Nội dung | Khi nào dùng |
+|---|---|---|
+| **Purchase history** | Sản phẩm từng được mua **cùng nhau** trong 1 order | Mọi store |
+| **Product description** | Sản phẩm có **mô tả tương tự** | Mọi store |
+| **Related collections** | Collection mà product hiện tại cũng thuộc, **loại trừ** handle `all` và `frontpage` | Chỉ khi 2 tiêu chí trên không có data |
+
+Ngược lại với trực giác: thuật toán **không dùng** `tags`, `product_type`, hay `title`. Nhưng **`description` có ảnh hưởng thật** — mô tả copy-paste giống nhau sẽ làm gợi ý sai lệch.
+
+#### ⚠️ Lưu ý khi dùng:
+
+- **Section trống trên dev store là ĐÚNG, không phải bug.** Docs ghi rõ: không tính đơn hàng import từ platform khác; loại trừ sản phẩm hết hàng, giá = 0, gift card, và sản phẩm đang trong cart của khách. Dev store chưa có đơn hàng thật → mất tiêu chí mạnh nhất; sản phẩm chỉ thuộc `all`/`frontpage` → fallback cũng bị loại.
+- **Không can thiệp được đầu vào thuật toán**, nhưng **lọc được đầu ra**: *"You can't customize the recommendation algorithm to exclude specific products. However, you can choose which of the returned products to show with JavaScript."*
+- **Vị trí đặt section theo khuyến nghị docs**: `related` → cuối trang (section "You might also like"); `complementary` → **gần đầu trang**, trong khu product information cạnh ảnh sản phẩm (nên làm block trong product section, không phải section riêng ở cuối). Đây là lý do Dawn tách làm 2 chỗ.
+- **Giới hạn 4 sản phẩm** dù API trả tối đa 10 — độ liên quan giảm dần theo thứ tự, sản phẩm thứ 10 gần như vô nghĩa.
+- **Custom element thắng `querySelectorAll` + `shopify:section:load`**: `connectedCallback` tự chạy khi node vào DOM nên Theme Editor render lại section là tự init. Cả một lớp bug "listener chết sau khi section reload" biến mất, không phải nhớ gắn listener cho từng section.
+
+#### 🗺️ Mental model — phân loại section theo nguồn data:
+
+| Loại | Nguồn data | Ví dụ | Test được ngay trên dev store? |
+|---|---|---|---|
+| **Presentation** | Setting của section | slideshow, testimonials, logo-list, footer | ✅ luôn thấy |
+| **Store data** | Object Liquid có sẵn | featured-collection (`collections[...]`), product | ✅ nếu có sản phẩm |
+| **Platform-computed** | API riêng, 2 lượt render | **related-products** | ❌ cần đơn hàng thật hoặc app |
+
+Phần lớn section thuộc 2 loại đầu — code xong là thấy kết quả. Loại thứ 3 viết đúng 100% vẫn có thể ra section trống.
