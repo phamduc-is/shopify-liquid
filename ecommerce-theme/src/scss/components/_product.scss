@@ -117,7 +117,8 @@
   font-family: var(--font-heading--family);
   font-size: var(--fs-hero-md);
   line-height: 1.1;
-  text-transform: uppercase;
+  // Không uppercase: tên sản phẩm đã được chuẩn hoá về dạng "Chữ thường in hoa
+  // chữ cái đầu" ngay ở Liquid (product.liquid → downcase | capitalize).
   color: var(--color-foreground);
 }
 

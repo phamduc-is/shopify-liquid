@@ -2,7 +2,18 @@
     position: relative; // làm điểm neo cho lớp __fill absolute
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--space-1);
+
+    // Sao to hơn text xung quanh 2px. ★ là glyph chữ nên kích thước điều khiển
+    // bằng font-size, không phải width/height. Đặt ở đây (không đặt riêng cho
+    // __track/__fill) để 2 lớp luôn cùng cỡ — lệch 1px là overlay lộ ngay.
+    font-size: calc(1em + 2px);
+
+    // Ép line-height 1 cho cả component: body đang có line-height 1.5, half-leading
+    // của hàng sao (18px) và của text "4.0/5" (12px) khác nhau → align-items: center
+    // căn theo box lệch nhau, làm phần "/5" trông như bị đẩy lên trên.
+    // line-height 1 cho box bám sát glyph, center mới ra đúng thị giác.
+    line-height: 1;
 }
 
 // __track nằm TRONG luồng (không absolute) để nó tự tạo kích thước cho
@@ -13,7 +24,9 @@
     color: var(--color-border);
 }
 
-// __fill chồng đúng lên __track, bị cắt theo width % → lộ ra bao nhiêu sao vàng
+// __fill chồng đúng lên __track, bị cắt theo width % → lộ ra bao nhiêu sao vàng.
+// top/left: 0 chỉ khớp khi __track là phần tử cao nhất trong container — đúng,
+// vì __value dùng --fs-label (12px) nhỏ hơn cỡ sao.
 .rating-stars__fill {
     position: absolute;
     top: 0;
@@ -25,5 +38,8 @@
 
 .rating-stars_value {
     font-size: var(--fs-label);
+    line-height: 1;
     color: var(--color-foreground);
+    white-space: nowrap; // "4.0/5" không tách dòng giữa số và /5
+    font-variant-numeric: tabular-nums; // số cùng bề rộng, không nhảy khi rating đổi
 }

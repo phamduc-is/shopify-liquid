@@ -2,9 +2,7 @@
   Renders a product card — image, title, rating, price (+ sale badge if on sale).
 
   @param {product} product - Sản phẩm cần hiển thị
-  @param {number} [rating] - Điểm đánh giá 0..5. Bỏ trống thì tự đọc metafield
-    `reviews.rating` (chuẩn của app Shopify Product Reviews); không có luôn thì
-    ẩn phần sao.
+  @param {number} [rating] - Điểm đánh giá 0..5. Bỏ trống thì tự đọc metafield `reviews.rating` (chuẩn của app Shopify Product Reviews); không có luôn thì ẩn phần sao.
 
   @example
   {% render 'product-card', product: product %}
@@ -13,8 +11,8 @@
 
 {% liquid
   assign card_rating = rating
-  if card_rating == blank and product.metafields.reviews.rating != blank
-    assign card_rating = product.metafields.reviews.rating.value.rating
+  if card_rating == blank and product.metafields.custom.rating != blank
+    assign card_rating = product.metafields.custom.rating.value
   endif
 %}
 
@@ -31,7 +29,7 @@
 
   <div class="product-card__info">
     <h3 class="product-card__title">
-      <a href="{{ product.url }}" class="product-card__link">{{ product.title }}</a>
+      <a href="{{ product.url }}" class="product-card__link">{{ product.title | downcase | capitalize }}</a>
     </h3>
 
     {% if card_rating != blank %}

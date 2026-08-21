@@ -34,7 +34,7 @@
           <a class="product__breadcrumb-link" href="{{ collection.url }}">{{ collection.title }}</a>
           <span class="product__breadcrumb-separator" aria-hidden="true">/</span>
         {%- endif -%}
-        <span class="product__breadcrumb-current" aria-current="page">{{ product.title }}</span>
+        <span class="product__breadcrumb-current" aria-current="page">{{ product.title | downcase | capitalize }}</span>
       </nav>
     {%- endif -%}
 
@@ -124,7 +124,7 @@
       </div>
 
       <div class="product__info">
-        <h1 class="product__title">{{ product.title }}</h1>
+        <h1 class="product__title">{{ product.title | downcase | capitalize }}</h1>
 
         {%- if section.settings.show_rating and product_rating != blank -%}
           {% render 'rating-stars', rating: product_rating %}

@@ -2,6 +2,9 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  // Card cao bằng ô grid (li stretch theo row) → __info mới có chỗ đẩy price
+  // xuống đáy, nhờ vậy hàng price của các card thẳng nhau.
+  block-size: 100%;
 }
 
 .product-card__media {
@@ -24,13 +27,29 @@
 .product-card__info {
   display: flex;
   flex-direction: column;
+  flex: 1; // chiếm hết phần còn lại của card
+  // space-between chia đều khoảng trống dư cho các khe → khoảng cách
+  // title↔rating luôn bằng rating↔price. gap là mức tối thiểu, phần dư
+  // được cộng đều vào cả hai khe.
+  justify-content: space-between;
   gap: var(--space-2);
 }
 
 .product-card__title {
-  font-size: var(--fs-subheading);
-  font-weight: var(--fw-bold);
+  font-size: 17px;
+  // fw 500: selector class (0,1,0) thắng `h3 { font-weight: 700 }` ở base/typography
+  font-weight: var(--fw-medium);
+  // Khai báo lại line-height để min-block-size bên dưới khớp đúng 2 dòng,
+  // không phụ thuộc giá trị kế thừa.
+  line-height: 1.2;
   color: var(--color-foreground);
+
+  // Cắt ở dòng 2 cho title dài. KHÔNG đặt min-block-size 2 dòng nữa: title 1
+  // dòng sẽ chừa lại một dòng trống, làm rating star trông rời khỏi title.
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
 .product-card__link {
@@ -42,7 +61,8 @@
   display: flex;
   align-items: center;
   gap: var(--space-2-5);
-  margin-top: var(--space-1);
+  // Không cần margin auto: justify-content: space-between của __info đã đẩy
+  // price xuống đáy card → price vẫn ngang hàng price giữa các card.
 }
 
 .product-card__price-current {
