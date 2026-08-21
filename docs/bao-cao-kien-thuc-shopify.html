@@ -1,0 +1,3344 @@
+<title>Bản Đồ Kiến Thức Shopify Liquid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root {
+    --bg: #f4f6f8;
+    --surface: #ffffff;
+    --surface-2: #eaeef2;
+    --text: #151b23;
+    --text-dim: #5a6675;
+    --text-faint: #8b97a5;
+    --border: #dce1e8;
+    --border-strong: #c3ccd6;
+    --accent: #0d6d68;
+    --accent-bright: #0d6d68;
+    --accent-soft: #e0efee;
+    --warn: #8a5410;
+    --warn-soft: #faf0df;
+    --code-bg: #eef1f5;
+    --shadow: 0 1px 2px rgba(21, 27, 35, .05), 0 8px 24px -16px rgba(21, 27, 35, .18);
+
+    --ff-display: "Literata", Georgia, "Times New Roman", serif;
+    --ff-body: "Be Vietnam Pro", "Segoe UI", system-ui, sans-serif;
+    --ff-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0d1218;
+      --surface: #141b23;
+      --surface-2: #1b242e;
+      --text: #e4e9ef;
+      --text-dim: #97a4b3;
+      --text-faint: #6f7d8c;
+      --border: #26313d;
+      --border-strong: #36434f;
+      --accent: #57cfc4;
+      --accent-bright: #7fded4;
+      --accent-soft: #10312f;
+      --warn: #e2a75c;
+      --warn-soft: #2a2115;
+      --code-bg: #10171f;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 30px -18px rgba(0, 0, 0, .8);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0d1218;
+    --surface: #141b23;
+    --surface-2: #1b242e;
+    --text: #e4e9ef;
+    --text-dim: #97a4b3;
+    --text-faint: #6f7d8c;
+    --border: #26313d;
+    --border-strong: #36434f;
+    --accent: #57cfc4;
+    --accent-bright: #7fded4;
+    --accent-soft: #10312f;
+    --warn: #e2a75c;
+    --warn-soft: #2a2115;
+    --code-bg: #10171f;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 30px -18px rgba(0, 0, 0, .8);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--ff-body);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- Shell ---------- */
+  .shell {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 20px 96px;
+  }
+
+  @media (min-width: 1060px) {
+    .shell {
+      grid-template-columns: 244px minmax(0, 1fr);
+      gap: 56px;
+      padding: 0 32px 120px;
+    }
+  }
+
+  /* ---------- Sidebar TOC ---------- */
+  .toc { display: none; }
+
+  @media (min-width: 1060px) {
+    .toc {
+      display: block;
+      position: sticky;
+      top: 0;
+      align-self: start;
+      max-height: 100vh;
+      overflow-y: auto;
+      padding: 40px 0 40px;
+      font-size: 13.5px;
+      line-height: 1.45;
+      border-right: 1px solid var(--border);
+      margin-right: -28px;
+      padding-right: 24px;
+    }
+  }
+
+  .toc__label {
+    font-family: var(--ff-mono);
+    font-size: 10.5px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin: 0 0 14px;
+  }
+
+  .toc ol {
+    list-style: none;
+    margin: 0 0 26px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .toc a {
+    display: flex;
+    gap: 9px;
+    padding: 5px 8px 5px 0;
+    color: var(--text-dim);
+    text-decoration: none;
+    border-radius: 4px;
+    transition: color .15s;
+  }
+
+  .toc a:hover { color: var(--accent-bright); }
+  .toc a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .toc a > i {
+    font-family: var(--ff-mono);
+    font-style: normal;
+    font-size: 11.5px;
+    color: var(--text-faint);
+    padding-top: 2px;
+    min-width: 15px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- Masthead ---------- */
+  main { min-width: 0; }
+
+  .masthead {
+    padding: 56px 0 36px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .eyebrow {
+    display: inline-block;
+    font-family: var(--ff-mono);
+    font-size: 11px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .masthead h1 {
+    font-family: var(--ff-display);
+    font-weight: 700;
+    font-size: clamp(2.1rem, 5.2vw, 3.35rem);
+    line-height: 1.08;
+    letter-spacing: -.015em;
+    text-wrap: balance;
+    margin: 14px 0 0;
+  }
+
+  .masthead .lede {
+    max-width: 63ch;
+    margin: 18px 0 0;
+    font-size: 1.06rem;
+    color: var(--text-dim);
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 26px;
+    margin-top: 28px;
+    font-family: var(--ff-mono);
+    font-size: 12px;
+    color: var(--text-faint);
+  }
+
+  .meta-row b {
+    font-weight: 500;
+    color: var(--text-dim);
+  }
+
+  /* ---------- Stat strip ---------- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 36px 0 8px;
+  }
+
+  .stat {
+    background: var(--surface);
+    padding: 18px 18px 16px;
+  }
+
+  .stat b {
+    display: block;
+    font-family: var(--ff-display);
+    font-size: 1.85rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat span {
+    display: block;
+    margin-top: 7px;
+    font-size: 12.5px;
+    line-height: 1.35;
+    color: var(--text-dim);
+  }
+
+  /* ---------- Modules ---------- */
+  .module {
+    padding-top: 60px;
+    scroll-margin-top: 24px;
+  }
+
+  .module__head {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--text);
+    margin-bottom: 30px;
+  }
+
+  .module__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 10px 14px;
+  }
+
+  .module__num {
+    font-family: var(--ff-mono);
+    font-size: 11px;
+    letter-spacing: .12em;
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .module h2 {
+    font-family: var(--ff-display);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 3vw, 1.95rem);
+    line-height: 1.18;
+    letter-spacing: -.012em;
+    text-wrap: balance;
+    margin: 0;
+    width: 100%;
+  }
+
+  .module__note {
+    margin: 0;
+    max-width: 68ch;
+    color: var(--text-dim);
+    font-size: 15px;
+  }
+
+  .chip {
+    display: inline-block;
+    font-family: var(--ff-mono);
+    font-size: 11px;
+    letter-spacing: .04em;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  h3 {
+    font-family: var(--ff-body);
+    font-weight: 600;
+    font-size: 1.06rem;
+    line-height: 1.35;
+    letter-spacing: -.005em;
+    margin: 40px 0 12px;
+  }
+
+  h4 {
+    font-family: var(--ff-mono);
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin: 30px 0 10px;
+  }
+
+  p { max-width: 70ch; margin: 0 0 14px; }
+  main ul, main ol { max-width: 70ch; padding-left: 22px; margin: 0 0 16px; }
+  main li { margin-bottom: 6px; }
+  main li::marker { color: var(--text-faint); }
+
+  strong { font-weight: 600; }
+
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+
+  code {
+    font-family: var(--ff-mono);
+    font-size: .855em;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: .1em .34em;
+    white-space: nowrap;
+  }
+
+  pre {
+    margin: 0 0 18px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  pre code {
+    background: none;
+    border: 0;
+    padding: 0;
+    font-size: inherit;
+    white-space: pre;
+  }
+
+  /* ---------- Tables ---------- */
+  .tbl {
+    overflow-x: auto;
+    margin: 0 0 20px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 460px;
+    font-size: 14px;
+  }
+
+  thead th {
+    text-align: left;
+    vertical-align: bottom;
+    font-family: var(--ff-mono);
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    padding: 11px 14px;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border-strong);
+    white-space: nowrap;
+  }
+
+  tbody td {
+    padding: 11px 14px;
+    vertical-align: top;
+    border-top: 1px solid var(--border);
+    line-height: 1.5;
+  }
+
+  tbody tr:first-child td { border-top: 0; }
+  tbody td:first-child { color: var(--text); }
+  td code { white-space: normal; }
+
+  .col-tight { white-space: nowrap; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* ---------- Callouts ---------- */
+  .note, .trap {
+    border-radius: 8px;
+    padding: 15px 18px;
+    margin: 0 0 20px;
+    font-size: 14.5px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .note { border-left: 3px solid var(--accent); }
+  .trap { border-left: 3px solid var(--warn); background: var(--warn-soft); }
+
+  .note > :last-child, .trap > :last-child { margin-bottom: 0; }
+
+  .note b, .trap b {
+    display: block;
+    font-family: var(--ff-mono);
+    font-size: 11px;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+
+  .note b { color: var(--accent); }
+  .trap b { color: var(--warn); }
+
+  /* ---------- Pipeline diagram ---------- */
+  .pipe {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 0 0 24px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    padding: 22px 20px 24px;
+  }
+
+  .pipe__row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px 18px;
+    padding: 13px 0;
+  }
+
+  @media (min-width: 720px) {
+    .pipe__row {
+      grid-template-columns: 208px minmax(0, 1fr);
+      align-items: baseline;
+    }
+  }
+
+  .pipe__key {
+    font-family: var(--ff-mono);
+    font-size: 13px;
+    color: var(--text);
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .pipe__key i {
+    font-style: normal;
+    font-size: 10.5px;
+    color: var(--accent);
+    letter-spacing: .1em;
+  }
+
+  .pipe__val {
+    font-size: 14px;
+    color: var(--text-dim);
+  }
+
+  .pipe__arrow {
+    height: 18px;
+    margin-left: 5px;
+    border-left: 1px dashed var(--border-strong);
+  }
+
+  /* ---------- Split compare ---------- */
+  .split {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin: 0 0 20px;
+  }
+
+  @media (min-width: 700px) {
+    .split { grid-template-columns: 1fr 1fr; }
+  }
+
+  .split > div {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    padding: 16px 18px;
+  }
+
+  .split h5 {
+    font-family: var(--ff-mono);
+    font-size: 11.5px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 9px;
+  }
+
+  .split p { font-size: 14px; margin-bottom: 8px; }
+  .split > div > :last-child { margin-bottom: 0; }
+
+  /* ---------- Ví dụ (dropdown) ---------- */
+  .ex-set {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin: 34px 0 6px;
+  }
+
+  .ex-set__label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--ff-mono);
+    font-size: 11px;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin: 0 0 5px;
+  }
+
+  .ex-set__label::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  details.ex {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+  }
+
+  details.ex[open] {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow);
+  }
+
+  details.ex > summary {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding: 11px 15px;
+    cursor: pointer;
+    list-style: none;
+    font-size: 14.5px;
+    line-height: 1.5;
+    border-radius: 7px;
+  }
+
+  details.ex > summary::-webkit-details-marker { display: none; }
+  details.ex > summary::marker { content: ""; }
+  details.ex > summary:hover { background: var(--surface-2); }
+
+  details.ex > summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  .ex__chev {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    margin: 7px 1px 0 2px;
+    border-right: 1.6px solid var(--accent);
+    border-bottom: 1.6px solid var(--accent);
+    transform: rotate(-45deg);
+    transition: transform .18s ease;
+  }
+
+  details.ex[open] .ex__chev { transform: rotate(45deg); }
+
+  .ex__tag {
+    flex: none;
+    font-family: var(--ff-mono);
+    font-size: 10.5px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    padding-top: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ex__title { font-weight: 500; }
+
+  .ex__body {
+    padding: 15px 15px 17px;
+    border-top: 1px solid var(--border);
+  }
+
+  .ex__body > :last-child { margin-bottom: 0; }
+
+  .ex__ask {
+    margin: 0 0 16px;
+    font-size: 14px;
+    color: var(--text-dim);
+    max-width: 74ch;
+  }
+
+  .ex__ask b {
+    font-family: var(--ff-mono);
+    font-size: 10.5px;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    font-weight: 500;
+    margin-right: 7px;
+  }
+
+  .io { margin: 0 0 14px; }
+  .io:last-child { margin-bottom: 0; }
+
+  .io__label {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--ff-mono);
+    font-size: 10.5px;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin: 0 0 6px;
+  }
+
+  .io__label::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .io pre { margin: 0; }
+
+  .io--out .io__label { color: var(--accent); }
+  .io--out .io__label::after { background: var(--accent-soft); }
+  .io--out pre {
+    background: var(--accent-soft);
+    border-color: var(--accent-soft);
+  }
+
+  .io--bad .io__label { color: var(--warn); }
+  .io--bad .io__label::after { background: var(--warn-soft); }
+  .io--bad pre {
+    background: var(--warn-soft);
+    border-color: var(--warn-soft);
+  }
+
+  .exall {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--ff-mono);
+    font-size: 11.5px;
+    letter-spacing: .05em;
+    padding: 8px 15px;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text-dim);
+    cursor: pointer;
+    font-weight: 500;
+  }
+
+  .exall:hover { color: var(--accent); border-color: var(--accent); }
+  .exall:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .exall__hint {
+    font-size: 12.5px;
+    color: var(--text-faint);
+    margin: 0;
+  }
+
+  .exall-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 16px;
+    margin: 18px 0 0;
+  }
+
+  /* ---------- Footer ---------- */
+  .closing {
+    margin-top: 72px;
+    padding-top: 26px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-faint);
+  }
+
+  .closing p { max-width: 74ch; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<div class="shell">
+
+  <nav class="toc" aria-label="Mục lục báo cáo">
+    <p class="toc__label">Nội dung</p>
+    <ol>
+      <li><a href="#tomtat"><i>—</i><span>Tóm tắt</span></a></li>
+      <li><a href="#m1"><i>1</i><span>Môi trường &amp; công cụ</span></a></li>
+      <li><a href="#m2"><i>2</i><span>Kiến trúc Theme OS 2.0</span></a></li>
+      <li><a href="#m3"><i>3</i><span>Cú pháp Liquid cốt lõi</span></a></li>
+      <li><a href="#m4"><i>4</i><span>Objects &amp; data model</span></a></li>
+      <li><a href="#m5"><i>5</i><span>Component hoá snippet</span></a></li>
+      <li><a href="#m6"><i>6</i><span>Section Schema &amp; Block</span></a></li>
+      <li><a href="#m7"><i>7</i><span>Global Settings &amp; CSS</span></a></li>
+      <li><a href="#m8"><i>8</i><span>Đa ngôn ngữ (i18n)</span></a></li>
+      <li><a href="#m9"><i>9</i><span>Bind data thật</span></a></li>
+    </ol>
+    <p class="toc__label">Phụ lục</p>
+    <ol>
+      <li><a href="#bay"><i>A</i><span>Bẫy &amp; bài học thực chiến</span></a></li>
+      <li><a href="#sanpham"><i>B</i><span>Sản phẩm đã xây</span></a></li>
+      <li><a href="#tiendo"><i>C</i><span>Tiến độ &amp; bước tiếp</span></a></li>
+      <li><a href="#cheatsheet"><i>D</i><span>Cheat-sheet cú pháp</span></a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <header class="masthead">
+      <span class="eyebrow">Báo cáo tổng hợp kiến thức</span>
+      <h1>Shopify Liquid &amp; Theme OS 2.0</h1>
+      <p class="lede">Toàn bộ kiến thức tích luỹ qua 13 ngày lộ trình, được sắp xếp lại theo <strong>9 nhóm chuyên môn</strong> thay vì theo trình tự thời gian. Mỗi nhóm kèm ví dụ <strong>bài toán → code → output</strong> mở ra khi cần, cùng bẫy thực chiến đã gặp, sản phẩm đã xây và bước tiếp theo.</p>
+      <div class="meta-row">
+        <span><b>Nguồn:</b> docs/shopify-liquid-summary.md</span>
+        <span><b>Phạm vi:</b> Ngày 1 – Ngày 13</span>
+        <span><b>Project:</b> my-first-theme, ecommerce-theme</span>
+      </div>
+    </header>
+
+    <section id="tomtat">
+      <div class="stats">
+        <div class="stat"><b>9</b><span>nhóm kiến thức đã nắm</span></div>
+        <div class="stat"><b>2</b><span>theme project thực hành</span></div>
+        <div class="stat"><b>46</b><span>file section / snippet / block</span></div>
+        <div class="stat"><b>3</b><span>ngôn ngữ locale (en · vi · fr)</span></div>
+        <div class="stat"><b>0</b><span>offense khi <code>theme check</code></span></div>
+      </div>
+
+      <div class="exall-row">
+        <button type="button" class="exall" data-exall aria-pressed="false"><span>Mở tất cả ví dụ</span></button>
+        <p class="exall__hint">Mỗi nhóm kiến thức có ví dụ <em>bài toán → code → output</em>, mặc định đóng — bấm từng dòng để mở.</p>
+      </div>
+
+      <h3>Mạch kiến thức — từ nền tảng tới sản phẩm chạy được</h3>
+      <p>Bốn tầng dưới đây là trục xuyên suốt: mỗi nhóm kiến thức đều thuộc về đúng một tầng, và tầng sau chỉ có nghĩa khi tầng trước đã vững.</p>
+
+      <div class="pipe">
+        <div class="pipe__row">
+          <div class="pipe__key"><i>TẦNG 1</i> Nền tảng</div>
+          <div class="pipe__val">Môi trường, Shopify CLI, 7 thư mục chuẩn — <em>điều kiện để bắt đầu viết code</em> (nhóm 1)</div>
+        </div>
+        <div class="pipe__arrow"></div>
+        <div class="pipe__row">
+          <div class="pipe__key"><i>TẦNG 2</i> Ngôn ngữ</div>
+          <div class="pipe__val">Cú pháp Liquid, objects, filters, component hoá bằng snippet — <em>viết ra được HTML từ dữ liệu</em> (nhóm 3, 4, 5)</div>
+        </div>
+        <div class="pipe__arrow"></div>
+        <div class="pipe__row">
+          <div class="pipe__key"><i>TẦNG 3</i> Kiến trúc</div>
+          <div class="pipe__val">Layout → Template → Section → Block, Section Group, limits — <em>tổ chức code thành 1 theme đúng chuẩn</em> (nhóm 2)</div>
+        </div>
+        <div class="pipe__arrow"></div>
+        <div class="pipe__row">
+          <div class="pipe__key"><i>TẦNG 4</i> Trao quyền merchant</div>
+          <div class="pipe__val">Section Schema, Global Settings, locales, bind data thật — <em>merchant tự sửa được nội dung mà dev không phải mở code</em> (nhóm 6, 7, 8, 9)</div>
+        </div>
+      </div>
+
+      <div class="note">
+        <b>Kết luận nghề nghiệp</b>
+        <p>Giá trị lớn nhất của Theme OS 2.0 không nằm ở cú pháp Liquid, mà nằm ở <strong>đường ranh giữa code và data</strong>: file <code>.liquid</code> định nghĩa <em>luật</em> (được phép có gì), file <code>.json</code> lưu <em>thực thể</em> (thực tế đang có gì). Nắm đúng ranh giới này thì merchant tự vận hành được store, dev chỉ can thiệp khi cần tính năng mới.</p>
+      </div>
+    </section>
+
+    <!-- ═══════════════ 1 ═══════════════ -->
+    <section id="m1" class="module">
+      <header class="module__head">
+        <div class="module__top">
+          <span class="module__num">NHÓM 01</span>
+          <span class="chip">Ngày 1–2</span>
+        </div>
+        <h2>Môi trường phát triển &amp; công cụ</h2>
+        <p class="module__note">Dựng được vòng lặp dev cục bộ: sửa file → thấy ngay trên store thật, và có công cụ tự bắt lỗi trước khi commit.</p>
+      </header>
+
+      <h3>Chuỗi lệnh CLI xương sống</h3>
+      <pre><code>npm install -g @shopify/cli @shopify/theme   # cài Shopify CLI
+shopify version                              # kiểm tra bản cài
+shopify theme init my-first-theme             # khởi tạo theme mới
+shopify theme dev                             # local server, hot-reload lên dev store
+shopify theme check --path my-first-theme     # linter chính thức của Shopify</code></pre>
+
+      <div class="tbl">
+        <table>
+          <thead>
+            <tr><th>Hạng mục</th><th>Đã thiết lập</th><th>Vai trò thực tế</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="col-tight">Dev Store</td><td>Partner account + Development Store, bật <em>Start with test data</em></td><td>Có sẵn sản phẩm/collection giả để test mà không cần store thương mại</td></tr>
+            <tr><td class="col-tight">Runtime</td><td>Node.js + Shopify CLI</td><td>Chạy <code>theme dev</code>, <code>theme check</code>, <code>theme push/pull</code></td></tr>
+            <tr><td class="col-tight">Editor</td><td>VS Code + Shopify Liquid, Prettier, GitLens</td><td>Syntax highlight Liquid, format nhất quán, xem lịch sử thay đổi</td></tr>
+            <tr><td class="col-tight">Chất lượng</td><td><code>shopify theme check</code></td><td>Bắt lỗi cú pháp / schema / performance trước khi lên store</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>7 thư mục chuẩn — không được tạo thư mục ngoài danh mục này</h3>
+      <div class="tbl">
+        <table>
+          <thead>
+            <tr><th>Thư mục</th><th>Chứa gì</th><th>Đặc điểm</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>layout/</code></td><td><code>theme.liquid</code>, <code>password.liquid</code></td><td>Vỏ khung HTML chung của mọi trang</td></tr>
+            <tr><td><code>templates/</code></td><td><code>index.json</code>, <code>product.json</code>…</td><td>Quyết định route nào hiển thị nội dung gì</td></tr>
+            <tr><td><code>sections/</code></td><td><code>*.liquid</code> + <code>*-group.json</code></td><td>Khối giao diện merchant kéo-thả được</td></tr>
+            <tr><td><code>blocks/</code></td><td><code>*.liquid</code></td><td>Theme block tái dùng chéo nhiều section</td></tr>
+            <tr><td><code>snippets/</code></td><td><code>*.liquid</code></td><td>Component nội bộ, gọi bằng <code>{% render %}</code></td></tr>
+            <tr><td><code>config/</code></td><td><code>settings_schema.json</code>, <code>settings_data.json</code></td><td>Cấu hình toàn theme (schema = luật, data = giá trị merchant đã chọn)</td></tr>
+            <tr><td><code>locales/</code></td><td><code>en.default.json</code>, <code>en.default.schema.json</code>…</td><td>Đa ngôn ngữ, tách riêng phía khách và phía merchant</td></tr>
+            <tr><td><code>assets/</code></td><td>CSS, JS, SVG, ảnh</td><td>Truy cập qua <code>| asset_url</code>, Shopify tự CDN hoá</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="module__note">Ghi chú: <code>blocks/</code> là thư mục của Theme block (OS 2.0 mới), tính chung với 7 thư mục kinh điển thì thành 8 — nhưng bản chất vẫn nằm trong danh mục chuẩn của Shopify.</p>
+
+      <div class="ex-set">
+        <p class="ex-set__label">Ví dụ minh hoạ</p>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 1.1</span><span class="ex__title">Nạp file CSS từ <code>assets/</code> — vì sao không được viết thẳng đường dẫn</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Cần nạp <code>theme.css</code> đặt trong <code>assets/</code>. Không được hardcode URL vì Shopify đẩy asset lên CDN và gắn version để cache-busting.</p>
+            <div class="io">
+              <p class="io__label">Code Liquid — layout/theme.liquid</p>
+              <pre><code>{{ 'theme.css' | asset_url | stylesheet_tag }}
+{{ 'icon-cart.svg' | asset_url }}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML thật</p>
+              <pre><code>&lt;link href="//store.myshopify.com/cdn/shop/t/2/assets/theme.css?v=41827…"
+      rel="stylesheet" type="text/css" media="all"&gt;
+//store.myshopify.com/cdn/shop/t/2/assets/icon-cart.svg?v=93110…</code></pre>
+            </div>
+            <p class="ex__ask">Chuỗi <code>?v=…</code> do Shopify tự sinh theo nội dung file: sửa CSS thì version đổi, trình duyệt tải bản mới. Hardcode <code>/assets/theme.css</code> thì mất hoàn toàn cơ chế này.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 1.2</span><span class="ex__title">Đặt file sai thư mục — Shopify báo lỗi như thế nào</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Viết component <code>product-price.liquid</code> nhưng để lẫn vào <code>sections/</code> thay vì <code>snippets/</code>, rồi gọi bằng <code>{% render %}</code>.</p>
+            <div class="io">
+              <p class="io__label">Code Liquid</p>
+              <pre><code>{% render 'product-price', product: product %}
+{% comment %} file thật đang nằm ở sections/product-price.liquid {% endcomment %}</code></pre>
+            </div>
+            <div class="io io--bad">
+              <p class="io__label">Output — lỗi in thẳng ra trang</p>
+              <pre><code>Liquid error (line 12): Could not find asset snippets/product-price.liquid</code></pre>
+            </div>
+            <p class="ex__ask">Đây là một trong ít trường hợp Shopify <strong>báo lỗi rõ ràng</strong>: <code>{% render %}</code> luôn tìm trong <code>snippets/</code>, <code>{% section %}</code> luôn tìm trong <code>sections/</code>. Sai thư mục là hỏng ngay, không im lặng như phần lớn lỗi khác trong Phụ lục A.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ═══════════════ 2 ═══════════════ -->
+    <section id="m2" class="module">
+      <header class="module__head">
+        <div class="module__top">
+          <span class="module__num">NHÓM 02</span>
+          <span class="chip">Ngày 2 · 7 · 8 · 10</span>
+        </div>
+        <h2>Kiến trúc Theme OS 2.0</h2>
+        <p class="module__note">Hiểu một request từ URL đi qua những file nào để thành HTML — đây là nhóm kiến thức quyết định khả năng đọc hiểu một theme lạ.</p>
+      </header>
+
+      <h3>Đường đi của một request</h3>
+      <div class="pipe">
+        <div class="pipe__row">
+          <div class="pipe__key"><i>BƯỚC 1</i> URL</div>
+          <div class="pipe__val"><code>/collections/ao-thun</code> — Shopify khớp route với file template tương ứng</div>
+        </div>
+        <div class="pipe__arrow"></div>
+        <div class="pipe__row">
+          <div class="pipe__key"><i>BƯỚC 2</i> templates/</div>
+          <div class="pipe__val"><code>collection.json</code> — khai báo section nào hiển thị, thứ tự nào, và <em>dùng layout nào</em> (field <code>"layout"</code>)</div>
+        </div>
+        <div class="pipe__arrow"></div>
+        <div class="pipe__row">
+          <div class="pipe__key"><i>BƯỚC 3</i> layout/</div>
+          <div class="pipe__val"><code>theme.liquid</code> render vỏ khung; <code>{{ content_for_layout }}</code> là chỗ "khoét lỗ" để nội dung template chảy vào</div>
+        </div>
+        <div class="pipe__arrow"></div>
+        <div class="pipe__row">
+          <div class="pipe__key"><i>BƯỚC 4</i> sections/ → blocks/</div>
+          <div class="pipe__val">Từng section render markup của mình, lặp qua block con, và gọi <code>{% render %}</code> tới snippet để tái dùng component</div>
+        </div>
+      </div>
+
+      <h3>Layout — khung xương của mọi trang</h3>
+      <pre><code>layout/theme.liquid
+  └── &lt;head&gt;  … SEO, {{ content_for_header }}   ← BẮT BUỘC
+  └── &lt;body&gt;
+       ├── {% sections 'header-group' %}
+       ├── &lt;main&gt;{{ content_for_layout }}&lt;/main&gt;  ← nội dung template
+       └── {% sections 'footer-group' %}</code></pre>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Thẻ hệ thống</th><th>Vai trò</th><th>Thiếu thì sao</th></tr></thead>
+          <tbody>
+            <tr><td><code>{{ content_for_header }}</code></td><td>Shopify tự bơm Analytics, Pixel, app script, meta checkout</td><td>Hỏng tracking và nhiều app, nhưng <em>không báo lỗi</em></td></tr>
+            <tr><td><code>{{ content_for_layout }}</code></td><td>Chỗ nội dung template hiện tại được bơm vào</td><td>Mọi trang trắng trơn</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Layout <strong>không cố định một file</strong>. Template có thể override qua field <code>"layout"</code>, dùng cho các trang cần khung tối giản:</p>
+      <pre><code>// templates/password.json
+{ "layout": "password", "sections": { … }, "order": [ … ] }
+// → route /password dùng layout/password.liquid, không header/footer</code></pre>
+
+      <h3>Template — <code>.json</code> hay <code>.liquid</code></h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Kiểu</th><th>Ví dụ</th><th>Merchant customize?</th></tr></thead>
+          <tbody>
+            <tr><td><code>.json</code> — chuẩn OS 2.0</td><td><code>index.json</code>, <code>product.json</code>, <code>collection.json</code></td><td>✅ Kéo-thả section trong Theme Editor, không cần dev</td></tr>
+            <tr><td><code>.liquid</code> — kiểu cũ (Vintage)</td><td><code>gift_card.liquid</code></td><td>❌ Code cứng, merchant không sửa được</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><strong>Custom page template:</strong> tạo <code>templates/page.about.json</code> → Admin → Pages có thêm lựa chọn template "about" cho merchant chọn.</p>
+
+      <div class="trap">
+        <b>Bẫy đã gặp</b>
+        <p>Tạo <code>templates/collection.liquid</code> trong khi <code>templates/collection.json</code> đã tồn tại → file <code>.liquid</code> <strong>không bao giờ được route tới</strong>. Muốn sửa nội dung trang collection thì phải sửa section mà file JSON trỏ tới (<code>"type": "collection"</code> → <code>sections/collection.liquid</code>), không phải tạo template mới.</p>
+      </div>
+
+      <h3>Section Group — <code>{% sections %}</code> khác <code>{% section %}</code></h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th></th><th><code>{% section 'x' %}</code> (số ít)</th><th><code>{% sections 'x-group' %}</code> (số nhiều)</th></tr></thead>
+          <tbody>
+            <tr><td class="col-tight">Render</td><td>Đúng 1 section</td><td>Cả một <strong>nhóm</strong> section khai trong <code>x-group.json</code></td></tr>
+            <tr><td class="col-tight">Merchant</td><td>Không thêm/bớt được section khác</td><td>Thêm / bớt / sắp xếp lại nhiều section trong nhóm</td></tr>
+            <tr><td class="col-tight">File cấu hình</td><td>Không cần</td><td><code>sections/&lt;tên&gt;-group.json</code>, cùng cấu trúc <code>sections{}</code> + <code>order[]</code> như template</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Vì vậy header/footer nên bọc trong Section Group: merchant tự chèn thêm được thanh khuyến mãi phía trên header mà <strong>dev không sửa một dòng code</strong>.</p>
+
+      <h3>Bảng giới hạn (limits) phải nhớ</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Giới hạn</th><th class="num">Giá trị</th><th>Ý nghĩa thực tế</th></tr></thead>
+          <tbody>
+            <tr><td>Section / template</td><td class="num">25</td><td>Không nhồi quá nhiều section vào 1 trang</td></tr>
+            <tr><td>Block / section</td><td class="num">50</td><td>—</td></tr>
+            <tr><td>Độ sâu block lồng nhau</td><td class="num">8</td><td>Block chứa block tối đa 8 tầng</td></tr>
+            <tr><td>Vòng lặp <code>for</code></td><td class="num">50</td><td><strong>Liquid cắt ngang ở phần tử thứ 50</strong> — đây là lý do kỹ thuật bắt buộc dùng <code>paginate</code>, không chỉ vì UX</td></tr>
+            <tr><td>Kích thước 1 file section/snippet</td><td class="num">100 KB</td><td>—</td></tr>
+            <tr><td>Tổng số file theme</td><td class="num">1.000</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="ex-set">
+        <p class="ex-set__label">Ví dụ minh hoạ</p>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 2.1</span><span class="ex__title">Trang chủ ghép từ những file nào — và Shopify tự bọc thêm thẻ gì</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Trang chủ cần hero slideshow rồi tới featured collection. Cần biết chính xác HTML cuối cùng gửi về browser trông ra sao.</p>
+            <div class="io">
+              <p class="io__label">Code — templates/index.json</p>
+              <pre><code>{
+  "sections": {
+    "hero":     { "type": "slideshow",          "settings": {} },
+    "featured": { "type": "featured-collection", "settings": {} }
+  },
+  "order": ["hero", "featured"]
+}</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Code — layout/theme.liquid</p>
+              <pre><code>&lt;body&gt;
+  {% sections 'header-group' %}
+  &lt;main&gt;{{ content_for_layout }}&lt;/main&gt;
+  {% sections 'footer-group' %}
+&lt;/body&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML</p>
+              <pre><code>&lt;body&gt;
+  &lt;div id="shopify-section-sections--…__header" class="shopify-section"&gt;…&lt;/div&gt;
+  &lt;main&gt;
+    &lt;div id="shopify-section-template--…__hero" class="shopify-section"&gt;…slideshow…&lt;/div&gt;
+    &lt;div id="shopify-section-template--…__featured" class="shopify-section"&gt;…&lt;/div&gt;
+  &lt;/main&gt;
+  &lt;div id="shopify-section-sections--…__footer" class="shopify-section"&gt;…&lt;/div&gt;
+&lt;/body&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Hai điều rút ra: thứ tự trong <code>order[]</code> quyết định thứ tự DOM, và Shopify <strong>tự bọc mỗi section</strong> trong một thẻ có <code>id="shopify-section-…"</code> + class <code>shopify-section</code>. Thẻ bọc mặc định là <code>div</code>, đổi được bằng field <code>"tag"</code> trong <code>{% schema %}</code>.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 2.2</span><span class="ex__title">Ép riêng trang password dùng layout tối giản</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Trang nhập mật khẩu không được có header/footer/menu — nhưng mọi trang khác vẫn dùng <code>theme.liquid</code> bình thường.</p>
+            <div class="io">
+              <p class="io__label">Code — templates/password.json</p>
+              <pre><code>{
+  "layout": "password",
+  "sections": { "main": { "type": "password", "settings": {} } },
+  "order": ["main"]
+}</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Code — layout/password.liquid</p>
+              <pre><code>&lt;body&gt;
+  {{ content_for_layout }}
+&lt;/body&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output — route /password</p>
+              <pre><code>&lt;body&gt;
+  &lt;div id="shopify-section-template--…__main" class="shopify-section"&gt;
+    &lt;form action="/password" method="post"&gt;…&lt;/form&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+&lt;!-- không có header, không có footer, không có menu --&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Chỉ một field <code>"layout"</code> trong JSON template là đủ — không phải viết <code>{% if request.page_type == 'password' %}</code> rải rác trong <code>theme.liquid</code>.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 2.3</span><span class="ex__title">Merchant tự chèn announcement bar phía trên header — dev không sửa code</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Sếp yêu cầu thêm thanh thông báo "Freeship đơn trên 500k" phía trên header. Nếu header viết bằng <code>{% section 'header' %}</code> thì phải sửa layout; dùng Section Group thì merchant tự làm.</p>
+            <div class="io">
+              <p class="io__label">Code — sections/header-group.json (trước)</p>
+              <pre><code>{
+  "type": "header",
+  "sections": { "header": { "type": "header", "settings": {} } },
+  "order": ["header"]
+}</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Code — sau khi merchant kéo-thả trong Theme Editor</p>
+              <pre><code>{
+  "type": "header",
+  "sections": {
+    "announcement": { "type": "announcement-bar",
+                      "settings": { "text": "Freeship đơn trên 500k" } },
+    "header":       { "type": "header", "settings": {} }
+  },
+  "order": ["announcement", "header"]
+}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML — thứ tự đổi theo</p>
+              <pre><code>&lt;div class="shopify-section announcement-bar"&gt;Freeship đơn trên 500k&lt;/div&gt;
+&lt;div class="shopify-section site-header"&gt;…&lt;/div&gt;</code></pre>
+            </div>
+            <p class="ex__ask">File <code>layout/theme.liquid</code> vẫn chỉ có đúng một dòng <code>{% sections 'header-group' %}</code> — <strong>không đổi một ký tự</strong>. Thay đổi nằm hết trong file JSON do Theme Editor tự ghi.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 2.4</span><span class="ex__title">Giới hạn 50 iterations — triệu chứng và cách sửa</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Collection có 80 sản phẩm, render bằng vòng <code>for</code> thẳng. Trang không báo lỗi nhưng đếm ra thiếu sản phẩm.</p>
+            <div class="io">
+              <p class="io__label">Code sai — for thẳng</p>
+              <pre><code>{% for product in collection.products %}
+  &lt;li&gt;{{ product.title }}&lt;/li&gt;
+{% endfor %}
+&lt;p&gt;Tổng: {{ collection.products_count }} sản phẩm&lt;/p&gt;</code></pre>
+            </div>
+            <div class="io io--bad">
+              <p class="io__label">Output — bị cắt im lặng ở phần tử 50</p>
+              <pre><code>&lt;li&gt;Sản phẩm 1&lt;/li&gt;
+…
+&lt;li&gt;Sản phẩm 50&lt;/li&gt;   &lt;!-- dừng ở đây, 30 sản phẩm còn lại mất hẳn --&gt;
+&lt;p&gt;Tổng: 80 sản phẩm&lt;/p&gt;  &lt;!-- con số vẫn đúng 80 → càng khó phát hiện --&gt;</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Code đúng — bọc paginate</p>
+              <pre><code>{% paginate collection.products by 12 %}
+  {% for product in collection.products %}
+    &lt;li&gt;{{ product.title }}&lt;/li&gt;
+  {% endfor %}
+  {% if paginate.pages &gt; 1 %}{{ paginate | default_pagination }}{% endif %}
+{% endpaginate %}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output — 12 sản phẩm + thanh phân trang 7 trang</p>
+              <pre><code>&lt;li&gt;Sản phẩm 1&lt;/li&gt; … &lt;li&gt;Sản phẩm 12&lt;/li&gt;
+&lt;div class="pagination"&gt;
+  &lt;span class="page current"&gt;1&lt;/span&gt;
+  &lt;span class="page"&gt;&lt;a href="/collections/all?page=2"&gt;2&lt;/a&gt;&lt;/span&gt;
+  &lt;span class="next"&gt;&lt;a href="/collections/all?page=2"&gt;Next »&lt;/a&gt;&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+            </div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ═══════════════ 3 ═══════════════ -->
+    <section id="m3" class="module">
+      <header class="module__head">
+        <div class="module__top">
+          <span class="module__num">NHÓM 03</span>
+          <span class="chip">Ngày 3 · 4 · 5 · 7</span>
+        </div>
+        <h2>Cú pháp Liquid cốt lõi</h2>
+        <p class="module__note">Ba loại markup, bốn nhóm tag, và các đối tượng phụ trợ do chính tag sinh ra (<code>forloop</code>, <code>paginate</code>).</p>
+      </header>
+
+      <h3>Ba loại markup</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Loại</th><th>Ký hiệu</th><th>Nhiệm vụ</th><th>Ví dụ</th></tr></thead>
+          <tbody>
+            <tr><td>Output</td><td><code>{{ }}</code></td><td>In dữ liệu ra HTML</td><td><code>{{ product.title }}</code></td></tr>
+            <tr><td>Tag</td><td><code>{% %}</code></td><td>Thực thi logic, không tự in gì</td><td><code>{% if product.available %}</code></td></tr>
+            <tr><td>Filter</td><td><code>|</code></td><td>Biến đổi dữ liệu, xâu chuỗi được</td><td><code>{{ product.price | money }}</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Tag nhóm 1 — Control flow</h3>
+      <pre><code>{% if available == false %}      &lt;span class="badge--sold-out"&gt;Hết hàng&lt;/span&gt;
+{% elsif compare_price &gt; price %} &lt;span class="badge--sale"&gt;Đang giảm giá&lt;/span&gt;
+{% else %}                        &lt;span class="badge--normal"&gt;Đang bán&lt;/span&gt;
+{% endif %}
+
+{% unless available %}…{% endunless %}   {% # chỉ chạy khi điều kiện FALSE %}
+
+{% case product_type %}
+  {% when 'Shirts' %} …
+  {% when 'Pants' %}  …
+  {% else %}          …
+{% endcase %}
+
+{% assign tags = "new-arrival, sale" | split: ", " %}
+{% if tags contains 'new-arrival' %}…{% endif %}   {% # toán tử contains %}</code></pre>
+
+      <h3>Tag nhóm 2 — Iteration &amp; đối tượng <code>forloop</code></h3>
+      <pre><code>{% for title in product_titles limit: 2 offset: 1 %}   {% # bỏ 1, lấy 2 %}
+  &lt;p&gt;SP {{ forloop.index }}: {{ title }}&lt;/p&gt;
+{% endfor %}
+
+{% for i in (1..5) %}
+  {% if i == 2 %}{% continue %}{% endif %}   {% # bỏ qua lượt này %}
+  {% if i == 4 %}{% break %}{% endif %}      {% # thoát hẳn vòng lặp %}
+{% endfor %}</code></pre>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Thuộc tính</th><th>Kiểu</th><th>Ứng dụng thật</th></tr></thead>
+          <tbody>
+            <tr><td><code>forloop.first</code></td><td>Boolean</td><td>Mở thẻ container <code>&lt;ul&gt;</code> / <code>&lt;div class="grid"&gt;</code></td></tr>
+            <tr><td><code>forloop.last</code></td><td>Boolean</td><td>Đóng container, thêm nhãn cuối, bỏ dấu phân cách</td></tr>
+            <tr><td><code>forloop.index</code></td><td>Integer</td><td>Đếm từ <strong>1</strong> — tạo class <code>item-1</code>, <code>item-2</code></td></tr>
+            <tr><td><code>forloop.index0</code></td><td>Integer</td><td>Đếm từ <strong>0</strong> — khớp chỉ số mảng</td></tr>
+            <tr><td><code>forloop.length</code></td><td>Integer</td><td>Tổng số phần tử đang duyệt</td></tr>
+            <tr><td><code>forloop.rindex</code> / <code>rindex0</code></td><td>Integer</td><td>Số lượt còn lại, đếm ngược về 1 / về 0</td></tr>
+            <tr><td><code>forloop.parentloop</code></td><td>Object</td><td>Truy cập <code>forloop</code> của vòng lặp cha khi lồng nhau</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Tag nhóm 3 — Variable</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Tag</th><th>Dùng khi</th><th>Ví dụ</th></tr></thead>
+          <tbody>
+            <tr><td><code>{% assign %}</code></td><td>Gán giá trị đơn (string, number, boolean, object)</td><td><code>{% assign giá = gốc | times: 0.8 %}</code></td></tr>
+            <tr><td><code>{% capture %}</code></td><td>Gói cả một khối HTML nhiều dòng vào biến</td><td><code>{% capture ten %}product-1{% endcapture %}</code></td></tr>
+            <tr><td><code>{% increment %}</code></td><td>Biến đếm tự tăng, bắt đầu từ <strong>0</strong>, sống độc lập với <code>assign</code></td><td><code>{% increment counter %}</code> → 0, 1, 2…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Tag nhóm 4 — Pagination</h3>
+      <pre><code>{% paginate collection.products by 12 %}
+  {% for product in collection.products %} … {% endfor %}
+  {{ paginate | default_pagination }}
+{% endpaginate %}</code></pre>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Thuộc tính</th><th>Kiểu</th><th>Ý nghĩa</th></tr></thead>
+          <tbody>
+            <tr><td><code>paginate.current_page</code></td><td>Integer</td><td>Trang đang xem</td></tr>
+            <tr><td><code>paginate.pages</code></td><td>Integer</td><td>Tổng số trang — dùng <code>{% if paginate.pages &gt; 1 %}</code> để ẩn thanh phân trang khi chỉ có 1 trang</td></tr>
+            <tr><td><code>paginate.items</code></td><td>Integer</td><td>Tổng số phần tử đang phân trang</td></tr>
+            <tr><td><code>paginate.page_size</code></td><td>Integer</td><td>Số phần tử / trang, do <code>by N</code> quy định (tối đa 50)</td></tr>
+            <tr><td><code>paginate.current_offset</code></td><td>Integer</td><td><code>(current_page − 1) × page_size</code></td></tr>
+            <tr><td><code>paginate.previous</code> / <code>next</code></td><td>Object / <code>nil</code></td><td><code>.url</code>, <code>.title</code>; trả <code>nil</code> ở trang đầu / cuối</td></tr>
+            <tr><td><code>paginate.parts</code></td><td>Array</td><td>Từng nút trang — dùng khi tự thiết kế UI phân trang riêng</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Năm nhóm filter dùng thường xuyên</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Nhóm</th><th>Filter tiêu biểu</th><th>Lưu ý</th></tr></thead>
+          <tbody>
+            <tr><td>String</td><td><code>upcase</code>, <code>strip_html</code>, <code>truncate</code>, <code>escape</code>, <code>handleize</code></td><td>Chuỗi lọc SEO: <code>strip_html | truncate: 160</code></td></tr>
+            <tr><td>Money &amp; Number</td><td><code>money</code>, <code>money_with_currency</code>, <code>round</code>, <code>times</code>, <code>divided_by</code></td><td><strong>Luôn</strong> qua <code>money</code> — giá lưu bằng cents</td></tr>
+            <tr><td>Array</td><td><code>first</code>, <code>last</code>, <code>join</code>, <code>size</code>, <code>split</code>, <code>where</code></td><td><code>where</code> để lọc block theo <code>type</code></td></tr>
+            <tr><td>URL &amp; Asset</td><td><code>asset_url</code>, <code>stylesheet_tag</code>, <code>script_tag</code>, <code>image_url</code></td><td><code>image_url: width: 600</code> để Shopify resize sẵn trên CDN</td></tr>
+            <tr><td>Date</td><td><code>date: "%d/%m/%Y"</code></td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Whitespace control &amp; comment</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Cú pháp</th><th>Tác dụng</th></tr></thead>
+          <tbody>
+            <tr><td><code>{%- tag %}</code></td><td>Xoá khoảng trắng phía trước thẻ</td></tr>
+            <tr><td><code>{% tag -%}</code></td><td>Xoá khoảng trắng phía sau thẻ</td></tr>
+            <tr><td><code>{%- tag -%}</code> / <code>{{- out -}}</code></td><td>Xoá cả hai phía</td></tr>
+            <tr><td><code>{% comment %}…{% endcomment %}</code></td><td>Ghi chú nhiều dòng, không in ra HTML</td></tr>
+            <tr><td><code>{% # … %}</code></td><td>Ghi chú inline gọn 1 dòng</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">
+        <b>Quy tắc thực dụng</b>
+        <p>Dùng dấu <code>-</code> cho tag <strong>logic thuần</strong> (<code>assign</code>, <code>if</code>, <code>for</code>, <code>liquid</code>, <code>paginate</code>) vì chúng không xuất HTML. Tag <strong>output</strong> (<code>{{ product.title }}</code>) thì giữ nguyên, tránh chữ dính liền nhau. Khối logic dài nên gom vào một thẻ <code>{% liquid %}</code> cho gọn.</p>
+      </div>
+
+      <div class="ex-set">
+        <p class="ex-set__label">Ví dụ minh hoạ · control flow</p>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 3.1</span><span class="ex__title">Badge trạng thái sản phẩm — 3 nhánh loại trừ nhau</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Thẻ sản phẩm hiển thị đúng một badge: hết hàng, đang giảm giá, hoặc đang bán bình thường. Ba trạng thái loại trừ nhau nên phải dùng <code>elsif</code>, không phải ba khối <code>if</code> rời.</p>
+            <div class="io">
+              <p class="io__label">Code Liquid</p>
+              <pre><code>{% assign product_price = 40000 %}
+{% assign compare_price = 50000 %}
+{% assign available = true %}
+
+{% if available == false %}
+  &lt;span class="badge badge--sold-out"&gt;Hết hàng&lt;/span&gt;
+{% elsif compare_price &gt; product_price %}
+  &lt;span class="badge badge--sale"&gt;Đang giảm giá&lt;/span&gt;
+{% else %}
+  &lt;span class="badge badge--normal"&gt;Đang bán&lt;/span&gt;
+{% endif %}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML</p>
+              <pre><code>&lt;span class="badge badge--sale"&gt;Đang giảm giá&lt;/span&gt;</code></pre>
+            </div>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 3.2</span><span class="ex__title"><code>unless</code> — chỉ chạy khi điều kiện là false</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Hiện cảnh báo hết hàng. Viết <code>{% if available == false %}</code> cũng được, nhưng <code>unless</code> đọc gọn hơn khi chỉ có đúng một nhánh phủ định.</p>
+            <div class="io">
+              <p class="io__label">Code Liquid</p>
+              <pre><code>{% assign available = false %}
+
+{% unless available %}
+  &lt;p class="text-error"&gt;Sản phẩm này tạm thời hết hàng&lt;/p&gt;
+{% endunless %}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML</p>
+              <pre><code>&lt;p class="text-error"&gt;Sản phẩm này tạm thời hết hàng&lt;/p&gt;</code></pre>
+            </div>
+            <p class="ex__ask"><code>unless</code> <strong>không có</strong> <code>elsif</code>. Cần nhiều nhánh thì phải quay về <code>if / elsif</code>.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 3.3</span><span class="ex__title"><code>case / when</code> — so khớp một biến với nhiều giá trị</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Dịch <code>product.type</code> sang nhãn tiếng Việt. Có 5–10 loại nên chuỗi <code>if / elsif</code> sẽ dài và khó đọc.</p>
+            <div class="io">
+              <p class="io__label">Code Liquid</p>
+              <pre><code>{% assign product_type = 'Shirts' %}
+
+{% case product_type %}
+  {% when 'Shirts' %}
+    &lt;p&gt;Danh mục: Áo sơ mi&lt;/p&gt;
+  {% when 'Pants' %}
+    &lt;p&gt;Danh mục: Quần dài&lt;/p&gt;
+  {% else %}
+    &lt;p&gt;Danh mục khác&lt;/p&gt;
+{% endcase %}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML</p>
+              <pre><code>&lt;p&gt;Danh mục: Áo sơ mi&lt;/p&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Quy tắc dễ sai: <code>case</code> nhận <strong>tên biến</strong>, giá trị so sánh chỉ nằm trong <code>when</code>. Viết <code>{% case product_type == 'Shirts' %}</code> là sai cú pháp.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 3.4</span><span class="ex__title">Toán tử <code>contains</code> — kiểm tra tag sản phẩm</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Gắn nhãn "Hàng mới" cho sản phẩm có tag <code>new-arrival</code>. Tag là một array nên không so sánh bằng <code>==</code> được.</p>
+            <div class="io">
+              <p class="io__label">Code Liquid</p>
+              <pre><code>{% assign product_tags = "new-arrival, summer, sale" | split: ", " %}
+
+{% if product_tags contains 'new-arrival' %}
+  &lt;span class="badge"&gt;Hàng Mới&lt;/span&gt;
+{% endif %}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML</p>
+              <pre><code>&lt;span class="badge"&gt;Hàng Mới&lt;/span&gt;</code></pre>
+            </div>
+            <p class="ex__ask"><code>contains</code> dùng được cho cả array (có phần tử này không) và string (có chứa chuỗi con này không).</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="ex-set">
+        <p class="ex-set__label">Ví dụ minh hoạ · vòng lặp</p>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 3.5</span><span class="ex__title"><code>limit</code> + <code>offset</code> — bỏ sản phẩm đầu, lấy 2 sản phẩm tiếp</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Sản phẩm đầu tiên đã hiển thị lớn ở khối hero, khối "gợi ý" bên dưới cần bỏ nó ra và chỉ lấy 2 sản phẩm kế tiếp.</p>
+            <div class="io">
+              <p class="io__label">Code Liquid</p>
+              <pre><code>{% assign product_titles = "Áo Polo, Áo Sơ Mi, Quần Jeans, Váy" | split: ", " %}
+
+{% for title in product_titles limit: 2 offset: 1 %}
+  &lt;p&gt;SP {{ forloop.index }}: {{ title }}&lt;/p&gt;
+{% endfor %}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML</p>
+              <pre><code>&lt;p&gt;SP 1: Áo Sơ Mi&lt;/p&gt;
+&lt;p&gt;SP 2: Quần Jeans&lt;/p&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Lưu ý <code>forloop.index</code> đếm lại từ 1 <strong>theo vòng lặp</strong>, không phải theo vị trí trong mảng gốc — "Áo Sơ Mi" là phần tử thứ 2 của mảng nhưng là lượt lặp thứ 1.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 3.6</span><span class="ex__title"><code>forloop.first / last / index</code> — tự mở và đóng thẻ container</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Render danh sách màu trong thẻ <code>&lt;ul&gt;</code>, nhưng chỉ mở <code>&lt;ul&gt;</code> khi thật sự có phần tử — và mỗi <code>&lt;li&gt;</code> cần class đánh số để CSS bắt được.</p>
+            <div class="io">
+              <p class="io__label">Code Liquid</p>
+              <pre><code>{% assign colors = "Đỏ, Xanh, Vàng" | split: ", " %}
+
+{% for color in colors %}
+  {% if forloop.first %}&lt;ul&gt;{% endif %}
+    &lt;li class="item-{{ forloop.index }}"&gt;Màu {{ color }}
+      {% if forloop.last %}(Cuối cùng){% endif %}&lt;/li&gt;
+  {% if forloop.last %}&lt;/ul&gt;{% endif %}
+{% endfor %}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML</p>
+              <pre><code>&lt;ul&gt;
+  &lt;li class="item-1"&gt;Màu Đỏ&lt;/li&gt;
+  &lt;li class="item-2"&gt;Màu Xanh&lt;/li&gt;
+  &lt;li class="item-3"&gt;Màu Vàng (Cuối cùng)&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Mảng rỗng thì vòng lặp không chạy lượt nào → không có <code>&lt;ul&gt;&lt;/ul&gt;</code> rỗng nằm lại trong DOM.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 3.7</span><span class="ex__title"><code>break</code> vs <code>continue</code> — bỏ một lượt hay thoát cả vòng</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Duyệt 5 phần tử: bỏ qua phần tử 2, và dừng hẳn khi tới phần tử 4.</p>
+            <div class="io">
+              <p class="io__label">Code Liquid</p>
+              <pre><code>{% for i in (1..5) %}
+  {% if i == 2 %}{% continue %}{% endif %}   {% # bỏ lượt này, chạy tiếp %}
+  {% if i == 4 %}{% break %}{% endif %}      {% # thoát hẳn vòng lặp %}
+  &lt;span&gt;Số {{ i }}&lt;/span&gt;
+{% endfor %}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML</p>
+              <pre><code>&lt;span&gt;Số 1&lt;/span&gt;
+&lt;span&gt;Số 3&lt;/span&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Số 2 mất vì <code>continue</code>; số 4 và 5 mất vì <code>break</code> chặn trước khi kịp in.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="ex-set">
+        <p class="ex-set__label">Ví dụ minh hoạ · biến, filter &amp; phân trang</p>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 3.8</span><span class="ex__title">Tính giá sale bằng <code>assign</code> + filter chaining</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Giá gốc 100.000 (đơn vị cents), cần in ra giá sau khi giảm 20% dưới dạng tiền tệ của cửa hàng.</p>
+            <div class="io">
+              <p class="io__label">Code Liquid</p>
+              <pre><code>{% assign store_name = "Nike Store" %}
+{% assign original_price = 100000 %}
+{% assign discount_price = original_price | times: 0.8 %}
+
+&lt;h3&gt;Chào mừng bạn đến với {{ store_name }}&lt;/h3&gt;
+&lt;p&gt;Giá ưu đãi: {{ discount_price | money }}&lt;/p&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML</p>
+              <pre><code>&lt;h3&gt;Chào mừng bạn đến với Nike Store&lt;/h3&gt;
+&lt;p&gt;Giá ưu đãi: $800.00&lt;/p&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Bản thân <code>{% assign %}</code> không in gì — phải kết hợp <code>{{ }}</code> mới ra HTML. Filter <code>money</code> chuyển 80000 cents thành <code>$800.00</code> theo định dạng tiền tệ merchant đã cấu hình.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 3.9</span><span class="ex__title"><code>capture</code> và <code>increment</code> — hai kiểu biến đặc biệt</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> (a) Gói một khối HTML nhiều dòng vào biến để tái dùng. (b) Sinh id tự tăng cho các phần tử trong cùng một trang.</p>
+            <div class="io">
+              <p class="io__label">Code Liquid — capture</p>
+              <pre><code>{% capture placeholder_name %}product-1{% endcapture %}
+
+&lt;div class="media-wrapper"&gt;
+  {{ placeholder_name | placeholder_svg_tag: 'placeholder-svg' }}
+&lt;/div&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML</p>
+              <pre><code>&lt;div class="media-wrapper"&gt;
+  &lt;svg class="placeholder-svg" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 525 525"&gt;…&lt;/svg&gt;
+&lt;/div&gt;</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Code Liquid — increment</p>
+              <pre><code>&lt;p&gt;Lần 1: {% increment my_counter %}&lt;/p&gt;
+&lt;p&gt;Lần 2: {% increment my_counter %}&lt;/p&gt;
+&lt;p&gt;Lần 3: {% increment my_counter %}&lt;/p&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML</p>
+              <pre><code>&lt;p&gt;Lần 1: 0&lt;/p&gt;
+&lt;p&gt;Lần 2: 1&lt;/p&gt;
+&lt;p&gt;Lần 3: 2&lt;/p&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Điểm dễ nhầm: <code>increment</code> bắt đầu từ <strong>0</strong> (không phải 1) và sống trong một namespace riêng — biến <code>my_counter</code> của <code>increment</code> hoàn toàn độc lập với biến cùng tên do <code>assign</code> tạo ra.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 3.10</span><span class="ex__title">Phân trang collection và ẩn thanh phân trang khi chỉ có 1 trang</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Hiển thị 12 sản phẩm mỗi trang, kèm dòng "đang xem N / tổng M", và không hiện thanh phân trang khi collection ít sản phẩm.</p>
+            <div class="io">
+              <p class="io__label">Code Liquid</p>
+              <pre><code>{%- paginate collection.products by 12 -%}
+  &lt;p&gt;Hiển thị {{ collection.products.size }} / {{ collection.products_count }} sản phẩm&lt;/p&gt;
+
+  {%- for product in collection.products -%}
+    &lt;article&gt;{{ product.title }}&lt;/article&gt;
+  {%- endfor -%}
+
+  {%- if paginate.pages &gt; 1 -%}
+    {{ paginate | default_pagination }}
+  {%- endif -%}
+{%- endpaginate -%}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML — collection có 80 sản phẩm</p>
+              <pre><code>&lt;p&gt;Hiển thị 12 / 80 sản phẩm&lt;/p&gt;
+&lt;article&gt;Áo Polo&lt;/article&gt; … (12 thẻ)
+
+&lt;div class="pagination"&gt;
+  &lt;span class="page current"&gt;1&lt;/span&gt;
+  &lt;span class="page"&gt;&lt;a href="/collections/all?page=2"&gt;2&lt;/a&gt;&lt;/span&gt;
+  &lt;span class="next"&gt;&lt;a href="/collections/all?page=2"&gt;Next »&lt;/a&gt;&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML — collection có 8 sản phẩm</p>
+              <pre><code>&lt;p&gt;Hiển thị 8 / 8 sản phẩm&lt;/p&gt;
+&lt;article&gt;…&lt;/article&gt; … (8 thẻ)
+&lt;!-- không có div.pagination vì paginate.pages = 1 --&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Bên trong khối <code>paginate</code>, <code>collection.products</code> chỉ còn 12 phần tử của trang hiện tại — muốn lấy tổng số thật thì dùng <code>collection.products_count</code> hoặc <code>paginate.items</code>.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 3.11</span><span class="ex__title">Filter chaining làm sạch meta description cho SEO</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Mô tả sản phẩm merchant nhập là HTML có thẻ và dài hàng nghìn ký tự. Thẻ <code>&lt;meta name="description"&gt;</code> cần text thuần, tối đa ~160 ký tự, và an toàn khi nhúng vào attribute.</p>
+            <div class="io">
+              <p class="io__label">Code Liquid — snippets/meta-tags.liquid</p>
+              <pre><code>&lt;meta name="description" content="
+  {{- product.description | strip_html | truncate: 160 | escape -}}
+"&gt;</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Dữ liệu vào — product.description</p>
+              <pre><code>&lt;p&gt;&lt;strong&gt;Áo thun cotton 100%&lt;/strong&gt; — mềm mại, thoáng mát,
+phù hợp mặc hằng ngày. Có 5 màu &amp; 4 size từ S đến XL. Bảo hành đường
+may 30 ngày, đổi size miễn phí trong 7 ngày kể từ ngày nhận hàng.&lt;/p&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML</p>
+              <pre><code>&lt;meta name="description" content="Áo thun cotton 100% — mềm mại, thoáng mát,
+phù hợp mặc hằng ngày. Có 5 màu &amp;amp; 4 size từ S đến XL. Bảo hành đường m..."&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Thứ tự filter có ý nghĩa: <code>strip_html</code> phải chạy <strong>trước</strong> <code>truncate</code>, nếu không 160 ký tự đầu có thể bị thẻ HTML chiếm hết. <code>escape</code> chạy cuối để đổi <code>&amp;</code> thành <code>&amp;amp;</code>, tránh làm hỏng attribute.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 3.12</span><span class="ex__title">Whitespace control — cùng logic, hai chất lượng HTML</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Vòng lặp lồng trong <code>if</code> sinh ra rất nhiều dòng trắng trong HTML. Không gây lỗi nhưng khó đọc khi debug bằng View Source.</p>
+            <div class="io">
+              <p class="io__label">Code — không trim</p>
+              <pre><code>{% for i in (1..3) %}
+  &lt;li&gt;{{ i }}&lt;/li&gt;
+{% endfor %}</code></pre>
+            </div>
+            <div class="io io--bad">
+              <p class="io__label">Output — thừa dòng trắng ở mỗi lượt lặp</p>
+              <pre><code>
+  &lt;li&gt;1&lt;/li&gt;
+
+  &lt;li&gt;2&lt;/li&gt;
+
+  &lt;li&gt;3&lt;/li&gt;
+</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Code — có trim</p>
+              <pre><code>{%- for i in (1..3) -%}
+  &lt;li&gt;{{ i }}&lt;/li&gt;
+{%- endfor -%}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output — sạch</p>
+              <pre><code>&lt;li&gt;1&lt;/li&gt;&lt;li&gt;2&lt;/li&gt;&lt;li&gt;3&lt;/li&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Chỉ trim tag logic. Nếu trim cả <code>{{- i -}}</code> ở những chỗ text nằm cạnh nhau thì chữ sẽ dính liền — ví dụ <code>{{- first_name -}}{{- last_name -}}</code> ra "NguyễnVăn".</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ═══════════════ 4 ═══════════════ -->
+    <section id="m4" class="module">
+      <header class="module__head">
+        <div class="module__top">
+          <span class="module__num">NHÓM 04</span>
+          <span class="chip">Ngày 3 · 7 · 13</span>
+        </div>
+        <h2>Liquid Objects &amp; data model</h2>
+        <p class="module__note">Biết dữ liệu nào có sẵn ở đâu — và quan trọng hơn: object nào <em>luôn</em> tồn tại, object nào chỉ có ở một số trang.</p>
+      </header>
+
+      <h3>Phân loại object theo phạm vi tồn tại</h3>
+      <div class="split">
+        <div>
+          <h5>Toàn cục thật</h5>
+          <p><code>shop</code>, <code>cart</code>, <code>settings</code>, <code>request</code>, <code>routes</code>, <code>linklists</code>, <code>customer</code></p>
+          <p>Có mặt ở <strong>mọi trang</strong>. Snippet đọc trực tiếp là an toàn.</p>
+        </div>
+        <div>
+          <h5>Theo ngữ cảnh</h5>
+          <p><code>product</code>, <code>collection</code>, <code>article</code>, <code>blog</code>, <code>search</code></p>
+          <p>Chỉ tự có ở <strong>một số route</strong> (hoặc trong vòng lặp trùng tên biến). Phải truyền qua param, đừng dựa vào việc "tình cờ có sẵn".</p>
+        </div>
+      </div>
+
+      <div class="note">
+        <b>Bài học về routes</b>
+        <p>Dùng <code>{{ routes.cart_url }}</code> thay vì gõ tay <code>"/cart"</code>. Object <code>routes</code> tự resolve đúng theo market/ngôn ngữ đang bật (ví dụ <code>/vi/cart</code>) — hard-code path sẽ hỏng ngay khi store bật đa ngôn ngữ. Các route hay dùng: <code>root_url</code>, <code>cart_url</code>, <code>account_url</code>, <code>account_login_url</code>, <code>search_url</code>, <code>all_products_collection_url</code>.</p>
+      </div>
+
+      <h4>Object <code>product</code></h4>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Thuộc tính</th><th>Kiểu</th><th>Ý nghĩa</th></tr></thead>
+          <tbody>
+            <tr><td><code>title</code> · <code>handle</code> · <code>url</code></td><td>String</td><td>Tên, URL slug (<code>ao-thun-polo</code>), đường dẫn <code>/products/…</code></td></tr>
+            <tr><td><code>price</code></td><td>Integer</td><td><strong>Đơn vị cents</strong> — <code>1000</code> = $10.00, luôn qua <code>| money</code></td></tr>
+            <tr><td><code>compare_at_price</code></td><td>Integer / <code>nil</code></td><td>Giá gốc, dùng tính % giảm</td></tr>
+            <tr><td><code>price_varies</code></td><td>Boolean</td><td><code>true</code> khi các variant khác giá → hiển thị "Từ …"</td></tr>
+            <tr><td><code>available</code></td><td>Boolean</td><td>Còn hàng hay không</td></tr>
+            <tr><td><code>featured_image</code> · <code>images</code></td><td>Image Object / Array</td><td>Ảnh đại diện và toàn bộ ảnh</td></tr>
+            <tr><td><code>variants</code></td><td>Array</td><td>Biến thể màu / size</td></tr>
+            <tr><td><code>vendor</code> · <code>type</code> · <code>tags</code></td><td>String / Array</td><td>Thương hiệu, loại, nhãn</td></tr>
+            <tr><td><code>description</code></td><td>HTML</td><td>Mô tả chi tiết (đã là HTML sẵn)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Object <code>link</code> (navigation)</h4>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Thuộc tính</th><th>Kiểu</th><th>Ý nghĩa</th></tr></thead>
+          <tbody>
+            <tr><td><code>link.title</code></td><td>String</td><td>Label merchant tự đặt — <em>không</em> liên quan tên collection/product thật</td></tr>
+            <tr><td><code>link.url</code></td><td>String</td><td>Shopify <strong>tự resolve</strong> theo resource merchant chọn ở Admin</td></tr>
+            <tr><td><code>link.links</code></td><td>Array</td><td>Menu con cấp 2 — <code>{% if link.links != blank %}</code> để quyết định render dropdown</td></tr>
+            <tr><td><code>link.active</code> / <code>child_active</code></td><td>Boolean</td><td>Trang hiện tại trùng link này / trùng một link con</td></tr>
+            <tr><td><code>link.levels</code></td><td>Integer</td><td>Độ sâu menu con (0 = không có)</td></tr>
+            <tr><td><code>link.type</code></td><td>String</td><td><code>collection_link</code>, <code>product_link</code>, <code>page_link</code>, <code>http_link</code>…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Object <code>cart</code> · <code>shop</code> · <code>request</code></h4>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Thuộc tính</th><th>Kiểu</th><th>Ý nghĩa</th></tr></thead>
+          <tbody>
+            <tr><td><code>cart.item_count</code></td><td>Integer</td><td>Tổng số sản phẩm trong giỏ — dùng cho badge trên icon cart</td></tr>
+            <tr><td><code>cart.total_price</code></td><td>Integer</td><td>Tạm tính, đơn vị cents</td></tr>
+            <tr><td><code>cart.items</code> · <code>cart.note</code></td><td>Array / String</td><td>Line items, ghi chú khách gửi kèm</td></tr>
+            <tr><td><code>shop.name</code> · <code>email</code> · <code>currency</code> · <code>url</code> · <code>description</code></td><td>String</td><td>Thông tin cửa hàng, dùng nhiều ở footer và meta SEO</td></tr>
+            <tr><td><code>request.page_type</code></td><td>String</td><td><code>'index'</code>, <code>'product'</code>, <code>'collection'</code>, <code>'cart'</code>… — rẽ nhánh logic theo loại trang</td></tr>
+            <tr><td><code>request.path</code></td><td>String</td><td>URL tương đối hiện tại</td></tr>
+            <tr><td><code>request.locale</code></td><td>Locale Object</td><td><code>request.locale.iso_code</code> → <code>'vi'</code>, <code>'en'</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Metafields — dữ liệu tuỳ chỉnh ngoài field mặc định</h3>
+      <pre><code>{%- assign material = product.metafields.custom.material -%}
+{%- if material != blank -%}
+  &lt;p&gt;Chất liệu: {{ material.value }}&lt;/p&gt;
+{%- endif -%}</code></pre>
+      <p>Cú pháp <code>object.metafields.&lt;namespace&gt;.&lt;key&gt;</code>. Metafield trả về <strong>object có type riêng</strong> nên phải đi qua <code>.value</code>, và luôn kiểm tra tồn tại vì rất hay <code>nil</code> khi merchant chưa nhập.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Type metafield</th><th>Cách đọc</th></tr></thead>
+          <tbody>
+            <tr><td><code>single_line_text_field</code></td><td><code>{{ mf.value }}</code> — string trực tiếp</td></tr>
+            <tr><td><code>number_integer</code> / <code>number_decimal</code></td><td><code>{{ mf.value }}</code> — dùng được filter số</td></tr>
+            <tr><td><code>boolean</code></td><td><code>{% if mf.value %}</code></td></tr>
+            <tr><td><code>list.single_line_text_field</code></td><td><code>{% for item in mf.value %}</code> — là array</td></tr>
+            <tr><td><code>file_reference</code> / <code>product_reference</code></td><td><code>{{ mf.value.title }}</code>, <code>{{ mf.value | image_url }}</code></td></tr>
+            <tr><td><code>rich_text</code></td><td><code>{{ mf.value }}</code> — đã render sẵn HTML</td></tr>
+            <tr><td><code>json</code></td><td><code>{{ mf.value.some_key }}</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <b>Mẹo debug</b>
+        <p><code>{{ product | json }}</code> in ra toàn bộ cấu trúc object dưới dạng JSON — cách nhanh nhất để biết một object thực sự có field gì mà không phải tra tài liệu.</p>
+      </div>
+
+      <div class="ex-set">
+        <p class="ex-set__label">Ví dụ minh hoạ</p>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 4.1</span><span class="ex__title">Giá tiền: in thô vs qua filter <code>money</code></span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> In giá sản phẩm. Đây là lỗi kinh điển của người mới: <code>product.price</code> lưu bằng <strong>cents</strong>, in thô ra sẽ thành con số vô nghĩa với khách.</p>
+            <div class="io">
+              <p class="io__label">Code Liquid</p>
+              <pre><code>&lt;p&gt;Sai:  {{ product.price }}&lt;/p&gt;
+&lt;p&gt;Đúng: {{ product.price | money }}&lt;/p&gt;
+&lt;p&gt;Đủ:   {{ product.price | money_with_currency }}&lt;/p&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML — product.price = 249000</p>
+              <pre><code>&lt;p&gt;Sai:  249000&lt;/p&gt;
+&lt;p&gt;Đúng: $2,490.00&lt;/p&gt;
+&lt;p&gt;Đủ:   $2,490.00 USD&lt;/p&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Cùng một logic áp cho <code>compare_at_price</code>, <code>cart.total_price</code>, <code>line_item.line_price</code> — mọi field tiền tệ trong Shopify đều là integer cents.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 4.2</span><span class="ex__title"><code>routes</code> vs hardcode path — hỏng khi store bật đa ngôn ngữ</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Icon giỏ hàng trong header cần link tới trang cart. Store đang bật thêm tiếng Việt, khách đang xem ở locale <code>vi</code>.</p>
+            <div class="io">
+              <p class="io__label">Code Liquid</p>
+              <pre><code>&lt;a href="/cart"&gt;Giỏ hàng&lt;/a&gt;                    {% # hardcode %}
+&lt;a href="{{ routes.cart_url }}"&gt;Giỏ hàng&lt;/a&gt;    {% # dùng routes %}</code></pre>
+            </div>
+            <div class="io io--bad">
+              <p class="io__label">Output khi khách đang ở /vi — dòng hardcode</p>
+              <pre><code>&lt;a href="/cart"&gt;Giỏ hàng&lt;/a&gt;
+&lt;!-- bấm vào bị nhảy về locale mặc định, mất ngữ cảnh tiếng Việt --&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output khi khách đang ở /vi — dòng dùng routes</p>
+              <pre><code>&lt;a href="/vi/cart"&gt;Giỏ hàng&lt;/a&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Áp dụng cho mọi route hệ thống: <code>routes.root_url</code>, <code>routes.search_url</code>, <code>routes.account_url</code>, <code>routes.account_login_url</code>, <code>routes.all_products_collection_url</code>.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 4.3</span><span class="ex__title">Badge số trên icon giỏ hàng — ẩn khi giỏ rỗng</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Icon cart cần hiện số lượng sản phẩm, nhưng không được hiện vòng tròn "0" khi giỏ trống.</p>
+            <div class="io">
+              <p class="io__label">Code Liquid — sections/header.liquid</p>
+              <pre><code>&lt;a href="{{ routes.cart_url }}" class="header__cart"&gt;
+  {% render 'icon-cart' %}
+  {%- if cart.item_count &gt; 0 -%}
+    &lt;span class="header__cart-badge"&gt;{{ cart.item_count }}&lt;/span&gt;
+  {%- endif -%}
+&lt;/a&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output — giỏ có 3 sản phẩm</p>
+              <pre><code>&lt;a href="/cart" class="header__cart"&gt;
+  &lt;svg …&gt;&lt;/svg&gt;&lt;span class="header__cart-badge"&gt;3&lt;/span&gt;
+&lt;/a&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output — giỏ rỗng</p>
+              <pre><code>&lt;a href="/cart" class="header__cart"&gt;
+  &lt;svg …&gt;&lt;/svg&gt;
+&lt;/a&gt;</code></pre>
+            </div>
+            <p class="ex__ask"><code>cart</code> là object <strong>toàn cục thật</strong> — đọc được ở mọi trang, mọi snippet, không cần truyền param.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 4.4</span><span class="ex__title">Menu 2 cấp từ object <code>link</code> — tự biết khi nào cần dropdown</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Render menu chính. Item nào có menu con thì bọc dropdown, item nào không thì để thẻ <code>&lt;a&gt;</code> thường. Đồng thời đánh dấu item đang active.</p>
+            <div class="io">
+              <p class="io__label">Code Liquid</p>
+              <pre><code>&lt;ul class="nav"&gt;
+  {%- for link in section.settings.menu.links -%}
+    &lt;li class="nav__item {% if link.active or link.child_active %}is-active{% endif %}"&gt;
+      &lt;a href="{{ link.url }}"&gt;{{ link.title }}&lt;/a&gt;
+
+      {%- if link.links != blank -%}
+        &lt;ul class="nav__sub"&gt;
+          {%- for child in link.links -%}
+            &lt;li&gt;&lt;a href="{{ child.url }}"&gt;{{ child.title }}&lt;/a&gt;&lt;/li&gt;
+          {%- endfor -%}
+        &lt;/ul&gt;
+      {%- endif -%}
+    &lt;/li&gt;
+  {%- endfor -%}
+&lt;/ul&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output — khách đang ở trang /collections/ao-nam</p>
+              <pre><code>&lt;ul class="nav"&gt;
+  &lt;li class="nav__item "&gt;&lt;a href="/"&gt;Trang chủ&lt;/a&gt;&lt;/li&gt;
+  &lt;li class="nav__item is-active"&gt;
+    &lt;a href="/collections/all"&gt;Sản phẩm&lt;/a&gt;
+    &lt;ul class="nav__sub"&gt;
+      &lt;li&gt;&lt;a href="/collections/ao-nam"&gt;Áo nam&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="/collections/ao-nu"&gt;Áo nữ&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li class="nav__item "&gt;&lt;a href="/pages/lien-he"&gt;Liên hệ&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Item "Sản phẩm" được đánh <code>is-active</code> nhờ <code>link.child_active</code> — dù URL hiện tại không khớp chính nó mà khớp một menu con của nó.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 4.5</span><span class="ex__title">Metafield: có data vs merchant chưa nhập</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Hiện dòng "Chất liệu" trên trang sản phẩm, lấy từ metafield <code>custom.material</code>. Sản phẩm cũ chưa được nhập field này — không được để trống lơ lửng cái nhãn.</p>
+            <div class="io">
+              <p class="io__label">Code Liquid</p>
+              <pre><code>{%- assign material = product.metafields.custom.material -%}
+{%- if material != blank -%}
+  &lt;p class="product__spec"&gt;Chất liệu: {{ material.value }}&lt;/p&gt;
+{%- endif -%}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output — sản phẩm đã nhập metafield</p>
+              <pre><code>&lt;p class="product__spec"&gt;Chất liệu: Cotton 100%&lt;/p&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output — sản phẩm chưa nhập</p>
+              <pre><code>&lt;!-- không in gì cả, không có thẻ p rỗng --&gt;</code></pre>
+            </div>
+            <div class="io io--bad">
+              <p class="io__label">Nếu quên <code>.value</code> — bẫy hay gặp</p>
+              <pre><code>Code:   Chất liệu: {{ material }}
+Output: Chất liệu:            ← rỗng, vì material là OBJECT không phải string</code></pre>
+            </div>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 4.6</span><span class="ex__title">Rẽ nhánh theo loại trang bằng <code>request.page_type</code></span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Header cần thu nhỏ (compact) ở mọi trang <strong>trừ</strong> trang chủ, nơi header nằm chồng lên ảnh hero.</p>
+            <div class="io">
+              <p class="io__label">Code Liquid — layout/theme.liquid</p>
+              <pre><code>&lt;body class="template-{{ request.page_type }}
+  {% unless request.page_type == 'index' %}header--compact{% endunless %}"&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output — trang chủ</p>
+              <pre><code>&lt;body class="template-index "&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output — trang sản phẩm</p>
+              <pre><code>&lt;body class="template-product header--compact"&gt;</code></pre>
+            </div>
+            <p class="ex__ask">In luôn <code>template-{{ request.page_type }}</code> lên <code>&lt;body&gt;</code> là kỹ thuật rất đáng dùng: CSS sau đó nhắm được từng loại trang mà không cần thêm setting nào.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 4.7</span><span class="ex__title">Debug: không biết object có field nào thì làm sao</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Cần biết một variant có field gì để làm variant picker, nhưng không muốn tra tài liệu từng dòng.</p>
+            <div class="io">
+              <p class="io__label">Code Liquid — đặt tạm vào section đang làm</p>
+              <pre><code>&lt;pre&gt;{{ product.selected_or_first_available_variant | json }}&lt;/pre&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output trên browser</p>
+              <pre><code>{
+  "id": 43821059891398,
+  "title": "Đen / M",
+  "option1": "Đen",
+  "option2": "M",
+  "price": 249000,
+  "compare_at_price": 349000,
+  "available": true,
+  "inventory_quantity": 12,
+  "featured_image": { "src": "…", "width": 1200, "height": 1200 }
+}</code></pre>
+            </div>
+            <p class="ex__ask">Nhớ xoá dòng debug trước khi push — <code>theme check</code> không bắt lỗi này vì về mặt cú pháp nó hoàn toàn hợp lệ.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ═══════════════ 5 ═══════════════ -->
+    <section id="m5" class="module">
+      <header class="module__head">
+        <div class="module__top">
+          <span class="module__num">NHÓM 05</span>
+          <span class="chip">Ngày 6</span>
+        </div>
+        <h2>Component hoá: snippet &amp; <code>{% render %}</code></h2>
+        <p class="module__note">Coi snippet như một <strong>hàm</strong>: có input khai báo rõ, không đọc biến ngoài phạm vi. Đây là nhóm kiến thức tạo ra khác biệt lớn nhất về khả năng bảo trì.</p>
+      </header>
+
+      <h3><code>render</code> vs <code>include</code></h3>
+      <div class="split">
+        <div>
+          <h5>render — chuẩn OS 2.0</h5>
+          <p>Chạy trong <strong>isolated scope</strong>: không kế thừa biến local của file cha (trừ object toàn cục).</p>
+          <p>Tránh đụng độ tên biến, và được Shopify cache → nhanh hơn nhiều lần.</p>
+        </div>
+        <div>
+          <h5>include — deprecated</h5>
+          <p>Kế thừa toàn bộ biến từ file cha.</p>
+          <p>Dễ xung đột tên biến, không cache được, giảm hiệu năng. Không dùng cho code mới.</p>
+        </div>
+      </div>
+
+      <h3>Năm dạng cú pháp <code>{% render %}</code></h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Dạng</th><th>Cú pháp</th><th>Dùng khi</th></tr></thead>
+          <tbody>
+            <tr><td>1 · Cơ bản</td><td><code>{% render 'header-icon' %}</code></td><td>Snippet chỉ đọc HTML tĩnh hoặc object toàn cục (icon SVG, thông tin shop)</td></tr>
+            <tr><td>2 · Truyền tham số</td><td><code>{% render 'product-price', product: item, price_color: 'red' %}</code></td><td>Truyền nhiều biến cùng lúc — <strong>dạng nên dùng làm mặc định</strong></td></tr>
+            <tr><td>3 · <code>with … as</code></td><td><code>{% render 'product-card' with featured as product %}</code></td><td>Viết tắt khi chỉ truyền đúng 1 object</td></tr>
+            <tr><td>4 · <code>for … as</code></td><td><code>{% render 'product-card' for collection.products as product %}</code></td><td>Tự lặp mảng, mỗi lượt render 1 lần, tự có <code>forloop</code> — hiệu năng tốt nhất</td></tr>
+            <tr><td>5 · Kết hợp</td><td><code>{% render 'product-card' for collection.products as product, show_vendor: true, lazy_load: true %}</code></td><td>Vừa lặp mảng vừa truyền cờ config từ theme settings</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Chuẩn LiquidDoc <code>{% doc %}</code></h3>
+      <pre><code>{% doc %}
+  @file snippets/product-card.liquid
+  @description Component thẻ sản phẩm chuẩn OS 2.0
+  @param {Object}  product              - Sản phẩm cần render (Bắt buộc)
+  @param {Boolean} [show_vendor=false]  - Hiển thị thương hiệu
+  @param {Boolean} [show_quick_add=false] - Hiển thị nút Thêm nhanh
+  @param {Boolean} [lazy_load=true]     - Bật lazy loading cho ảnh
+{% enddoc %}</code></pre>
+
+      <div class="trap">
+        <b>Bẫy nghiêm trọng: global "tình cờ" trùng tên</b>
+        <p>Snippet đọc thẳng <code>{{ product.title }}</code> sẽ chạy đúng khi được gọi từ <code>{% for product in collection.products %}</code> — <strong>nhưng chỉ vì biến lặp tình cờ tên là <code>product</code></strong>. Gọi từ <code>{% for item in recommended %}</code> thì <code>product = nil</code>, snippet ra <strong>rỗng và không báo bất kỳ lỗi nào</strong>.</p>
+        <p>Cách sửa: khai báo <code>product</code> là param trong <code>{% doc %}</code>, rồi mọi nơi gọi đều truyền tường minh <code>{% render 'product-card', product: item %}</code>. Nội dung bên trong snippet không đổi một chữ — nhưng nó thôi phụ thuộc vào tên biến của người gọi.</p>
+      </div>
+
+      <div class="ex-set">
+        <p class="ex-set__label">Ví dụ minh hoạ</p>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 5.1</span><span class="ex__title">Snippet nhận param — cùng một component, hai cách hiển thị</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Component giá tiền dùng ở 2 nơi: thẻ sản phẩm trong grid (gọn), và trang chi tiết sản phẩm (có gạch giá gốc + % giảm). Không muốn viết 2 file.</p>
+            <div class="io">
+              <p class="io__label">Code — snippets/product-price.liquid</p>
+              <pre><code>{% doc %}
+  @param {Object}  product          - Sản phẩm (Bắt buộc)
+  @param {Boolean} [show_compare=false] - Hiện giá gốc bị gạch + % giảm
+{% enddoc %}
+
+&lt;div class="price"&gt;
+  &lt;span class="price__now"&gt;{{ product.price | money }}&lt;/span&gt;
+
+  {%- if show_compare and product.compare_at_price &gt; product.price -%}
+    {%- assign saved = product.compare_at_price | minus: product.price -%}
+    {%- assign percent = saved | times: 100 | divided_by: product.compare_at_price -%}
+    &lt;s class="price__was"&gt;{{ product.compare_at_price | money }}&lt;/s&gt;
+    &lt;span class="price__off"&gt;-{{ percent }}%&lt;/span&gt;
+  {%- endif -%}
+&lt;/div&gt;</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Code — nơi gọi</p>
+              <pre><code>{% render 'product-price', product: card_product %}
+{% render 'product-price', product: product, show_compare: true %}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output — lần gọi 1 (grid)</p>
+              <pre><code>&lt;div class="price"&gt;&lt;span class="price__now"&gt;$249.00&lt;/span&gt;&lt;/div&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output — lần gọi 2 (trang chi tiết)</p>
+              <pre><code>&lt;div class="price"&gt;
+  &lt;span class="price__now"&gt;$249.00&lt;/span&gt;
+  &lt;s class="price__was"&gt;$349.00&lt;/s&gt;
+  &lt;span class="price__off"&gt;-28%&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Không truyền <code>show_compare</code> thì biến đó là <code>nil</code> → <code>{% if %}</code> coi như false. Đó là cơ chế "giá trị mặc định" của snippet, và cũng là lý do phải ghi <code>[show_compare=false]</code> trong <code>{% doc %}</code> cho người sau đọc.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 5.2</span><span class="ex__title"><code>render … for … as</code> — lặp cả danh sách trong một dòng</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Render grid sản phẩm. Có 2 cách: bọc <code>{% for %}</code> bên ngoài rồi gọi render bên trong, hoặc để chính <code>render</code> lặp. Cách thứ hai được Shopify tối ưu tốt hơn.</p>
+            <div class="io">
+              <p class="io__label">Code — cách thường</p>
+              <pre><code>{% for product in collection.products %}
+  {% render 'product-card', product: product, show_vendor: true %}
+{% endfor %}</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Code — cách dùng for/as (tương đương, hiệu năng tốt hơn)</p>
+              <pre><code>{% render 'product-card' for collection.products as product,
+   show_vendor: true, show_quick_add: true, lazy_load: true %}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML — collection có 3 sản phẩm</p>
+              <pre><code>&lt;article class="card" data-index="1"&gt;
+  &lt;img src="…" loading="lazy"&gt;&lt;h3&gt;Áo Polo&lt;/h3&gt;
+  &lt;p class="card__vendor"&gt;Nike&lt;/p&gt;&lt;button&gt;Thêm nhanh&lt;/button&gt;
+&lt;/article&gt;
+&lt;article class="card" data-index="2"&gt;…Áo Sơ Mi…&lt;/article&gt;
+&lt;article class="card" data-index="3"&gt;…Quần Jeans…&lt;/article&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Trong dạng <code>for/as</code>, snippet vẫn có sẵn object <code>forloop</code> — nên <code>data-index="{{ forloop.index }}"</code> bên trong snippet vẫn chạy đúng.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 5.3</span><span class="ex__title">Bẫy isolated scope — cùng snippet, hai nơi gọi, hai kết quả khác nhau</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Snippet <code>product-card</code> đọc thẳng <code>product.title</code> mà không nhận param. Nó chạy đúng ở trang collection nhưng ra rỗng ở khối "Sản phẩm liên quan" — không có lỗi nào để lần theo.</p>
+            <div class="io">
+              <p class="io__label">Code — snippets/product-card.liquid (thiếu param)</p>
+              <pre><code>&lt;h3&gt;{{ product.title }}&lt;/h3&gt;</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Nơi gọi A — biến lặp tình cờ tên là "product"</p>
+              <pre><code>{% for product in collection.products %}
+  {% render 'product-card' %}
+{% endfor %}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output A — đúng, nhưng đúng vì may</p>
+              <pre><code>&lt;h3&gt;Áo Polo&lt;/h3&gt;
+&lt;h3&gt;Áo Sơ Mi&lt;/h3&gt;</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Nơi gọi B — biến lặp tên "item"</p>
+              <pre><code>{% for item in recommendations.products %}
+  {% render 'product-card' %}
+{% endfor %}</code></pre>
+            </div>
+            <div class="io io--bad">
+              <p class="io__label">Output B — rỗng, không một dòng lỗi</p>
+              <pre><code>&lt;h3&gt;&lt;/h3&gt;
+&lt;h3&gt;&lt;/h3&gt;</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Cách sửa — nội dung snippet không đổi một chữ</p>
+              <pre><code>{% doc %}
+  @param {Object} product - Sản phẩm cần render (Bắt buộc)
+{% enddoc %}
+&lt;h3&gt;{{ product.title }}&lt;/h3&gt;
+
+{% comment %} và ở MỌI nơi gọi đều truyền tường minh: {% endcomment %}
+{% render 'product-card', product: item %}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output B sau khi sửa</p>
+              <pre><code>&lt;h3&gt;Quần Jeans&lt;/h3&gt;
+&lt;h3&gt;Váy Liền&lt;/h3&gt;</code></pre>
+            </div>
+            <p class="ex__ask"><code>product: item</code> đọc là "bên trong snippet gọi nó là <code>product</code>, giá trị lấy từ biến <code>item</code> ở ngoài". Người gọi đặt tên biến ngoài là gì cũng được — snippet thôi phụ thuộc vào đó.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 5.4</span><span class="ex__title"><code>render</code> vs <code>include</code> — cùng code, khác kết quả</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Chứng minh vì sao <code>include</code> bị deprecated: nó nhìn thấy biến của file cha, nên hai file "vô tình" phụ thuộc vào nhau.</p>
+            <div class="io">
+              <p class="io__label">Code — snippets/badge.liquid</p>
+              <pre><code>&lt;span class="badge"&gt;{{ label }}&lt;/span&gt;</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Code — file cha</p>
+              <pre><code>{% assign label = "Hàng mới" %}
+
+{% include 'badge' %}   {% # kế thừa biến cha %}
+{% render  'badge' %}   {% # isolated scope %}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML</p>
+              <pre><code>&lt;span class="badge"&gt;Hàng mới&lt;/span&gt;   &lt;!-- include: thấy biến label --&gt;
+&lt;span class="badge"&gt;&lt;/span&gt;            &lt;!-- render: KHÔNG thấy, ra rỗng --&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Nhìn qua thì <code>include</code> "tiện hơn". Nhưng chính sự tiện đó khiến snippet không thể tái dùng an toàn: đổi tên biến ở file cha là snippet hỏng, mà không ai biết snippet đang phụ thuộc vào tên nào. Bản đúng là <code>{% render 'badge', label: "Hàng mới" %}</code>.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ═══════════════ 6 ═══════════════ -->
+    <section id="m6" class="module">
+      <header class="module__head">
+        <div class="module__top">
+          <span class="module__num">NHÓM 06</span>
+          <span class="chip">Ngày 9 · 10</span>
+        </div>
+        <h2>Section Schema &amp; Block — trao quyền cho merchant</h2>
+        <p class="module__note">Nhóm kiến thức nhiều bẫy nhất, vì ở đây có <strong>hai hệ khái niệm trùng tên nhau</strong> (schema vs JSON instance, classic block vs theme block, presets ở section vs ở block).</p>
+      </header>
+
+      <h3>Cấu tạo một file section</h3>
+      <pre><code>sections/my-section.liquid
+├── HTML markup       → dùng {{ section.settings.xxx }}
+├── {% schema %}      → name, tag, class, settings[], blocks[], max_blocks, presets[]
+├── {% stylesheet %}  → CSS riêng (Shopify tự dedupe: section lặp N lần vẫn chỉ load 1 lần)
+└── {% javascript %}  → JS riêng (tuỳ chọn)</code></pre>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Field</th><th>Vai trò thật (không phải để "nhận diện")</th></tr></thead>
+          <tbody>
+            <tr><td><code>name</code></td><td>Tên hiển thị trong khay <strong>"Add section"</strong> của merchant</td></tr>
+            <tr><td><code>tag</code></td><td>Thẻ HTML Shopify tự bọc quanh output (<code>section</code> / <code>div</code> / <code>article</code>)</td></tr>
+            <tr><td><code>class</code></td><td>CSS class thêm vào đúng thẻ bọc đó</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3><code>settings[]</code> — bảng type đầy đủ</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Type</th><th>Field đặc thù</th><th>Giá trị trả về</th></tr></thead>
+          <tbody>
+            <tr><td><code>text</code>, <code>textarea</code></td><td>—</td><td>string</td></tr>
+            <tr><td><code>richtext</code></td><td>—</td><td>string <strong>đã là HTML</strong></td></tr>
+            <tr><td><code>select</code>, <code>radio</code></td><td><code>options: [{value, label}]</code></td><td>value đã chọn</td></tr>
+            <tr><td><code>checkbox</code></td><td>—</td><td><code>true</code> / <code>false</code></td></tr>
+            <tr><td><code>range</code></td><td><code>min</code>, <code>max</code>, <code>step</code>, <code>unit</code></td><td>number</td></tr>
+            <tr><td><code>color</code></td><td>—</td><td>string mã màu</td></tr>
+            <tr><td><code>image_picker</code></td><td>—</td><td><strong>image object</strong> (cần <code>| image_url</code>)</td></tr>
+            <tr><td><code>product</code> / <code>collection</code> / <code>page</code></td><td>—</td><td><strong>object đầy đủ</strong>, không phải id</td></tr>
+            <tr><td><code>link_list</code></td><td><code>default: "main-menu"</code></td><td>Menu object → <code>.links</code></td></tr>
+            <tr><td><code>font_picker</code></td><td>—</td><td><strong>font object</strong> (xem nhóm 7)</td></tr>
+            <tr><td><code>text_alignment</code></td><td>tự có left/center/right</td><td>string</td></tr>
+            <tr><td><code>header</code>, <code>paragraph</code></td><td>—</td><td><strong>Không có <code>id</code></strong>, không lưu giá trị — chỉ để trang trí UI panel</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Mỗi phần tử trong <code>settings[]</code> gọi là <strong>setting field</strong>, không gọi là "block" — hai khái niệm hoàn toàn khác nhau.</p>
+
+      <h3>Classic block vs Theme block</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th></th><th>Classic block</th><th>Theme block (<code>@theme</code>)</th></tr></thead>
+          <tbody>
+            <tr><td class="col-tight">Khai báo</td><td><code>"blocks": [{"type":"text_block","settings":[…]}]</code> ngay trong schema section</td><td>File riêng trong <code>blocks/</code>; section chỉ ghi <code>"blocks":[{"type":"@theme"}]</code></td></tr>
+            <tr><td class="col-tight">Tái dùng ở section khác</td><td>❌ Phải copy y nguyên khai báo, sửa một bên không đồng bộ bên kia</td><td>✅ Dùng chung 1 file cho mọi section</td></tr>
+            <tr><td class="col-tight">Render</td><td><code>{% for block in section.blocks %}{% case block.type %}…{% endcase %}{% endfor %}</code></td><td><code>{% content_for 'blocks' %}</code></td></tr>
+            <tr><td class="col-tight">Block lồng block</td><td>❌ Không hỗ trợ</td><td>✅ Có (tối đa 8 tầng)</td></tr>
+            <tr><td class="col-tight">Giới hạn số lượng</td><td><code>limit: 4</code> — riêng từng <code>type</code>, độc lập nhau</td><td>Qua <code>max_blocks</code> của section</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <pre><code>{% for block in section.blocks %}
+  &lt;div {{ block.shopify_attributes }}&gt;      {% # LUÔN phải có %}
+    {% case block.type %}                    {% # đúng: tên biến %}
+      {% when 'icon_with_text' %}  &lt;h3&gt;{{ block.settings.heading }}&lt;/h3&gt;
+      {% when 'image_with_text' %} &lt;img src="{{ block.settings.image | image_url: width: 600 }}"&gt;
+    {% endcase %}
+  &lt;/div&gt;
+{% endfor %}</code></pre>
+      <p><code>{{ block.shopify_attributes }}</code> phải đặt trên thẻ HTML gốc của mỗi block, để Theme Editor highlight đúng block khi merchant hover/click.</p>
+
+      <h3>Luật (schema) vs Thực thể (JSON) — ranh giới cốt lõi</h3>
+      <div class="split">
+        <div>
+          <h5>Schema <code>blocks[]</code> — trong file .liquid</h5>
+          <p>Định nghĩa <strong>LUẬT</strong>: loại block nào được phép thêm, setting nào hợp lệ.</p>
+        </div>
+        <div>
+          <h5>Block instance — trong file .json</h5>
+          <p>Lưu <strong>THỰC THỂ</strong> đã thêm: id nào, giá trị setting gì, thứ tự nào.</p>
+        </div>
+      </div>
+
+      <pre><code>"feature_banner_1": {
+  "type": "custom-section",
+  "settings": { "background_image": "banner.jpg" },
+  "blocks": {
+    "group_1": {
+      "type": "group",
+      "settings": { "layout_direction": "group--horizontal", "padding": 20 },
+      "blocks": {
+        "text_1": { "type": "text", "settings": { "text": "Sale 50%" } },
+        "text_2": { "type": "text", "settings": { "text": "Chỉ hôm nay" } }
+      },
+      "block_order": ["text_1", "text_2"]
+    }
+  },
+  "block_order": ["group_1"]
+}</code></pre>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Field</th><th>Bắt buộc</th><th>Ý nghĩa</th></tr></thead>
+          <tbody>
+            <tr><td><code>type</code></td><td>✅</td><td>Khớp classic type trong schema, hoặc <strong>tên file</strong> trong <code>blocks/</code> nếu section cha dùng <code>@theme</code></td></tr>
+            <tr><td><code>settings</code></td><td>Tuỳ chọn</td><td>Key phải trùng đúng <code>id</code> đã khai trong schema; thiếu field nào thì lấy <code>default</code></td></tr>
+            <tr><td><code>blocks</code></td><td>Tuỳ chọn</td><td>Chỉ có tác dụng nếu <strong>chính block này</strong> cũng khai <code>"blocks":[{"type":"@theme"}]</code></td></tr>
+            <tr><td><code>block_order</code></td><td>✅ nếu có <code>blocks</code></td><td>JSON object <code>{}</code> không đảm bảo giữ thứ tự → cần mảng riêng để chỉ rõ thứ tự render</td></tr>
+            <tr><td><code>disabled</code></td><td>Tuỳ chọn</td><td><code>true</code> = ẩn khi render nhưng <strong>giữ nguyên config</strong> (khác xoá hẳn)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Chỉ đúng 5 field trên là hợp lệ — thêm key lạ, Shopify <strong>âm thầm bỏ qua</strong>. Còn <code>"group_1"</code>, <code>"text_1"</code> chỉ là <strong>key tự đặt</strong> làm id nhận diện, không phải giá trị của field nào.</p>
+
+      <h3><code>presets[]</code> — cùng tên, hai vai trò khác hẳn</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th><code>presets</code> nằm ở đâu</th><th>Tác dụng</th></tr></thead>
+          <tbody>
+            <tr><td><code>sections/xxx.liquid</code></td><td>Section hiện trong khay <strong>"Add section"</strong>, kèm cấu hình mặc định</td></tr>
+            <tr><td><code>blocks/xxx.liquid</code></td><td>Theme block hiện trong khay <strong>"Add block"</strong> — <strong>không có <code>presets</code> = merchant không add được</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="trap">
+        <b>Bẫy lớn nhất đã gặp: "No blocks available for this section"</b>
+        <p>Thiếu <code>presets</code> trong file <code>blocks/*.liquid</code> thì <strong>không có bất kỳ lỗi nào</strong>: <code>theme check</code> pass sạch, block vẫn render đúng, vẫn sửa được settings ở sidebar. Triệu chứng duy nhất là bấm "Add block" báo <em>No blocks available</em> — rất dễ chẩn đoán nhầm sang lỗi môi trường (CORS, <code>theme dev</code>, cache trình duyệt).</p>
+        <p>Nguyên nhân hiểu sai: tưởng khai <code>"blocks": [{"type": "slide"}]</code> bên section là đủ. Hai thứ đó trả lời <strong>hai câu hỏi khác nhau</strong>:</p>
+        <pre><code>sections/slideshow.liquid  "blocks": [{"type":"slide"}]  → "Section này CHO PHÉP chứa block loại nào?"
+blocks/slide.liquid        "presets": [{"name":"…"}]     → "Block này có được PHÉP tự thêm mới không?"</code></pre>
+        <p>Cách kiểm tra nhanh toàn bộ: <code>grep -c presets blocks/*.liquid</code> — file nào ra <code>0</code> là file đó không add được.</p>
+      </div>
+
+      <p><code>preset.settings</code> <strong>không phải</strong> nơi viết CSS tự do — nó chỉ set giá trị mặc định cho <strong>đúng những <code>id</code> đã tồn tại trong <code>settings[]</code></strong>. Còn <code>presets.blocks</code> thì tạo sẵn <strong>block instance thật có data cụ thể</strong> khi merchant thêm section lần đầu; không có nó, section thêm vào sẽ trống trơn và merchant phải tự bấm "Add block" từng cái:</p>
+      <pre><code>"presets": [{
+  "name": "Feature Columns",
+  "blocks": [
+    { "type": "icon_with_text", "settings": { "icon": "truck", "heading": "Free Shipping" }},
+    { "type": "icon_with_text", "settings": { "icon": "lock",  "heading": "Secure Payment" }}
+  ]
+}]</code></pre>
+
+      <h3>Ba hiểu lầm đã sửa được qua thực hành</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Hiểu lầm</th><th>Thực tế</th></tr></thead>
+          <tbody>
+            <tr><td>"Viết <code>feature_banner_1</code> vào JSON = đổi router tới <code>feature-banner.liquid</code>"</td><td>Route không hề đổi. <code>index.json</code> đã cố định cho route <code>/</code>; thêm object mới chỉ là <strong>thêm 1 khối nội dung</strong> vào trang đã có. <code>"type"</code> chỉ chọn file <code>.liquid</code> nào để vẽ khối đó.</td></tr>
+            <tr><td>"Thêm block = chèn code HTML + schema vào bên trong file section"</td><td>Code block đã tồn tại ở file riêng. JSON chỉ tạo một <strong>tham chiếu</strong>: "tại vị trí <code>{% content_for 'blocks' %}</code>, chạy file này rồi dán kết quả vào". File gốc không đổi một dòng.</td></tr>
+            <tr><td>"Object trong JSON được Shopify sinh ra từ schema"</td><td>JSON do <strong>người viết theme tự gõ</strong> (hoặc Theme Editor ghi khi merchant kéo-thả). Schema chỉ là <strong>luật kiểm tra</strong> — JSON phải <em>tuân theo</em> luật, không phải <em>lấy từ</em> luật.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="ex-set">
+        <p class="ex-set__label">Ví dụ minh hoạ</p>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 6.1</span><span class="ex__title">Section tối thiểu — từ schema tới HTML thật, kèm thẻ bọc Shopify thêm vào</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Một section "Rich text" cho merchant nhập tiêu đề, nội dung và chọn căn lề. Cần thấy rõ <code>tag</code>/<code>class</code> ảnh hưởng HTML thế nào.</p>
+            <div class="io">
+              <p class="io__label">Code — sections/rich-text.liquid</p>
+              <pre><code>&lt;div class="rich-text rich-text--{{ section.settings.alignment }}"&gt;
+  &lt;h2&gt;{{ section.settings.heading }}&lt;/h2&gt;
+  {{ section.settings.body }}
+&lt;/div&gt;
+
+{% schema %}
+{
+  "name": "Rich text",
+  "tag": "section",
+  "class": "section-rich-text",
+  "settings": [
+    { "type": "text",           "id": "heading",   "label": "Tiêu đề", "default": "Về chúng tôi" },
+    { "type": "richtext",       "id": "body",      "label": "Nội dung" },
+    { "type": "text_alignment", "id": "alignment", "label": "Căn lề",  "default": "center" }
+  ],
+  "presets": [{ "name": "Rich text" }]
+}
+{% endschema %}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML</p>
+              <pre><code>&lt;section id="shopify-section-template--…__rich_text_x7Y"
+         class="shopify-section section-rich-text"&gt;
+  &lt;div class="rich-text rich-text--center"&gt;
+    &lt;h2&gt;Về chúng tôi&lt;/h2&gt;
+    &lt;p&gt;Chúng tôi bán &lt;strong&gt;áo thun cotton&lt;/strong&gt; từ 2019.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/section&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Ba điều đọc ra từ output: <code>"tag": "section"</code> quyết định thẻ bọc là <code>&lt;section&gt;</code> (mặc định là <code>div</code>); <code>"class"</code> được thêm <strong>cạnh</strong> class <code>shopify-section</code> mà Shopify luôn gắn; và <code>richtext</code> trả về HTML có sẵn thẻ <code>&lt;p&gt;</code>, <code>&lt;strong&gt;</code> nên không được bọc thêm <code>&lt;p&gt;</code> bên ngoài.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 6.2</span><span class="ex__title">Setting nào trả về string, setting nào trả về object</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Cùng khai <code>image_picker</code> và <code>text</code>, nhưng một cái in ra thẳng được, một cái không. Đây là nguồn gốc của lỗi "ảnh không hiện".</p>
+            <div class="io">
+              <p class="io__label">Code sai</p>
+              <pre><code>&lt;img src="{{ section.settings.banner }}"&gt;</code></pre>
+            </div>
+            <div class="io io--bad">
+              <p class="io__label">Output — ảnh vỡ</p>
+              <pre><code>&lt;img src="ImageDrop"&gt;   &lt;!-- object bị stringify thành text vô nghĩa --&gt;</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Code đúng</p>
+              <pre><code>{%- if section.settings.banner != blank -%}
+  &lt;img src="{{ section.settings.banner | image_url: width: 1200 }}"
+       width="{{ section.settings.banner.width }}"
+       height="{{ section.settings.banner.height }}"
+       alt="{{ section.settings.banner.alt | escape }}" loading="lazy"&gt;
+{%- endif -%}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML</p>
+              <pre><code>&lt;img src="//store.myshopify.com/cdn/shop/files/banner.jpg?v=17…&amp;width=1200"
+     width="2400" height="1200" alt="Bộ sưu tập hè" loading="lazy"&gt;</code></pre>
+            </div>
+            <p class="ex__ask">In luôn <code>width</code>/<code>height</code> thật của ảnh là kỹ thuật chống CLS (layout nhảy khi ảnh load xong) — browser biết trước tỷ lệ để chừa chỗ.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 6.3</span><span class="ex__title">Classic block — 3 cột "cam kết" merchant tự thêm, tối đa 3</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Section trust-badge cho merchant thêm tối đa 3 cột icon + tiêu đề. Block chỉ dùng trong đúng section này nên không cần Theme block.</p>
+            <div class="io">
+              <p class="io__label">Code — sections/trust-badge.liquid</p>
+              <pre><code>&lt;div class="trust"&gt;
+  {% for block in section.blocks %}
+    &lt;div class="trust__item" {{ block.shopify_attributes }}&gt;
+      {% case block.type %}
+        {% when 'icon_with_text' %}
+          {% render 'icon-' | append: block.settings.icon %}
+          &lt;h3&gt;{{ block.settings.heading }}&lt;/h3&gt;
+      {% endcase %}
+    &lt;/div&gt;
+  {% endfor %}
+&lt;/div&gt;
+
+{% schema %}
+{
+  "name": "Trust badge",
+  "blocks": [{
+    "type": "icon_with_text",
+    "name": "Icon with text",
+    "limit": 3,
+    "settings": [
+      { "type": "select", "id": "icon", "label": "Icon",
+        "options": [{ "value": "truck", "label": "Giao hàng" },
+                    { "value": "lock",  "label": "Bảo mật" }] },
+      { "type": "text", "id": "heading", "label": "Tiêu đề" }
+    ]
+  }],
+  "presets": [{
+    "name": "Trust badge",
+    "blocks": [
+      { "type": "icon_with_text", "settings": { "icon": "truck", "heading": "Freeship toàn quốc" }},
+      { "type": "icon_with_text", "settings": { "icon": "lock",  "heading": "Thanh toán bảo mật" }}
+    ]
+  }]
+}
+{% endschema %}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML — ngay khi merchant vừa thêm section (nhờ presets.blocks)</p>
+              <pre><code>&lt;div class="trust"&gt;
+  &lt;div class="trust__item" data-shopify-editor-block='{"id":"…","type":"icon_with_text"}'&gt;
+    &lt;svg class="icon-truck"&gt;…&lt;/svg&gt;&lt;h3&gt;Freeship toàn quốc&lt;/h3&gt;
+  &lt;/div&gt;
+  &lt;div class="trust__item" data-shopify-editor-block='{"id":"…","type":"icon_with_text"}'&gt;
+    &lt;svg class="icon-lock"&gt;…&lt;/svg&gt;&lt;h3&gt;Thanh toán bảo mật&lt;/h3&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Hai chi tiết: <code>{{ block.shopify_attributes }}</code> render ra <code>data-shopify-editor-block</code> — thiếu nó thì merchant click vào block trong Theme Editor không highlight đúng chỗ. Và <code>limit: 3</code> khiến nút "Add block" tự mờ đi sau block thứ 3.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 6.4</span><span class="ex__title">Theme block lồng 3 tầng — trace từ JSON ra HTML</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Banner cho phép merchant xếp nhiều khối text bên trong một nhóm có hướng ngang/dọc. Cần thấy rõ file <code>.liquid</code> và file <code>.json</code> chia việc thế nào.</p>
+            <div class="io">
+              <p class="io__label">Code — 3 file .liquid (LUẬT)</p>
+              <pre><code>{# sections/custom-section.liquid #}
+&lt;div class="custom-section"&gt;{% content_for 'blocks' %}&lt;/div&gt;
+{% schema %}{ "name": "Custom section", "blocks": [{ "type": "@theme" }] }{% endschema %}
+
+{# blocks/group.liquid #}
+&lt;div class="group {{ block.settings.layout_direction }}"&gt;{% content_for 'blocks' %}&lt;/div&gt;
+{% schema %}{ "name": "Group", "blocks": [{ "type": "@theme" }],
+              "presets": [{ "name": "Group" }] }{% endschema %}
+
+{# blocks/text.liquid #}
+&lt;div class="text {{ block.settings.text_style }}"&gt;{{ block.settings.text }}&lt;/div&gt;
+{% schema %}{ "name": "Text", "presets": [{ "name": "Text" }] }{% endschema %}</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Code — templates/index.json (THỰC THỂ)</p>
+              <pre><code>"feature_banner_1": {
+  "type": "custom-section",
+  "blocks": {
+    "group_1": {
+      "type": "group",
+      "settings": { "layout_direction": "group--horizontal" },
+      "blocks": {
+        "text_1": { "type": "text", "settings": { "text": "Sale 50%",   "text_style": "text--title" }},
+        "text_2": { "type": "text", "settings": { "text": "Chỉ hôm nay", "text_style": "text--subtitle" }}
+      },
+      "block_order": ["text_1", "text_2"]
+    }
+  },
+  "block_order": ["group_1"]
+}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML</p>
+              <pre><code>&lt;div class="custom-section"&gt;
+  &lt;div class="group group--horizontal"&gt;
+    &lt;div class="text text--title"&gt;Sale 50%&lt;/div&gt;
+    &lt;div class="text text--subtitle"&gt;Chỉ hôm nay&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Đảo <code>"block_order": ["text_2", "text_1"]</code> thì HTML đảo theo — không cần sửa file <code>.liquid</code>. Đó chính là ranh giới luật/thực thể: file <code>.liquid</code> nói "được phép chứa block", file <code>.json</code> nói "đang chứa cái nào, thứ tự nào".</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 6.5</span><span class="ex__title">Bẫy "No blocks available" — code chạy đúng mà merchant không thêm được block</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Section slideshow đã khai cho phép chứa block <code>slide</code>, block render đúng, <code>theme check</code> sạch — nhưng bấm "Add block" trong Theme Editor thì trống.</p>
+            <div class="io">
+              <p class="io__label">Code — hai file, thiếu đúng một dòng</p>
+              <pre><code>{# sections/slideshow.liquid — ĐÃ khai cho phép #}
+{% schema %}{ "name": "Slideshow", "blocks": [{ "type": "slide" }] }{% endschema %}
+
+{# blocks/slide.liquid — THIẾU presets #}
+{% schema %}
+{
+  "name": "Slide",
+  "settings": [{ "type": "image_picker", "id": "image", "label": "Ảnh" }]
+}
+{% endschema %}</code></pre>
+            </div>
+            <div class="io io--bad">
+              <p class="io__label">Kết quả trong Theme Editor</p>
+              <pre><code>shopify theme check  →  31 files inspected, no offenses    ✓ pass
+Slide đã ghi sẵn trong index.json  →  render đúng           ✓ hiện trên trang
+Bấm "Add block"  →  "No blocks available for this section"  ✗</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Cách sửa — thêm presets vào FILE BLOCK</p>
+              <pre><code>{# blocks/slide.liquid #}
+{% schema %}
+{
+  "name": "Slide",
+  "settings": [{ "type": "image_picker", "id": "image", "label": "Ảnh" }],
+  "presets": [{ "name": "Slide" }]
+}
+{% endschema %}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Kết quả sau khi sửa</p>
+              <pre><code>Bấm "Add block"  →  danh sách hiện "Slide", merchant thêm được  ✓</code></pre>
+            </div>
+            <p class="ex__ask">Cách quét cả theme trong một lệnh: <code>grep -c presets blocks/*.liquid</code> — file nào ra <code>0</code> là file đó merchant không thêm mới được.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 6.6</span><span class="ex__title"><code>header</code> / <code>paragraph</code> — setting không có <code>id</code>, không lưu gì</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Panel setting có 8 field lẫn lộn, cần chia nhóm cho merchant dễ đọc. Hai type này chỉ để trang trí UI, không phải dữ liệu.</p>
+            <div class="io">
+              <p class="io__label">Code — {% schema %}</p>
+              <pre><code>"settings": [
+  { "type": "header",    "content": "Bố cục" },
+  { "type": "range",     "id": "columns", "label": "Số cột", "min": 2, "max": 5, "step": 1, "default": 4 },
+
+  { "type": "header",    "content": "Hiển thị" },
+  { "type": "paragraph", "content": "Tắt bớt để trang nhẹ hơn trên mobile." },
+  { "type": "checkbox",  "id": "show_vendor", "label": "Hiện thương hiệu", "default": false }
+]</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Kết quả trong panel Theme Editor</p>
+              <pre><code>── Bố cục ───────────────────
+Số cột            [──●──] 4
+
+── Hiển thị ─────────────────
+Tắt bớt để trang nhẹ hơn trên mobile.
+[ ] Hiện thương hiệu</code></pre>
+            </div>
+            <div class="io io--bad">
+              <p class="io__label">Đọc thử trong Liquid — không có gì để đọc</p>
+              <pre><code>{{ section.settings.columns }}      → 4        ✓ có id nên lưu được
+{{ section.settings.header }}       → (rỗng)   ✗ type header không có id</code></pre>
+            </div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ═══════════════ 7 ═══════════════ -->
+    <section id="m7" class="module">
+      <header class="module__head">
+        <div class="module__top">
+          <span class="module__num">NHÓM 07</span>
+          <span class="chip">Ngày 2 · 11</span>
+        </div>
+        <h2>Global Settings, CSS &amp; Typography</h2>
+        <p class="module__note">Tầng cấu hình toàn site, và kỷ luật quản lý CSS/font để không hardcode màu rải rác khắp theme.</p>
+      </header>
+
+      <h3><code>config/settings_schema.json</code> — mảng lồng nhóm, khác hẳn Section Schema</h3>
+      <pre><code>[
+  { "name": "theme_info", "theme_name": "…", … },   ← phần tử ĐẶC BIỆT đầu tiên, KHÔNG có "settings"
+  { "name": "Typography", "settings": [ … ] },      ← 1 NHÓM = 1 tab trong Theme Settings
+  { "name": "Colors",     "settings": [ … ] }
+]</code></pre>
+      <div class="tbl">
+        <table>
+          <thead><tr><th></th><th>Section Schema</th><th><code>settings_schema.json</code></th></tr></thead>
+          <tbody>
+            <tr><td class="col-tight">Cấu trúc</td><td><code>settings[]</code> là một mảng phẳng duy nhất</td><td><code>settings[]</code> lồng trong từng object nhóm, các nhóm nằm trong mảng ngoài cùng</td></tr>
+            <tr><td class="col-tight"><code>name</code></td><td>Tên hiện trong "Add section"</td><td>Tên <strong>tab</strong> trong Theme Settings</td></tr>
+            <tr><td class="col-tight">Phần tử đầu</td><td>Không có gì đặc biệt</td><td><strong>Luôn phải là <code>theme_info</code></strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Phạm vi: <code>settings</code> vs <code>section.settings</code></h3>
+      <div class="split">
+        <div>
+          <h5>settings.xxx — toàn site</h5>
+          <p>Đọc từ <code>config/settings_schema.json</code>. Đổi một lần, áp dụng mọi trang: màu thương hiệu, font, bán kính bo góc nút.</p>
+        </div>
+        <div>
+          <h5>section.settings.xxx — scoped</h5>
+          <p>Đọc từ <code>{% schema %}</code> của <strong>một section instance cụ thể</strong>. Cùng một section đặt 2 lần trên trang có thể có 2 giá trị khác nhau.</p>
+        </div>
+      </div>
+
+      <h3><code>font_picker</code> trả về Font Object, không phải string</h3>
+      <pre><code>{{ settings.type_primary_font.family }}            → "Work Sans"
+{{ settings.type_primary_font.fallback_families }}  → "sans-serif"
+{{ settings.type_primary_font.style }}              → "normal" / "italic"
+{{ settings.type_primary_font.weight }}             → 400 / 700
+
+{{ settings.type_primary_font | font_face: font_display: 'swap' }}
+{{ settings.type_primary_font | font_modify: 'weight', 'bold' | font_face: font_display: 'swap' }}</code></pre>
+      <p>Lấy <code>.family</code> chỉ ra <em>tên</em> font — <strong>phải gọi filter <code>font_face</code></strong> trình duyệt mới thực sự tải file. Gọi nhiều lần kèm <code>font_modify</code> để tải đủ biến thể bold/italic, tránh trình duyệt tự giả lập (faux bold/italic bị vỡ nét).</p>
+
+      <h3><code>{% style %}</code> khác <code>{% stylesheet %}</code></h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th></th><th><code>{% stylesheet %}</code></th><th><code>{% style %}</code></th></tr></thead>
+          <tbody>
+            <tr><td class="col-tight">Dùng ở đâu</td><td>Chỉ trong <code>sections/</code>, <code>blocks/</code></td><td><strong>Bất kỳ đâu</strong> (snippet, layout…)</td></tr>
+            <tr><td class="col-tight">Chạy Liquid động?</td><td>❌ Không</td><td>✅ Có — dùng được <code>{{ settings.xxx }}</code></td></tr>
+            <tr><td class="col-tight">Dedupe</td><td>✅ Section lặp N lần chỉ load 1 lần</td><td>Inline tại chỗ</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Vì <code>{% style %}</code> chạy được Liquid, nó là công cụ đúng để sinh CSS variable từ global settings — đó chính là vai trò của <code>snippets/css-variables.liquid</code>.</p>
+
+      <h3>Thứ tự nạp CSS trong <code>&lt;head&gt;</code> — bắt buộc theo cascade</h3>
+      <div class="pipe">
+        <div class="pipe__row">
+          <div class="pipe__key"><i>1</i> css-variables</div>
+          <div class="pipe__val">Inline qua <code>{% render 'css-variables' %}</code> — biến màu + <code>@font-face</code> từ Admin. Nạp đầu tiên để chống nhấp nháy FOUC.</div>
+        </div>
+        <div class="pipe__arrow"></div>
+        <div class="pipe__row">
+          <div class="pipe__key"><i>2</i> critical.css</div>
+          <div class="pipe__val"><code>{{ 'critical.css' | asset_url | stylesheet_tag: preload: true }}</code> — khung lưới layout above-the-fold.</div>
+        </div>
+        <div class="pipe__arrow"></div>
+        <div class="pipe__row">
+          <div class="pipe__key"><i>3</i> theme.css</div>
+          <div class="pipe__val"><code>{{ 'theme.css' | asset_url | stylesheet_tag }}</code> — style trang trí chi tiết, <strong>luôn sau</strong> critical để ghi đè đúng thứ tự.</div>
+        </div>
+      </div>
+      <p>Nguyên tắc kèm theo: màu sắc và typography khai báo tập trung ở <code>css-variables.liquid</code> hoặc <code>:root</code>, tuyệt đối không hardcode rải rác trong từng section.</p>
+
+      <div class="trap">
+        <b>Bẫy đã gặp: sai một chữ trong <code>id</code></b>
+        <p>Gõ nhầm <code>buttno_corner_radius</code> (thay vì <code>button_corner_radius</code>) giữa <code>settings_schema.json</code> và <code>css-variables.liquid</code> → biến CSS rỗng, <strong>Liquid không báo lỗi</strong> vì gọi property không tồn tại chỉ trả về rỗng. Bài học: luôn đối chiếu <code>id</code> khớp tuyệt đối giữa nơi khai báo và nơi sử dụng — đây là dạng lỗi tốn thời gian nhất vì hoàn toàn im lặng.</p>
+      </div>
+
+      <div class="ex-set">
+        <p class="ex-set__label">Ví dụ minh hoạ</p>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 7.1</span><span class="ex__title">Từ Theme Settings tới CSS variable — chuỗi 3 file hoàn chỉnh</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Merchant chọn màu nút và bán kính bo góc trong Theme Settings, mọi nút trong theme đổi theo — không hardcode màu ở bất kỳ section nào.</p>
+            <div class="io">
+              <p class="io__label">Bước 1 — config/settings_schema.json (khai báo)</p>
+              <pre><code>{
+  "name": "Buttons",
+  "settings": [
+    { "type": "color", "id": "button_bg_color",     "label": "Màu nền nút",  "default": "#000000" },
+    { "type": "color", "id": "button_text_color",   "label": "Màu chữ nút",  "default": "#ffffff" },
+    { "type": "range", "id": "button_corner_radius", "label": "Bo góc",
+      "min": 0, "max": 40, "step": 2, "unit": "px", "default": 8 }
+  ]
+}</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Bước 2 — snippets/css-variables.liquid (sinh biến)</p>
+              <pre><code>{% style %}
+  :root {
+    --color-button-bg:     {{ settings.button_bg_color }};
+    --color-button-text:   {{ settings.button_text_color }};
+    --button-corner-radius: {{ settings.button_corner_radius }}px;
+  }
+{% endstyle %}</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Bước 3 — snippets/product-card.liquid (tiêu thụ)</p>
+              <pre><code>&lt;button class="card__add"&gt;Thêm nhanh&lt;/button&gt;
+
+{% comment %} trong assets/theme.css {% endcomment %}
+.card__add {
+  background: var(--color-button-bg);
+  color: var(--color-button-text);
+  border-radius: var(--button-corner-radius);
+}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML — merchant đã chọn nền xanh, bo 16px</p>
+              <pre><code>&lt;style&gt;
+  :root {
+    --color-button-bg:      #1f6f5c;
+    --color-button-text:    #ffffff;
+    --button-corner-radius: 16px;
+  }
+&lt;/style&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Đây là chỗ đã mắc lỗi thật: gõ <code>buttno_corner_radius</code> ở bước 2 → output ra <code>--button-corner-radius: px;</code> (thiếu số), CSS bỏ qua dòng đó, nút mất bo góc mà <strong>không có lỗi nào ở đâu cả</strong>.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 7.2</span><span class="ex__title"><code>font_picker</code>: chỉ lấy <code>.family</code> thì font không bao giờ được tải</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Merchant chọn font "Work Sans" trong Theme Settings. Chữ trên trang vẫn hiện font hệ thống, và chữ in đậm trông "béo" bất thường.</p>
+            <div class="io">
+              <p class="io__label">Code thiếu — chỉ khai tên font</p>
+              <pre><code>{% style %}
+  body { font-family: {{ settings.type_primary_font.family }}, sans-serif; }
+{% endstyle %}</code></pre>
+            </div>
+            <div class="io io--bad">
+              <p class="io__label">Output — khai tên nhưng không có file font để dùng</p>
+              <pre><code>&lt;style&gt;
+  body { font-family: Work Sans, sans-serif; }
+&lt;/style&gt;
+&lt;!-- không có @font-face → browser không có Work Sans → fallback sans-serif,
+     và tự "làm đậm" giả (faux bold) khi gặp font-weight: 700 --&gt;</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Code đủ — gọi font_face cho từng biến thể</p>
+              <pre><code>{% style %}
+  {{ settings.type_primary_font | font_face: font_display: 'swap' }}
+  {{ settings.type_primary_font | font_modify: 'weight', 'bold'
+                                | font_face: font_display: 'swap' }}
+  {{ settings.type_primary_font | font_modify: 'style', 'italic'
+                                | font_face: font_display: 'swap' }}
+
+  body {
+    font-family: {{ settings.type_primary_font.family }},
+                 {{ settings.type_primary_font.fallback_families }};
+    font-weight: {{ settings.type_primary_font.weight }};
+  }
+{% endstyle %}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML</p>
+              <pre><code>&lt;style&gt;
+  @font-face {
+    font-family: "Work Sans"; font-weight: 400; font-style: normal;
+    font-display: swap;
+    src: url("//store.myshopify.com/cdn/fonts/work_sans/…woff2") format("woff2");
+  }
+  @font-face { font-family: "Work Sans"; font-weight: 700; … }
+  @font-face { font-family: "Work Sans"; font-style: italic; … }
+
+  body { font-family: "Work Sans", sans-serif; font-weight: 400; }
+&lt;/style&gt;</code></pre>
+            </div>
+            <p class="ex__ask"><code>.family</code> chỉ là <em>tên</em>. Filter <code>font_face</code> mới là thứ sinh ra <code>@font-face</code> trỏ tới file font trên CDN Shopify — thiếu nó thì khai tên font cũng vô nghĩa.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 7.3</span><span class="ex__title"><code>{% stylesheet %}</code> không chạy Liquid — cùng ý định, hai kết quả</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Muốn màu chữ của section lấy từ setting merchant chọn. Viết trong <code>{% stylesheet %}</code> thì không ăn, phải chuyển sang <code>{% style %}</code>.</p>
+            <div class="io">
+              <p class="io__label">Code sai — Liquid trong stylesheet</p>
+              <pre><code>{% stylesheet %}
+  .hero__title { color: {{ section.settings.text_color }}; }
+{% endstylesheet %}</code></pre>
+            </div>
+            <div class="io io--bad">
+              <p class="io__label">Output CSS — Liquid không được nội suy</p>
+              <pre><code>.hero__title { color: {{ section.settings.text_color }}; }
+/* browser không hiểu → bỏ qua cả dòng, chữ về màu mặc định */</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Code đúng — dùng style cho phần động, stylesheet cho phần tĩnh</p>
+              <pre><code>{% style %}
+  #shopify-section-{{ section.id }} .hero__title {
+    color: {{ section.settings.text_color }};
+  }
+{% endstyle %}
+
+{% stylesheet %}
+  .hero__title { font-size: 2.5rem; line-height: 1.1; }
+{% endstylesheet %}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output</p>
+              <pre><code>&lt;style&gt;
+  #shopify-section-template--…__hero .hero__title { color: #1f6f5c; }
+&lt;/style&gt;
+/* phần tĩnh nằm trong bundle CSS chung, chỉ load 1 lần dù section lặp N lần */</code></pre>
+            </div>
+            <p class="ex__ask">Cách chia việc đúng: <strong>giá trị động</strong> (màu, kích thước merchant chọn) vào <code>{% style %}</code> kèm selector theo <code>section.id</code> để không rò rỉ sang instance khác; <strong>layout tĩnh</strong> vào <code>{% stylesheet %}</code> để được dedupe.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 7.4</span><span class="ex__title">Thứ tự nạp CSS trong <code>&lt;head&gt;</code> — đảo thứ tự là mất style</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Grid layout trong <code>critical.css</code> ghi đè lên style trang trí trong <code>theme.css</code>, khiến nút bị mất bo góc. Nguyên nhân là thứ tự nạp sai.</p>
+            <div class="io">
+              <p class="io__label">Code — layout/theme.liquid, đúng thứ tự</p>
+              <pre><code>&lt;head&gt;
+  {% render 'css-variables' %}
+  {{ 'critical.css' | asset_url | stylesheet_tag: preload: true }}
+  {{ 'theme.css'    | asset_url | stylesheet_tag }}
+  {{ content_for_header }}
+&lt;/head&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML</p>
+              <pre><code>&lt;head&gt;
+  &lt;style&gt;:root { --color-button-bg: #1f6f5c; … }&lt;/style&gt;
+  &lt;link rel="stylesheet" href="//…/critical.css?v=…" media="all"&gt;
+  &lt;link rel="stylesheet" href="//…/theme.css?v=…" media="all"&gt;
+  &lt;!-- script Analytics / Pixel / app do Shopify tự bơm --&gt;
+&lt;/head&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Lý do từng vị trí: <code>css-variables</code> phải <strong>inline và đầu tiên</strong> để biến có giá trị trước khi bất kỳ stylesheet nào dùng tới (chống nhấp nháy FOUC); <code>theme.css</code> phải <strong>sau</strong> <code>critical.css</code> vì hai file cùng specificity thì file sau thắng.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ═══════════════ 8 ═══════════════ -->
+    <section id="m8" class="module">
+      <header class="module__head">
+        <div class="module__top">
+          <span class="module__num">NHÓM 08</span>
+          <span class="chip">Ngày 12 · 13</span>
+        </div>
+        <h2>Đa ngôn ngữ (i18n)</h2>
+        <p class="module__note">Mỗi ngôn ngữ là <strong>hai file riêng biệt</strong> phục vụ hai đối tượng khác nhau — nhầm chỗ là dịch xong mà không thấy đổi gì.</p>
+      </header>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>File</th><th>Ai đọc</th><th>"Dây nối" trong code</th></tr></thead>
+          <tbody>
+            <tr><td><code>vi.json</code></td><td><strong>Khách hàng</strong> ngoài storefront</td><td>Filter <code>| t</code> — <code>{{ 'cart.checkout' | t }}</code></td></tr>
+            <tr><td><code>vi.schema.json</code></td><td><strong>Merchant</strong> trong Theme Editor</td><td>Tiền tố <code>t:</code> trong <code>{% schema %}</code> — <code>"label": "t:labels.menu"</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <pre><code>// locales/vi.json — tên key tuỳ đặt, nhưng phải khớp CHÍNH XÁC đường dẫn gọi trong code
+{ "cart": { "checkout": "Thanh toán", "remove": "Xoá" } }</code></pre>
+      <p>Thiếu <code>| t</code> hoặc <code>t:</code> → Shopify in ra <strong>nguyên văn chuỗi key</strong>, không tra file locale nào, dù file dịch có đầy đủ tới đâu.</p>
+
+      <h3>Tiền tố <code>t:</code> là TUỲ CHỌN, không bắt buộc</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Cách viết</th><th>Kết quả</th><th>Khi nào dùng</th></tr></thead>
+          <tbody>
+            <tr><td><code>"label": "t:labels.menu"</code></td><td>Tra key trong <code>*.schema.json</code> theo ngôn ngữ Theme Editor đang bật</td><td>Field merchant thấy được và cần đa ngôn ngữ</td></tr>
+            <tr><td><code>"label": "Menu"</code></td><td>Hiện đúng chữ "Menu", <strong>không tra file nào</strong></td><td>Không cần đa ngôn ngữ, hoặc field nội bộ (như <code>"id"</code> — merchant không thấy)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Cả hai đều hợp lệ và render UI giống nhau; khác nhau duy nhất ở việc <strong>có tự đổi theo ngôn ngữ Theme Editor hay không</strong>.</p>
+
+      <h3>Phạm vi dịch được — và không dịch được</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Loại nội dung</th><th>Dịch qua đâu</th></tr></thead>
+          <tbody>
+            <tr><td>Chữ cố định do dev viết trong theme (nút, label, tiêu đề section)</td><td>✅ <code>locales/*.json</code> + <code>*.schema.json</code></td></tr>
+            <tr><td>Nội dung merchant tự nhập (tên sản phẩm, mô tả, tên trang)</td><td>❌ Phải dùng app <strong>Shopify Translate &amp; Adapt</strong> riêng</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <b>Thêm file locale KHÔNG tự publish ngôn ngữ</b>
+        <p>Tạo <code>vi.json</code> / <code>vi.schema.json</code> chỉ là chuẩn bị sẵn nội dung dịch. Để thật sự hiện ra: Admin → <strong>Settings → Languages → Add language</strong>, sau đó ngôn ngữ ở trạng thái <em>Not published</em> — phải bấm <code>…</code> → <strong>Publish</strong>. Không cần chờ dịch xong nội dung sản phẩm, chữ cố định của theme dùng ngay file locale đã có.</p>
+      </div>
+
+      <div class="ex-set">
+        <p class="ex-set__label">Ví dụ minh hoạ</p>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 8.1</span><span class="ex__title">Nút "Thanh toán" đa ngôn ngữ — và điều gì xảy ra khi quên <code>| t</code></span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Nút checkout trong cart phải tự đổi chữ theo ngôn ngữ khách đang xem, không hardcode tiếng Việt.</p>
+            <div class="io">
+              <p class="io__label">Code — locales/en.default.json</p>
+              <pre><code>{ "cart": { "checkout": "Checkout", "remove": "Remove" } }</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Code — locales/vi.json</p>
+              <pre><code>{ "cart": { "checkout": "Thanh toán", "remove": "Xoá" } }</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Code — sections/cart.liquid</p>
+              <pre><code>&lt;button type="submit" name="checkout"&gt;{{ 'cart.checkout' | t }}&lt;/button&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output — khách xem ở locale en</p>
+              <pre><code>&lt;button type="submit" name="checkout"&gt;Checkout&lt;/button&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output — khách xem ở locale vi</p>
+              <pre><code>&lt;button type="submit" name="checkout"&gt;Thanh toán&lt;/button&gt;</code></pre>
+            </div>
+            <div class="io io--bad">
+              <p class="io__label">Output — nếu quên filter <code>| t</code></p>
+              <pre><code>Code:   &lt;button&gt;{{ 'cart.checkout' }}&lt;/button&gt;
+Output: &lt;button&gt;cart.checkout&lt;/button&gt;
+
+&lt;!-- in nguyên văn key, KHÔNG tra file locale nào,
+     dù vi.json đã dịch đầy đủ 100% --&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Tên key (<code>cart</code>, <code>checkout</code>) là do mình tự đặt. Điều kiện bắt buộc duy nhất: đường dẫn gọi trong code phải khớp <strong>chính xác</strong> cấu trúc lồng nhau trong file JSON.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 8.2</span><span class="ex__title">Tiền tố <code>t:</code> — dịch chữ merchant thấy trong Theme Editor</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Merchant người Việt mở Theme Editor: tên section và label setting nên hiện tiếng Việt. Đây là file locale <strong>khác</strong> với file dịch cho khách hàng.</p>
+            <div class="io">
+              <p class="io__label">Code — locales/vi.schema.json</p>
+              <pre><code>{
+  "general": { "header": "Đầu trang" },
+  "labels":  { "menu": "Menu điều hướng" }
+}</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Code — sections/header.liquid, khối {% schema %}</p>
+              <pre><code>{
+  "name": "t:general.header",
+  "settings": [
+    { "type": "link_list", "id": "menu",
+      "label": "t:labels.menu", "default": "main-menu" }
+  ]
+}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Kết quả — Theme Editor đang bật tiếng Việt</p>
+              <pre><code>Panel section:  "Đầu trang"
+Label setting:  "Menu điều hướng"   [ Main menu ▾ ]</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Kết quả — nếu viết thẳng "label": "Menu" (cũng hợp lệ)</p>
+              <pre><code>Label setting:  "Menu"   ← hiện y nguyên ở MỌI ngôn ngữ, không tra file nào</code></pre>
+            </div>
+            <p class="ex__ask">Cả hai cách đều hợp lệ. <code>t:</code> <strong>không bắt buộc</strong> — chỉ khác nhau ở chỗ có tự đổi theo ngôn ngữ Theme Editor hay không. Riêng <code>"id"</code> thì không bao giờ dùng <code>t:</code>, vì merchant không nhìn thấy nó.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 8.3</span><span class="ex__title">Giới hạn: nội dung merchant nhập không dịch được bằng locales</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Đã dịch đủ 2 file locale nhưng tên sản phẩm vẫn hiện tiếng Anh ở bản tiếng Việt. Cần biết ranh giới của <code>locales/</code>.</p>
+            <div class="io">
+              <p class="io__label">Code Liquid</p>
+              <pre><code>&lt;h1&gt;{{ product.title }}&lt;/h1&gt;
+&lt;button&gt;{{ 'products.add_to_cart' | t }}&lt;/button&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output — locale vi</p>
+              <pre><code>&lt;h1&gt;Cotton T-Shirt&lt;/h1&gt;      &lt;!-- KHÔNG dịch: merchant nhập ở Admin --&gt;
+&lt;button&gt;Thêm vào giỏ&lt;/button&gt;  &lt;!-- CÓ dịch: chữ cố định của theme --&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Muốn dịch cả <code>product.title</code>, <code>product.description</code>, tên page/collection thì phải cài app <strong>Shopify Translate &amp; Adapt</strong> — nằm ngoài phạm vi theme code.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ═══════════════ 9 ═══════════════ -->
+    <section id="m9" class="module">
+      <header class="module__head">
+        <div class="module__top">
+          <span class="module__num">NHÓM 09</span>
+          <span class="chip">Ngày 13</span>
+        </div>
+        <h2>Bind data thật — từ HTML tĩnh sang storefront sống</h2>
+        <p class="module__note">Nhóm kiến thức của giai đoạn clone thiết kế thật (project <code>ecommerce-theme</code>): biến markup tĩnh thành tính năng chạy được, đúng thứ tự.</p>
+      </header>
+
+      <h3>Quy trình chuyển đổi ba bước</h3>
+      <div class="pipe">
+        <div class="pipe__row">
+          <div class="pipe__key"><i>BƯỚC 1</i> HTML tĩnh</div>
+          <div class="pipe__val">Dựng markup + CSS với data giả, chốt xong layout trước khi lo dữ liệu</div>
+        </div>
+        <div class="pipe__arrow"></div>
+        <div class="pipe__row">
+          <div class="pipe__key"><i>BƯỚC 2</i> Bind object có sẵn</div>
+          <div class="pipe__val">Thay data giả bằng <code>cart.item_count</code>, <code>routes.account_url</code>, <code>routes.search_url</code> — làm ngay, không cần schema</div>
+        </div>
+        <div class="pipe__arrow"></div>
+        <div class="pipe__row">
+          <div class="pipe__key"><i>BƯỚC 3</i> Thêm <code>{% schema %}</code></div>
+          <div class="pipe__val">Từng setting một cho phần cần merchant nhập (nav menu <code>link_list</code>, text announcement bar). Code Liquid viết trước sẽ tạm rỗng, chỉ "sống" khi schema có</div>
+        </div>
+      </div>
+
+      <h3>Form search — submit thật, không cần một dòng JS</h3>
+      <pre><code>&lt;form action="{{ routes.search_url }}" method="get" role="search"&gt;
+  &lt;input type="search" name="q" value="{{ search.terms | escape }}"&gt;
+&lt;/form&gt;</code></pre>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Thuộc tính</th><th>Vai trò</th></tr></thead>
+          <tbody>
+            <tr><td><code>action="{{ routes.search_url }}"</code></td><td>Route object có sẵn, luôn resolve ra <code>/search</code> đúng theo market</td></tr>
+            <tr><td><code>method="get"</code></td><td>Search chỉ đọc, không đổi state → URL kết quả <strong>share / bookmark được</strong> (<code>?q=…</code>)</td></tr>
+            <tr><td><code>name="q"</code></td><td><strong>Bắt buộc đúng tên này</strong> — key backend Shopify đọc. Đặt tên khác thì <code>/search</code> vẫn load nhưng không tìm được gì</td></tr>
+            <tr><td><code>value="{{ search.terms | escape }}"</code></td><td><code>search</code> chỉ có data khi đang ở trang <code>/search</code> — dùng để điền lại từ khoá vừa tìm vào ô input</td></tr>
+            <tr><td><code>role="search"</code></td><td>ARIA landmark — screen reader nhảy thẳng tới vùng search</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Cơ chế: với <code>method="get"</code>, trình duyệt tự ghép mọi input thành query string, lấy <code>name</code> làm key. Gõ "áo thun" → Enter → tự ra <code>/search?q=áo+thun</code>.</p>
+
+      <h3><code>link.url</code> — Shopify tự resolve, dev không gõ tay</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Merchant chọn ở Admin</th><th><code>link.type</code></th><th><code>link.url</code> resolve ra</th></tr></thead>
+          <tbody>
+            <tr><td>Trang chủ</td><td><code>frontpage_link</code></td><td><code>/</code></td></tr>
+            <tr><td>Một collection cụ thể</td><td><code>collection_link</code></td><td><code>/collections/handle</code></td></tr>
+            <tr><td>Một product cụ thể</td><td><code>product_link</code></td><td><code>/products/handle</code></td></tr>
+            <tr><td>Một page</td><td><code>page_link</code></td><td><code>/pages/handle</code></td></tr>
+            <tr><td>Link ngoài tự nhập</td><td><code>http_link</code></td><td>Y hệt URL merchant gõ</td></tr>
+            <tr><td>Item cha có sub-menu</td><td>—</td><td><code>link.links</code> chứa mảng link con</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Một store có thể có nhiều menu (Main menu, Footer menu…). Setting <code>link_list</code> chính là dropdown cho merchant chọn menu nào áp vào section đó:</p>
+      <pre><code>{ "type": "link_list", "id": "menu", "label": "Menu điều hướng", "default": "main-menu" }</code></pre>
+
+      <div class="note">
+        <b>Điểm mấu chốt về phân chia trách nhiệm</b>
+        <p>Merchant thêm / xoá / sắp xếp nav item, đổi collection nào được link tới — làm hết ở Admin, <strong>theme code không đổi một dòng</strong>. Code định nghĩa <em>cách hiển thị</em>, Admin định nghĩa <em>nội dung</em>. Đây là lý do Shopify tách hai phần này ra, và cũng là tiêu chí đánh giá một theme viết tốt hay không.</p>
+      </div>
+
+      <div class="ex-set">
+        <p class="ex-set__label">Ví dụ minh hoạ</p>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 9.1</span><span class="ex__title">Ô search hoạt động thật — và điều gì xảy ra khi đặt sai <code>name</code></span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Ô tìm kiếm trong header phải submit được, URL kết quả phải share/bookmark được, và khi vào trang kết quả thì từ khoá vừa gõ vẫn còn trong input.</p>
+            <div class="io">
+              <p class="io__label">Code — sections/header.liquid</p>
+              <pre><code>&lt;form action="{{ routes.search_url }}" method="get" role="search"&gt;
+  &lt;input type="search" name="q" value="{{ search.terms | escape }}"
+         placeholder="{{ 'general.search.placeholder' | t }}"&gt;
+  &lt;button type="submit"&gt;{% render 'icon-search' %}&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output HTML — ở trang chủ</p>
+              <pre><code>&lt;form action="/search" method="get" role="search"&gt;
+  &lt;input type="search" name="q" value="" placeholder="Tìm sản phẩm..."&gt;
+  &lt;button type="submit"&gt;&lt;svg&gt;…&lt;/svg&gt;&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Hành vi — gõ "áo thun" rồi Enter</p>
+              <pre><code>Browser tự ghép query string từ thuộc tính name:
+  → /search?q=áo+thun
+
+Output HTML ở trang kết quả (search.terms giờ đã có data):
+  &lt;input type="search" name="q" value="áo thun" …&gt;   ← từ khoá được điền lại</code></pre>
+            </div>
+            <div class="io io--bad">
+              <p class="io__label">Nếu đặt <code>name="search"</code> thay vì <code>name="q"</code></p>
+              <pre><code>  → /search?search=áo+thun
+
+Trang /search VẪN load bình thường, không lỗi gì,
+nhưng luôn ra "0 kết quả" — vì backend Shopify chỉ đọc key "q".</code></pre>
+            </div>
+            <p class="ex__ask">Cả form không cần một dòng JS: <code>method="get"</code> khiến browser tự làm việc ghép query string, lấy <code>name</code> làm key.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 9.2</span><span class="ex__title">Setting <code>link_list</code> — merchant đổi menu, HTML đổi, code không đổi</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Header và footer đều render menu, nhưng dùng 2 menu khác nhau trong Admin. Không được hardcode <code>linklists['main-menu']</code> vì mỗi store đặt tên menu khác nhau.</p>
+            <div class="io">
+              <p class="io__label">Code — {% schema %}, cho merchant tự chọn menu</p>
+              <pre><code>"settings": [
+  { "type": "link_list", "id": "menu",
+    "label": "Menu điều hướng", "default": "main-menu" }
+]</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Code Liquid — dùng chung cho mọi menu</p>
+              <pre><code>{%- for link in section.settings.menu.links -%}
+  &lt;a href="{{ link.url }}"&gt;{{ link.title }}&lt;/a&gt;
+{%- endfor -%}</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output — section header, merchant chọn "Main menu"</p>
+              <pre><code>&lt;a href="/"&gt;Trang chủ&lt;/a&gt;
+&lt;a href="/collections/all"&gt;Cửa hàng&lt;/a&gt;
+&lt;a href="/pages/lien-he"&gt;Liên hệ&lt;/a&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output — cùng đoạn code đó ở footer, merchant chọn "Footer menu"</p>
+              <pre><code>&lt;a href="/pages/chinh-sach-doi-tra"&gt;Chính sách đổi trả&lt;/a&gt;
+&lt;a href="/pages/bao-mat"&gt;Bảo mật&lt;/a&gt;</code></pre>
+            </div>
+            <p class="ex__ask">Merchant sau đó đổi "Cửa hàng" trỏ từ <code>/collections/all</code> sang collection "Hàng mới về" — <code>link.url</code> tự resolve thành <code>/collections/hang-moi-ve</code>, dev không biết và cũng không cần biết.</p>
+          </div>
+        </details>
+
+        <details class="ex">
+          <summary><span class="ex__chev"></span><span class="ex__tag">VD 9.3</span><span class="ex__title">Ba bước từ HTML tĩnh sang động — cùng một icon cart</span></summary>
+          <div class="ex__body">
+            <p class="ex__ask"><b>Bài toán</b> Vừa clone xong header từ Figma, markup đang là HTML tĩnh với số "3" gõ cứng. Đi đúng thứ tự 3 bước để không phải sửa lại layout khi bind data.</p>
+            <div class="io">
+              <p class="io__label">Bước 1 — HTML tĩnh, data giả (chốt layout &amp; CSS trước)</p>
+              <pre><code>&lt;a href="/cart" class="header__cart"&gt;
+  &lt;img src="icon-cart.svg" alt=""&gt;
+  &lt;span class="header__cart-badge"&gt;3&lt;/span&gt;
+&lt;/a&gt;</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Bước 2 — bind object có sẵn (chưa cần schema)</p>
+              <pre><code>&lt;a href="{{ routes.cart_url }}" class="header__cart"&gt;
+  {% render 'icon-cart' %}
+  {%- if cart.item_count &gt; 0 -%}
+    &lt;span class="header__cart-badge"&gt;{{ cart.item_count }}&lt;/span&gt;
+  {%- endif -%}
+&lt;/a&gt;</code></pre>
+            </div>
+            <div class="io io--out">
+              <p class="io__label">Output sau bước 2 — đã sống thật</p>
+              <pre><code>&lt;a href="/cart" class="header__cart"&gt;
+  &lt;svg class="icon icon-cart"&gt;…&lt;/svg&gt;
+&lt;/a&gt;
+&lt;!-- badge tự biến mất vì giỏ đang rỗng, không cần merchant cấu hình gì --&gt;</code></pre>
+            </div>
+            <div class="io">
+              <p class="io__label">Bước 3 — thêm schema cho phần cần merchant nhập</p>
+              <pre><code>{% comment %} Code Liquid viết trước, tạm rỗng vì chưa có schema {% endcomment %}
+{%- if section.settings.show_cart_label -%}
+  &lt;span class="header__cart-text"&gt;{{ 'general.cart' | t }}&lt;/span&gt;
+{%- endif -%}
+
+{% schema %}
+{
+  "settings": [
+    { "type": "checkbox", "id": "show_cart_label",
+      "label": "Hiện chữ cạnh icon giỏ hàng", "default": false }
+  ]
+}
+{% endschema %}</code></pre>
+            </div>
+            <p class="ex__ask">Vì sao đúng thứ tự này quan trọng: bước 2 cho kết quả nhìn thấy ngay mà không phụ thuộc gì; nếu làm ngược (viết schema trước) thì suốt quá trình dựng layout mọi thứ đều rỗng, không biết CSS đã đúng chưa.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ═══════════════ PHỤ LỤC A ═══════════════ -->
+    <section id="bay" class="module">
+      <header class="module__head">
+        <div class="module__top">
+          <span class="module__num">PHỤ LỤC A</span>
+          <span class="chip">xuyên suốt 13 ngày</span>
+        </div>
+        <h2>Bẫy &amp; bài học thực chiến</h2>
+        <p class="module__note">Toàn bộ đều là lỗi <strong>im lặng</strong> — Liquid không throw exception, <code>theme check</code> pass sạch, chỉ có kết quả sai hoặc rỗng. Đây là phần tốn thời gian debug nhiều nhất và cũng là phần có giá trị chuyển giao cao nhất cho người mới.</p>
+      </header>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Triệu chứng</th><th>Nguyên nhân thật</th><th>Cách xử lý / phòng ngừa</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>"No blocks available for this section" khi bấm Add block</td>
+              <td>File <code>blocks/*.liquid</code> thiếu <code>presets</code></td>
+              <td><code>grep -c presets blocks/*.liquid</code>, file nào ra <code>0</code> thì thêm <code>"presets": [{ "name": "…" }]</code></td>
+            </tr>
+            <tr>
+              <td>Snippet render ra rỗng, không lỗi</td>
+              <td>Snippet đọc <code>product</code> nhưng người gọi đặt tên biến lặp là <code>item</code> — isolated scope nên <code>product = nil</code></td>
+              <td>Khai <code>@param</code> trong <code>{% doc %}</code> và luôn truyền tường minh <code>product: item</code></td>
+            </tr>
+            <tr>
+              <td>Biến CSS rỗng, style không áp dụng</td>
+              <td>Gõ sai <code>id</code> setting giữa hai file (<code>buttno_</code> vs <code>button_</code>)</td>
+              <td>Đối chiếu <code>id</code> khớp tuyệt đối giữa nơi khai báo và nơi dùng — Liquid trả rỗng thay vì báo lỗi</td>
+            </tr>
+            <tr>
+              <td>Block không render dù đã khai đủ</td>
+              <td>Viết <code>{% case block.icon_with_text %}</code></td>
+              <td><code>case</code> nhận <strong>tên biến</strong> (<code>block.type</code>); giá trị so sánh chỉ xuất hiện trong <code>when</code></td>
+            </tr>
+            <tr>
+              <td>Danh sách sản phẩm bị cắt ở phần tử thứ 50</td>
+              <td>Giới hạn cứng 50 iterations của vòng <code>for</code></td>
+              <td>Bọc <code>{% paginate … by N %}</code> — bắt buộc về mặt kỹ thuật, không chỉ vì UX</td>
+            </tr>
+            <tr>
+              <td>Sửa <code>templates/collection.liquid</code> mà trang không đổi</td>
+              <td>Đã tồn tại <code>collection.json</code> cùng tên → file <code>.liquid</code> không được route tới</td>
+              <td>Sửa section mà JSON trỏ tới (<code>"type": "collection"</code>)</td>
+            </tr>
+            <tr>
+              <td>Chữ hiện ra là <code>cart.checkout</code> thay vì "Thanh toán"</td>
+              <td>Thiếu <code>| t</code> (storefront) hoặc <code>t:</code> (schema)</td>
+              <td>Không có "dây nối" thì Shopify in nguyên văn key, dù file dịch đầy đủ</td>
+            </tr>
+            <tr>
+              <td>Theme Editor không highlight đúng block khi hover</td>
+              <td>Thiếu <code>{{ block.shopify_attributes }}</code> trên thẻ HTML gốc của block</td>
+              <td>Luôn đặt attribute này ở thẻ ngoài cùng mỗi block</td>
+            </tr>
+            <tr>
+              <td>Font hiện sai nét, bold bị "béo" bất thường</td>
+              <td>Chỉ lấy <code>.family</code> mà không gọi <code>| font_face</code> → trình duyệt tự giả lập faux bold</td>
+              <td>Gọi <code>font_face</code> cho từng biến thể qua <code>font_modify</code></td>
+            </tr>
+            <tr>
+              <td><code>/search</code> load được nhưng không ra kết quả</td>
+              <td>Input search đặt <code>name</code> khác <code>"q"</code></td>
+              <td><code>name="q"</code> là key cố định phía backend Shopify</td>
+            </tr>
+            <tr>
+              <td>App / tracking không hoạt động, không lỗi rõ ràng</td>
+              <td>Thiếu <code>{{ content_for_header }}</code> trong <code>&lt;head&gt;</code></td>
+              <td>Hai thẻ hệ thống này là bắt buộc, không được bỏ khi tự viết layout</td>
+            </tr>
+            <tr>
+              <td>Sửa classic block ở section A, section B không đổi theo</td>
+              <td>Classic block chỉ tồn tại trong đúng file section đã khai nó</td>
+              <td>Cần tái dùng chéo thì chuyển sang Theme block (<code>@theme</code> + file trong <code>blocks/</code>)</td>
+            </tr>
+            <tr>
+              <td>Theme Editor báo lỗi parse locale</td>
+              <td>Trailing comma trong file JSON</td>
+              <td>JSON không cho dấu phẩy cuối — chạy <code>theme check</code> trước khi push</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <b>Kết luận rút ra</b>
+        <p>Đặc trưng của Shopify theme development là <strong>lỗi không ồn ào</strong>: Liquid thiết kế theo hướng "fail mềm" để một sản phẩm thiếu ảnh không làm sập cả storefront. Hệ quả là kỹ năng quan trọng nhất không phải đọc stack trace, mà là <strong>biết chỗ nào Shopify sẽ im lặng</strong> và chủ động kiểm tra ở đúng chỗ đó: khớp <code>id</code>, khớp <code>type</code>, có <code>presets</code>, có "dây nối" <code>| t</code>.</p>
+      </div>
+    </section>
+
+    <!-- ═══════════════ PHỤ LỤC B ═══════════════ -->
+    <section id="sanpham" class="module">
+      <header class="module__head">
+        <div class="module__top">
+          <span class="module__num">PHỤ LỤC B</span>
+          <span class="chip">bằng chứng thực hành</span>
+        </div>
+        <h2>Sản phẩm đã xây</h2>
+        <p class="module__note">Mỗi nhóm kiến thức đều được nghiệm thu bằng file chạy thật trong theme, không dừng ở đọc tài liệu.</p>
+      </header>
+
+      <h3>Project 1 — <code>my-first-theme</code> (theme học, dựng từ đầu)</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>File</th><th>Kiến thức nghiệm thu</th><th>Nhóm</th></tr></thead>
+          <tbody>
+            <tr><td><code>snippets/store-info.liquid</code></td><td>Global object, output tag</td><td class="col-tight">3 · 4</td></tr>
+            <tr><td><code>snippets/product-price.liquid</code></td><td>Filter chaining, <code>money</code>, tính % giảm giá</td><td class="col-tight">3</td></tr>
+            <tr><td><code>snippets/product-list-sample.liquid</code></td><td>Vòng <code>for</code>, badge theo điều kiện, fallback mock data bằng <code>placeholder_svg_tag</code></td><td class="col-tight">3</td></tr>
+            <tr><td><code>snippets/product-card.liquid</code></td><td>Component chuẩn OS 2.0: LiquidDoc, aspect ratio, <code>srcset</code>, <code>price_varies</code>, Quick Add</td><td class="col-tight">5</td></tr>
+            <tr><td><code>snippets/css-variables.liquid</code></td><td><code>{% style %}</code> sinh CSS variable từ global settings</td><td class="col-tight">7</td></tr>
+            <tr><td><code>sections/collection.liquid</code></td><td>Mini-project Collection Page: <code>paginate</code> theo setting, grid responsive, tái dùng <code>product-card</code></td><td class="col-tight">2 · 3 · 6</td></tr>
+            <tr><td><code>sections/feature-banner.liquid</code></td><td><code>image_picker</code>, <code>text_alignment</code>, <code>header</code>, Theme block <code>@theme</code>, 2 <code>presets</code></td><td class="col-tight">6</td></tr>
+            <tr><td><code>sections/trust-badge.liquid</code></td><td>Classic block <code>icon_with_text</code> (<code>limit: 3</code>), <code>case block.type</code>, <code>presets.blocks</code></td><td class="col-tight">6</td></tr>
+            <tr><td><code>sections/custom-section.liquid</code> + <code>blocks/group,text</code></td><td>Theme block lồng nhau, <code>block_order</code> trong JSON template</td><td class="col-tight">6</td></tr>
+            <tr><td><code>sections/header-group.json</code>, <code>footer-group.json</code></td><td>Section Group, <code>{% sections %}</code></td><td class="col-tight">2</td></tr>
+            <tr><td><code>config/settings_schema.json</code></td><td>Nhóm "Buttons": <code>button_bg_color</code>, <code>button_text_color</code>, <code>button_corner_radius</code></td><td class="col-tight">7</td></tr>
+            <tr><td><code>locales/vi.*</code>, <code>locales/fr.*</code></td><td>Đa ngôn ngữ đầy đủ 2 tầng cho tiếng Việt và tiếng Pháp</td><td class="col-tight">8</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><strong>Quy mô:</strong> 16 section · 7 snippet · 2 block · 11 JSON template · 6 file locale (3 ngôn ngữ). <code>shopify theme check</code> chạy sạch 43 files, 0 offense.</p>
+
+      <h3>Project 2 — <code>ecommerce-theme</code> (clone thiết kế thật từ Figma)</h3>
+      <p>Giai đoạn áp dụng: chuyển thiết kế SHOP.CO từ Figma thành theme chạy được, mỗi section đều là bài kiểm tra tổng hợp cả 9 nhóm kiến thức.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>File</th><th>Kiến thức nghiệm thu</th></tr></thead>
+          <tbody>
+            <tr><td><code>sections/header.liquid</code></td><td>Cart badge (<code>cart.item_count</code>), account (<code>routes.account_url</code>), search form (<code>name="q"</code> + <code>search.terms</code>), nav menu qua <code>link_list</code></td></tr>
+            <tr><td><code>sections/slideshow.liquid</code> + <code>blocks/slide.liquid</code></td><td>Theme block có <code>presets</code>, kèm bài học "No blocks available"</td></tr>
+            <tr><td><code>sections/footer.liquid</code> + <code>blocks/link_list.liquid</code></td><td>Nhiều menu trong một footer, block tái dùng</td></tr>
+            <tr><td><code>sections/logo-list.liquid</code> + <code>blocks/logo.liquid</code></td><td>Block danh sách logo thương hiệu</td></tr>
+            <tr><td><code>sections/featured-collection.liquid</code></td><td>Setting <code>collection</code> trả object đầy đủ, tái dùng <code>product-card</code></td></tr>
+            <tr><td><code>sections/collections-grid.liquid</code> + <code>blocks/collection-card.liquid</code></td><td>Browse by dress style</td></tr>
+            <tr><td><code>sections/testimonials.liquid</code> + <code>blocks/testimonial.liquid</code> + <code>snippets/rating-stars.liquid</code></td><td>Component đánh giá sao, giữ listener khi Theme Editor render lại section</td></tr>
+            <tr><td><code>sections/product.liquid</code></td><td>Main product: gallery, variant picker, add to cart</td></tr>
+            <tr><td><code>sections/product-tabs.liquid</code></td><td>Metafield (<code>rich_text</code>, <code>list.metaobject_reference</code>), classic block + <code>where</code> filter, <code>&lt;details&gt;</code> native cho FAQ</td></tr>
+            <tr><td><code>sections/related-products.liquid</code>, <code>sections/collection.liquid</code></td><td>Trang collection và gợi ý sản phẩm</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><strong>Quy mô:</strong> 11 section · 5 snippet · 5 block · 3 JSON template. Toàn bộ style viết bằng SCSS build ra <code>theme.css</code>.</p>
+      <p class="module__note">Ghi chú phạm vi: tài liệu tổng hợp nguồn dừng ở Ngày 13 (header). Các section product/collection/tabs thuộc phần làm sau, chi tiết tiến độ và các mục chờ verify nằm ở <code>docs/continue-here.md</code>.</p>
+    </section>
+
+    <!-- ═══════════════ PHỤ LỤC C ═══════════════ -->
+    <section id="tiendo" class="module">
+      <header class="module__head">
+        <div class="module__top">
+          <span class="module__num">PHỤ LỤC C</span>
+          <span class="chip">đánh giá &amp; kế hoạch</span>
+        </div>
+        <h2>Tiến độ &amp; bước tiếp theo</h2>
+      </header>
+
+      <h3>Checkpoint đã đạt</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Giai đoạn</th><th>Nội dung</th><th>Trạng thái</th></tr></thead>
+          <tbody>
+            <tr><td>1 – 2 · Nền tảng &amp; Liquid</td><td>Setup, cấu trúc theme, objects, filters, tags, snippets, Liquid nâng cao</td><td>✅ Hoàn thành</td></tr>
+            <tr><td>3 · Theme Architecture</td><td>Layout, templates, sections, blocks, global settings, locales</td><td>✅ Hoàn thành — đạt checkpoint roadmap "tạo được theme với section drag-and-drop trong Theme Editor"</td></tr>
+            <tr><td>4 · Storefront hoàn chỉnh</td><td>Header, footer, product page, collection page trên theme clone thiết kế thật</td><td>🔄 Đang làm</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Bộ khung section theo yêu cầu roadmap</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>File roadmap yêu cầu</th><th>Trạng thái</th></tr></thead>
+          <tbody>
+            <tr><td><code>header.liquid</code>, <code>footer.liquid</code></td><td>✅ Đã có ở cả 2 project</td></tr>
+            <tr><td><code>hero-banner.liquid</code></td><td>⚠️ Làm tương đương ở <code>feature-banner.liquid</code> và <code>slideshow.liquid</code></td></tr>
+            <tr><td><code>feature-columns.liquid</code></td><td>⚠️ Làm tương đương ở <code>trust-badge.liquid</code></td></tr>
+            <tr><td><code>announcement-bar.liquid</code>, <code>rich-text.liquid</code></td><td>❌ Chưa làm</td></tr>
+            <tr><td><code>featured-collection.liquid</code></td><td>✅ Đã có ở <code>ecommerce-theme</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Kế hoạch tiếp</h3>
+      <ol>
+        <li><strong>Hoàn thiện Product Page</strong> — verify tab bar / keyboard nav / accordion FAQ trên browser thật, chốt giữ hay bỏ <code>product-tabs</code>.</li>
+        <li><strong>Cart Page &amp; Cart Drawer</strong> — nhóm kiến thức chưa chạm tới: Cart AJAX API, Section Rendering API.</li>
+        <li><strong>Announcement bar &amp; rich-text</strong> — đóng nốt bộ khung section theo roadmap.</li>
+        <li><strong>Tối ưu hiệu năng</strong> — đo Lighthouse, rà lại lazy load ảnh, thứ tự nạp CSS, kích thước bundle.</li>
+      </ol>
+    </section>
+
+    <!-- ═══════════════ PHỤ LỤC D ═══════════════ -->
+    <section id="cheatsheet" class="module">
+      <header class="module__head">
+        <div class="module__top">
+          <span class="module__num">PHỤ LỤC D</span>
+          <span class="chip">tra cứu nhanh</span>
+        </div>
+        <h2>Cheat-sheet cú pháp Liquid</h2>
+      </header>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Loại</th><th>Ký hiệu</th><th>Mục đích</th><th>Ví dụ</th></tr></thead>
+          <tbody>
+            <tr><td>Output</td><td><code>{{ }}</code></td><td>In dữ liệu ra HTML</td><td><code>{{ product.title }}</code></td></tr>
+            <tr><td>Tag logic</td><td><code>{% %}</code></td><td>Rẽ nhánh &amp; vòng lặp</td><td><code>{% if product.available %}</code></td></tr>
+            <tr><td>Filter</td><td><code>|</code></td><td>Biến đổi dữ liệu</td><td><code>{{ product.price | money }}</code></td></tr>
+            <tr><td>Comment nhiều dòng</td><td><code>{% comment %}</code></td><td>Ghi chú không in ra HTML</td><td><code>{% comment %} Note {% endcomment %}</code></td></tr>
+            <tr><td>Comment inline</td><td><code>{% # %}</code></td><td>Ghi chú gọn 1 dòng</td><td><code>{% # Inline note %}</code></td></tr>
+            <tr><td>Trim whitespace</td><td><code>{%- -%}</code></td><td>Xoá khoảng trắng thừa</td><td><code>{%- assign x = 1 -%}</code></td></tr>
+            <tr><td>Khối logic gọn</td><td><code>{% liquid %}</code></td><td>Gom nhiều tag logic vào 1 khối</td><td><code>{% liquid assign a = 1 … %}</code></td></tr>
+            <tr><td>Render snippet</td><td><code>{% render %}</code></td><td>Nhúng component, isolated scope</td><td><code>{% render 'product-card', product: item %}</code></td></tr>
+            <tr><td>Render section</td><td><code>{% section %}</code> / <code>{% sections %}</code></td><td>1 section / cả một nhóm section</td><td><code>{% sections 'header-group' %}</code></td></tr>
+            <tr><td>Theme block</td><td><code>{% content_for 'blocks' %}</code></td><td>Render toàn bộ theme block của section</td><td>—</td></tr>
+            <tr><td>Iteration</td><td><code>{% for %}</code></td><td>Duyệt mảng (tối đa 50 phần tử)</td><td><code>{% for item in cart.items %}</code></td></tr>
+            <tr><td>Assign</td><td><code>{% assign %}</code></td><td>Gán biến đơn</td><td><code>{% assign is_sale = true %}</code></td></tr>
+            <tr><td>Capture</td><td><code>{% capture %}</code></td><td>Gói khối HTML vào biến</td><td><code>{% capture html %}…{% endcapture %}</code></td></tr>
+            <tr><td>Pagination</td><td><code>{% paginate %}</code></td><td>Phân trang mảng lớn</td><td><code>{% paginate collection.products by 12 %}</code></td></tr>
+            <tr><td>Doc</td><td><code>{% doc %}</code></td><td>Khai báo <code>@param</code> cho snippet</td><td><code>@param {Object} product</code></td></tr>
+            <tr><td>CSS động</td><td><code>{% style %}</code></td><td>CSS có chạy Liquid, dùng mọi nơi</td><td><code>color: {{ settings.text_color }}</code></td></tr>
+            <tr><td>CSS section</td><td><code>{% stylesheet %}</code></td><td>CSS tĩnh, Shopify tự dedupe</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="closing">
+      <p>Báo cáo tổng hợp từ <code>docs/shopify-liquid-summary.md</code> — 13 ngày lộ trình, sắp xếp lại theo 9 nhóm chuyên môn. Tài liệu đi kèm: <code>docs/shopify-practical-techniques.md</code> (sổ tay kỹ thuật thực tế: aspect-ratio box chống CLS, responsive <code>srcset</code>, Section Rendering API…), <code>docs/continue-here.md</code> (tiến độ chi tiết), <code>docs/shopify_theme_roadmap_detail.md</code> (lộ trình đầy đủ).</p>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  document.querySelectorAll("[data-exall]").forEach(function (btn) {
+    var text = btn.querySelector("span");
+    btn.addEventListener("click", function () {
+      var opening = btn.getAttribute("aria-pressed") !== "true";
+      document.querySelectorAll("details.ex").forEach(function (d) { d.open = opening; });
+      btn.setAttribute("aria-pressed", String(opening));
+      text.textContent = opening ? "Đóng tất cả ví dụ" : "Mở tất cả ví dụ";
+    });
+  });
+</script>
